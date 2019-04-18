@@ -163,6 +163,27 @@ void amo::Char::convert(char dest[], int n, int base) { //like atoi()
 	std::cout << "[Char::convert(char*,int,int)]: dest:" << dest << std::endl;
 }
 
+void amo::Char::resolve(char* p, amo::Stack<float>& stack) {
+	float factor = 10;
+	float fraction = 0.1f;
+	stack.push(0);
+	while (isdigit(*p)) {
+		std::cout << std::fixed << std::setprecision(4) << "[Char::resolve()]: integer resolving:" << *p-'0' << std::endl;
+		stack.push(stack.pop()*factor+(*p-'0'));
+		p++;
+	}
+	if ('.' != *p) return;
+	else p++;
+	while (isdigit(*p)) {
+		std::cout << "[Char::resolve()]: fraction resolving:" << *p-'0' << ", fraction:" << fraction << ", top:" << stack.top() << std::endl;
+		stack.push(stack.pop()+(*p-'0')*fraction);
+		fraction /= 10;
+		p++;
+	}
+	std::cout << "[Char::resolve()]: top of stack:" << stack.top() << std::endl;
+	std::cout.unsetf( std::ios::fixed );
+}
+
 void amo::Char::append(char* exp, int opnd) {
 	int n = strlen(exp);
 	int len;

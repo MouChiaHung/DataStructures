@@ -2374,7 +2374,7 @@ int main(int argc, char *argv[])
 #if 1
 	std::cout << GREEN << "****************** stack ******************\n" << WHITE << std::endl;
 	
-#if 0		
+#if 0	
 	amo::Stack<int> stack;
 	cout << GREEN << "going to push" << WHITE << endl;
 	for (int i=0;i<5;i++) stack.push(i);
@@ -2385,21 +2385,21 @@ int main(int argc, char *argv[])
 	
 	cout << GREEN << "going to convert" << WHITE << endl;
 	amo::Stack<char> s;
-	(amo::Number::getInstance()).convert(s, 4321, 10);
+	(amo::Char::getInstance()).convert(s, 4321, 10);
 	s.traverse();
 	
 
 	cout << GREEN << "going to check parenthesis" << WHITE << endl;
-	char exp[] = "_(ab(cd)e(rrrf()))_";
+	char express[] = "_(ab(cd)e(rrrf()))_";
 	//int lo=0, hi;
-	//hi = sizeof(exp)/sizeof(exp[0]);
-	//amo::Char::getInstance().paren(exp, lo, hi);
-	int len = sizeof(exp)/sizeof(exp[0]);
-	amo::Char::getInstance().paren(exp, len);
+	//hi = sizeof(express)/sizeof(express[0]);
+	//amo::Char::getInstance().paren(express, lo, hi);
+	int len = sizeof(express)/sizeof(express[0]);
+	amo::Char::getInstance().paren(express, len);
 	
 	amo::Stack<float> resolves;
 	resolves.push(999);
-	amo::Number::getInstance().resolve("321.123", resolves);
+	amo::Char::getInstance().resolve("321.123", resolves);
 	resolves.traverse();
 #endif		
 

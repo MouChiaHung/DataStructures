@@ -264,27 +264,6 @@ int amo::Number::fibonacci(int n, int& prev) {
 	}
 }
 
-void amo::Number::resolve(char* p, amo::Stack<float>& stack) {
-	float factor = 10;
-	float fraction = 0.1f;
-	stack.push(0);
-	while (isdigit(*p)) {
-		std::cout << std::fixed << std::setprecision(4) << "[Number::resolve()]: integer resolving:" << *p-'0' << std::endl;
-		stack.push(stack.pop()*factor+(*p-'0'));
-		p++;
-	}
-	if ('.' != *p) return;
-	else p++;
-	while (isdigit(*p)) {
-		std::cout << "[Number::resolve()]: fraction resolving:" << *p-'0' << ", fraction:" << fraction << ", top:" << stack.top() << std::endl;
-		stack.push(stack.pop()+(*p-'0')*fraction);
-		fraction /= 10;
-		p++;
-	}
-	std::cout << "[Number::resolve()]: top of stack:" << stack.top() << std::endl;
-	std::cout.unsetf( std::ios::fixed );
-}
-
 amo::Operator amo::Number::toOp(char op) {
 	switch (op) {
 		case '+' : return ADD;

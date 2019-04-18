@@ -30,7 +30,6 @@ public:
 	int factory(int n);
 	int fibonacci(int n);
 	int fibonacci(int n, int& prev);
-	void resolve(char* p, amo::Stack<float>& stack);
 	std::vector<char> rePolish(std::vector<char>& infix);
 	int evaluate(char* rpn);
 };

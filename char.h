@@ -21,6 +21,7 @@ public:
 	void append(char* exp, int opnd);
 	void convert(amo::Stack<char>& stack, int n, int base);
 	void convert(char* dest, int n, int base);
+	void resolve(char* p, amo::Stack<float>& stack);
 };
 
 };
