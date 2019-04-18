@@ -2405,23 +2405,41 @@ int main(int argc, char *argv[])
 
 	//cout << GREEN << "isCal:" << amo::Number::getInstance().isCal('(') << WHITE << endl;
 	//cout << GREEN << "isPrior:" << amo::Number::getInstance().isPrior('*', '+') << WHITE << endl;
+	//cout << GREEN << "power:" << amo::Number::getInstance().power(5, 3) << WHITE << std::endl;
+	//cout << GREEN << "factory:" << amo::Number::getInstance().factory(5) << WHITE << std::endl;
 	
-	char exp[] = "(1*((2+3)+4))";
+	char exp[] = "( 6 *((2+3)+4))";
+	//char exp[] = "1+2";
+	amo::Char::getInstance().append(exp, '/');
+	amo::Char::getInstance().append(exp, 5);
+	amo::Char::getInstance().append(exp, '+');
+	amo::Char::getInstance().append(exp, '!');
+	amo::Char::getInstance().append(exp, 3);
+	amo::Char::getInstance().append(exp, '+');
+	amo::Char::getInstance().append(exp, 3);
+	amo::Char::getInstance().append(exp, '^');
+	amo::Char::getInstance().append(exp, 2);
+	
+	
 	std::vector<char> infix;
 	for (int i=0;i<strlen(exp);i++) infix.push_back(exp[i]);
 	std::cout << GREEN << "Original infix:";
 		for (std::vector<char>::iterator it=infix.begin(); it!=infix.end(); it++) {
-		std::cout << YELLOW << *it;
+		std::cout << *it;
 	}
 	std::cout << WHITE << std::endl;
 	
 	std::vector<char> postfix = amo::Number::getInstance().rePolish(infix);
-	
-	std::cout << GREEN << "Reverse polish notation:";
+	char rpn[32] = "";
+	char *p = rpn;
 	for (std::vector<char>::iterator it=postfix.begin(); it!=postfix.end(); it++) {
-		std::cout  << YELLOW << *it;
+		std::cout << YELLOW << "Reverse polish notation char:" << *it << WHITE << std::endl;
+		*(p++) = *it;
 	}
-	std::cout << WHITE << std::endl;
+	rpn[strlen(rpn)] = '\0';
+	std::cout << GREEN << "Reverse polish notation:" << rpn << WHITE << std::endl;
+	std::cout << GREEN << "Evaluation:" << amo::Number::getInstance().evaluate(rpn) << WHITE << std::endl;
+	
 	
 	std::cout << GREEN << "\n****************** main return ******************" << WHITE << std::endl;
 	return 0;

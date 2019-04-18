@@ -49,7 +49,7 @@ void amo::Stack<T>::traverse() {
 
 template<class T>
 void amo::Stack<T>::push(T const& t) {
-	std::cout << "[Stack::push()]: t:" << t << WHITE << std::endl;
+	//std::cout << "[Stack::push()]: t:" << t << WHITE << std::endl;
 	vector.push_back(t);
 }
 
@@ -57,7 +57,7 @@ template<class T>
 T amo::Stack<T>::pop() {
 	T t = vector.at(vector.size()-1);
 	vector.pop_back();
-	std::cout << "[Stack::pop()]: returns:" << t << WHITE << std::endl;
+	//std::cout << "[Stack::pop()]: returns:" << t << WHITE << std::endl;
 	return t; 
 }
 

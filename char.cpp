@@ -130,6 +130,66 @@ bool amo::Char::paren(const char exp[], int len) {
 	return true;
 }
 
+#if 0 //HB at bottom
+void amo::Char::convert(amo::Stack<char>& stack, int n, int base) {
+	static char digit[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+	if (n > 0) {
+		convert(stack, n/base, base);
+		std::cout << "[Char::convert()]: going to push:" << digit[n%base] << std::endl;
+		stack.push(digit[n%base]);
+	} else std::cout << "[Char::convert()]: return and n:" << n << std::endl;
+}
+
+#else 
+void amo::Char::convert(amo::Stack<char>& stack, int n, int base) {
+	static char digit[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+	int rmd;
+	while ((rmd=n%base)>=0 && n!=0) {
+		stack.push(digit[rmd]);
+		n = n/base;
+	}
+}
+#endif
+
+void amo::Char::convert(char dest[], int n, int base) { //like atoi()
+	char* ori = dest;
+	amo::Stack<char> stack;
+	convert(stack, n, base);
+	while(!stack.empty()) { //LB at bottom
+		*(dest++) = stack.pop();
+	}
+	*(dest++) = '\0';
+	dest = ori;
+	std::cout << "[Char::convert(char*,int,int)]: dest:" << dest << std::endl;
+}
+
+void amo::Char::append(char* exp, int opnd) {
+	int n = strlen(exp);
+	int len;
+	char opnds[64];
+	convert(opnds, opnd, 10);
+	len = strlen(opnds);
+	//exp = (char*) realloc(exp, sizeof(char)*(n+len+1));
+	strcat(exp, opnds);
+}
+
+void amo::Char::append(char* exp, char optr) {
+	int n = strlen(exp);
+	//exp = (char*) realloc(exp, sizeof(char)*(n+2));
+	sprintf(exp+n, "%c", optr);
+	*(exp+n+1) = '\0';
+}
+
+
+
+
+
+
+
+
+
+
+
 
 
 

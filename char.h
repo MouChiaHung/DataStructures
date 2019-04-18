@@ -17,6 +17,10 @@ public:
 	int divide(const char exp[], int lo, int hi);
 	bool paren(const char exp[], int begin, int end);
 	bool paren(const char exp[], int len);
+	void append(char* exp, char optr);
+	void append(char* exp, int opnd);
+	void convert(amo::Stack<char>& stack, int n, int base);
+	void convert(char* dest, int n, int base);
 };
 
 };

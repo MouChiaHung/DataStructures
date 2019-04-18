@@ -21,6 +21,15 @@ using namespace amo;
 /* -------------------------------------------------------------------- */
 /* my define macro                                                     */
 /* -------------------------------------------------------------------- */
+#define RESET   "\033[0m"
+#define BLACK   "\033[30m"      /* Black */
+#define RED     "\033[31m"      /* Red */
+#define GREEN   "\033[32m"      /* Green */
+#define YELLOW  "\033[33m"      /* Yellow */
+#define BLUE    "\033[34m"      /* Blue */
+#define MAGENTA "\033[35m"      /* Magenta */
+#define CYAN    "\033[36m"      /* Cyan */
+#define WHITE   "\033[37m"      /* White */
 
 /* -------------------------------------------------------------------- */
 /* global variables                                                     */
@@ -60,7 +69,7 @@ int amo::Number::getBinCount(int num) {
 
 #if 0
 long long amo::Number::power2(int n) {
-	if (n < 0) retrun 0;
+	if (n < 0) return 0;
 	long long pow = 1;
 	std::cout << "[Number::power2(int)]: pow:" << pow << std::endl;
 	//while (0 < (--n)) {
@@ -84,6 +93,17 @@ long long amo::Number::power2(int n) {
 	return (n & 1) ? sqr(power2(n/2)) << 1 : sqr(power2(n/2));
 }
 #endif
+
+long long amo::Number::power(int base, int n) {
+	if (n < 0) return 0;
+	long long pow = 1;
+	std::cout << "[Number::power2(int)]: pow:" << pow << std::endl;
+	while (0 < n--) {
+		pow = pow*base;
+		std::cout << "[Number::power2(int)]: in while-loop, n:" << n << " and pow:" << pow << std::endl;
+	}
+	return pow;
+}
 
 int amo::Number::akermann(int m, int n) {
 	if (m < 0 || n <0) {
@@ -177,6 +197,11 @@ int amo::Number::sum(std::vector<int>& vector) {
 }
 #endif
 
+int amo::Number::factory(int n) {
+	if (n == 1) return 1;
+	else return n*(factory(n-1));
+} 
+
 #if 0
 /**
  * O(2^n)
@@ -239,27 +264,6 @@ int amo::Number::fibonacci(int n, int& prev) {
 	}
 }
 
-#if 0
-void amo::Number::convert(amo::Stack<char>& stack, int n, int base) {
-	static char digit[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
-	if (n > 0) {
-		convert(stack, n/base, base);
-		std::cout << "[Number::convert()]: going to push:" << digit[n%base] << std::endl;
-		stack.push(digit[n%base]);
-	} else std::cout << "[Number::convert()]: return and n:" << n << std::endl;
-}
-
-#else
-void amo::Number::convert(amo::Stack<char>& stack, int n, int base) {
-	static char digit[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
-	int rmd;
-	while ((rmd=n%base)>=0 && n!=0) {
-		stack.push(digit[rmd]);
-		n = n/base;
-	}
-}
-#endif
-
 void amo::Number::resolve(char* p, amo::Stack<float>& stack) {
 	float factor = 10;
 	float fraction = 0.1f;
@@ -292,7 +296,7 @@ amo::Operator amo::Number::toOp(char op) {
 		case '(' : return L_P;
 		case ')' : return R_P;
 		case '\0': return EOE;
-		default : exit(-1);
+		default :  return ERROR;
 	}
 }
 
@@ -311,19 +315,23 @@ const char priority[N_OPTR][N_OPTR] = {
  };
 
 char amo::Number::orderOp(char op1, char op2) {
+	if (toOp(op1) == Operator::ERROR) return '$';
+	if (toOp(op2) == Operator::ERROR) return '$';
 	return priority[toOp(op1)][toOp(op2)];
 }
 
 bool amo::Number::isPrior(char op1, char op2) {
+	if (toOp(op1) == Operator::ERROR) return false;
+	if (toOp(op2) == Operator::ERROR) return false;
 	if (priority[toOp(op1)][toOp(op2)] == '>') return true;
 	else return false;
 }
 
 bool amo::Number::isCal(char op) {
+	if (toOp(op) == Operator::ERROR) return false;
 	if (toOp(op) <= Operator::FAC) return true;
 	else return false;
 }
-
 
 std::vector<char> amo::Number::rePolish(std::vector<char>& infix) {
 	std::vector<char> postfix;
@@ -367,6 +375,7 @@ std::vector<char> amo::Number::rePolish(std::vector<char>& infix) {
 				}
 				stack.pop(); //pops '(' out from stack 
 			}
+			else std::cout << "[Number::rePolish()]: not a calculator or digit:" << c << std::endl;
 		}	
 	}
 	while(!stack.empty()) {
@@ -375,8 +384,42 @@ std::vector<char> amo::Number::rePolish(std::vector<char>& infix) {
 	}
 	return postfix;
 }
+
+int amo::Number::calculate(int arg, char op) {
+	//int arg = atoi(&d);
+	std::cout << "[Number::calculate()]: returns " << op << "" << arg << std::endl;
+	if (op=='!') return factory(arg);
+	else return -1;
+}
+
+int amo::Number::calculate(int arg1, int arg2, char op) {
+	//int arg1 = atoi(&d1);
+	//int arg2 = atoi(&d2);
+	std::cout << "[Number::calculate()]: returns " << arg1 << " " << op << " " << arg2 << std::endl;
+	if (op=='+')      return arg1 + arg2;
+	else if (op=='-') return arg1 - arg2;
+	else if (op=='*') return arg1 * arg2;
+	else if (op=='/') return arg1 / arg2;
+	else if (op=='^') return power(arg1, arg2);
+	else return -1;
+}
 	
-	
+int amo::Number::evaluate(char* rpn) {
+	amo::Stack<int> stack;
+	char c;
+	while ((c=*rpn++) != '\0') {
+		std::cout << "[Number::evaluate()]: while-loop, c:" << c << std::endl;
+		if (isdigit(c)) stack.push(atoi(&c));
+		else {
+			if (c == '!')
+				stack.push(calculate(stack.pop(), c));
+			else
+				stack.push(calculate(stack.pop(), stack.pop(), c));		
+		}
+		std::cout << CYAN << "[Number::evaluate()]: operated " << c << ", and top:" << stack.top() << WHITE << std::endl;
+	}
+	return stack.pop();
+}
 	
 	
 	
