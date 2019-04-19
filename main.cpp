@@ -2436,6 +2436,7 @@ int main(int argc, char *argv[])
 		std::cout << YELLOW << "Reverse polish notation char:" << *it << WHITE << std::endl;
 		*(p++) = *it;
 	}
+	std::cout << GREEN << "strlen of rpn:" << strlen(rpn) << " and size of rpn:" << sizeof(rpn)/sizeof(rpn[0]) << WHITE << std::endl;
 	rpn[strlen(rpn)] = '\0';
 	std::cout << GREEN << "Reverse polish notation:" << rpn << WHITE << std::endl;
 	std::cout << GREEN << "Evaluation:" << amo::Number::getInstance().evaluate(rpn) << WHITE << std::endl;
