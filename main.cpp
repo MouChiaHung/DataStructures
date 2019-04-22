@@ -35,6 +35,7 @@
 #include <move.h>
 
 #include <char.h>
+#include <queen.h>
 
 using namespace std;
 using namespace amo;
@@ -388,6 +389,7 @@ int main(int argc, char *argv[])
 #endif
 
 #if 0
+	//A dynamic 2D array is basically an array of pointers to arrays.
 	int	image[3][3] = {
 		{11, 12, 13},
 		{21, 22, 23},
@@ -395,18 +397,23 @@ int main(int argc, char *argv[])
 	};
 	int* pimage = image[0];
 	std::cout << "image          : " << std::hex << image << std::endl;
+	std::cout << "image[0]       : " << std::hex << image[0] << std::endl;
 	std::cout << "pimage         : " << std::hex << pimage << std::endl;
+	std::cout << "image[1]       : " << std::hex << image[1] << std::endl;
 	std::cout << "(image+1)      : " << std::hex << (image+1) << std::endl;
 	std::cout << "*(image+1)     : " << std::hex << *(image+1) << std::endl;
 	std::cout << "**(image+1)    : " << std::dec << **(image+1) << std::endl;
 	std::cout << "*(image+1)+1   : " << std::hex << *(image+1)+1 << std::endl;
 	std::cout << "*(*(image+1)+1): " << std::dec << *(*(image+1)+1) << std::endl;
 	
+	std::cout << "image[2]       : " << std::hex << image[2] << std::endl;
 	std::cout << "(image+2)      : " << std::hex << (image+2) << std::endl;
 	std::cout << "*(image+2)     : " << std::hex << *(image+2) << std::endl;
 	std::cout << "**(image+2)    : " << std::dec << **(image+2) << std::endl;
 	std::cout << "*(image+2)+1   : " << std::hex << *(image+2)+1 << std::endl;
 	std::cout << "*(*(image+2)+1): " << std::dec << *(*(image+2)+1) << std::endl;
+	std::cout << "*(*(image+2)+2): " << std::dec << *(*(image+2)+2) << std::endl;
+	return 0;
 #endif
 
 #if 0
@@ -2400,8 +2407,7 @@ int main(int argc, char *argv[])
 	amo::Stack<float> resolves;
 	resolves.push(999);
 	amo::Char::getInstance().resolve("321.123", resolves);
-	resolves.traverse();
-#endif		
+	resolves.traverse();	
 
 	//cout << GREEN << "isCal:" << amo::Number::getInstance().isCal('(') << WHITE << endl;
 	//cout << GREEN << "isPrior:" << amo::Number::getInstance().isPrior('*', '+') << WHITE << endl;
@@ -2440,7 +2446,10 @@ int main(int argc, char *argv[])
 	rpn[strlen(rpn)] = '\0';
 	std::cout << GREEN << "Reverse polish notation:" << rpn << WHITE << std::endl;
 	std::cout << GREEN << "Evaluation:" << amo::Number::getInstance().evaluate(rpn) << WHITE << std::endl;
-	
+#endif	
+
+	amo::Queen::getInstance().traverse();
+	amo::Queen::getInstance().place(0,8);
 	
 	std::cout << GREEN << "\n****************** main return ******************" << WHITE << std::endl;
 	return 0;
