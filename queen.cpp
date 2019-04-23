@@ -40,6 +40,8 @@ Queen* Queen::instance = 0;
 int** Queen::chess = 0;
 int row, col;
 int track;
+static int answer=0;
+std::vector<int> queens;
 
 /* -------------------------------------------------------------------- */
 /* implements                                                           */
@@ -60,8 +62,8 @@ Queen& amo::Queen::getInstance() {
 	}
 	if (chess == nullptr) {
 		std::cout << "[Queen::getInstance()]: going to 'chess = new int[][]'"<< std::endl;
-		row = 8;
-		col = 8;
+		row = 4;
+		col = 4;
 		chess = new int*[row];
 		for (int i=0; i<row; i++)  {		
 			*(chess+i) = new int[col];
@@ -87,7 +89,7 @@ void amo::Queen::traverse() {
 }
 
 void amo::Queen::traverse(int marki, int markj) {
-	std::cout << "[Queen::traverse()]: --- Traverse begin ---" << WHITE << std::endl;
+	std::cout << BLUE <<"[Queen::traverse()]: --- Traverse begin ---" << WHITE << std::endl;
 	for (int i=0; i<row; i++) {
 		for (int j=0; j<col; j++) {
 			if (i== marki && j==markj) std::cout << GREEN << "[" << i <<"][" << j << "]:" << chess[i][j] << WHITE;
@@ -95,25 +97,57 @@ void amo::Queen::traverse(int marki, int markj) {
 			if (j==col-1) std::cout << "" << std::endl;
 		}
 	}	
-	std::cout << "[Queen::traverse()]: --- Traverse end ---" << WHITE << std::endl;
+	std::cout << BLUE << "[Queen::traverse()]: --- Traverse end ---" << WHITE << std::endl;
 }
 
 void amo::Queen::place(int probing, int n) {
 	if (probing >= n) {
-		//std::cout << RED <<"[Queen::place()]: returns when met the pass-the-end of probing:" << probing << WHITE << std::endl;
+		answer += 1;
+		std::cout << RED <<"[Queen::place()]: met the pass-the-end of probing and returns, answer:" << answer << WHITE << std::endl;
 		return;
 	}
 	for (int pruning=0; pruning<col; pruning++) {
+		std::cout << "[Queen::place()]: for-loop, probing:" << probing << ", pruning:" << pruning << WHITE << std::endl;
 		track++;
-		if (probing==n-1 && pruning==col-1)
+		traverse(probing, pruning);
+		//if (probing==n-1 && pruning==col-1)
 			std::cout << RED <<"[Queen::place()]: track:" << track << WHITE << std::endl; //final track=4^4+4^3+4^2+4^1=340 if n=4 or track=3^3+3^2+3^1=39 if n=3
-		//traverse(probing, pruning);
-		place(probing+1, n); //one more call stack for probing one more deeper layer
+		if (!check(probing, pruning)) {
+			std::cout << "[Queen::place()]: going to prune" << WHITE << std::endl;
+			continue; //met one of dead ends of this probing at this pruning and 'prunes'
+		}
+		else { //found one of rights of this probing at this pruning and digs into the one more deeper 
+			std::cout << "[Queen::place()]: going to probe" << WHITE << std::endl;
+			if (queens.size() < n) queens.resize(n);
+			queens.at(probing) = pruning;
+			place(probing+1, n); //'probes' one more deeper by making one more call stack returning back here as backtracking and proceeding to another pruning
+		}
 	}
+	return; //'backtracks'
 }
 	
 bool amo::Queen::check(int row, int column) {
-	
+	if (row == 0) return true;
+	for (std::vector<int>::iterator it=queens.begin(); it!=std::next(queens.begin(), row); it++) {
+		int placed_row = std::distance(queens.begin(), it);
+		int placed_column = queens.at(placed_row);
+		//std::cout << YELLOW << "queen at [" << placed_row << "][" << placed_column << "] and chess at [" << row <<"][" << column << "]" << WHITE << std::endl;
+		if (placed_column == column) {
+			std::cout << MAGENTA << "not across queen at [" << placed_row << "][" << placed_column << "] with chess at [" << row <<"][" << column << "]" << WHITE << std::endl;
+			return false;
+		}
+		if (std::abs(placed_column-column) == std::abs(placed_row-row)) {
+			std::cout << MAGENTA << "not diagonal queen at [" << placed_row << "][" << placed_column << "] with chess at [" << row <<"][" << column << "]" << WHITE << std::endl;
+			return false;
+		}
+	}
+	std::cout << CYAN << "okay chess at [" << row <<"][" << column << "]" << WHITE << std::endl;
+	return true;
+}
+
+int amo::Queen::getAnswer() {
+	int a = answer;
+	return answer;
 }
 
 

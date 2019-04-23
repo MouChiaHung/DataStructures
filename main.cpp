@@ -2448,8 +2448,9 @@ int main(int argc, char *argv[])
 	std::cout << GREEN << "Evaluation:" << amo::Number::getInstance().evaluate(rpn) << WHITE << std::endl;
 #endif	
 
-	amo::Queen::getInstance().traverse();
-	amo::Queen::getInstance().place(0,8);
+	//amo::Queen::getInstance().traverse();
+	amo::Queen::getInstance().place(0,4);
+	std::cout << GREEN << "Answer of queens:" << amo::Queen::getInstance().getAnswer() << WHITE << std::endl;
 	
 	std::cout << GREEN << "\n****************** main return ******************" << WHITE << std::endl;
 	return 0;
