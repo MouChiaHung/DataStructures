@@ -1,5 +1,5 @@
 # DataStructures
-![image](https://github.com/MouChiaHung/DataStructures/blob/master/Capture.JPG)
+![image](https://github.com/MouChiaHung/DataStructures/blob/master/Q.JPG)
 
 Practices includes:
  - C++ skills 
