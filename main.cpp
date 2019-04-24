@@ -1644,7 +1644,8 @@ int main(int argc, char *argv[])
 	 * The types of key and mapped value may differ, and are grouped together in member type value_type, which is a pair type combining both:
 	 * typedef pair<const Key, T> value_type;
      * Internally, the elements in a map are sorted by its key following a strict weak ordering criterion indicated by its internal comparison object (of type Compare).
-     * map containers are generally slower than unordered_map containers to access individual elements by their key, but they allow the direct iteration on subsets based on their order.
+     * map containers are generally slower than unordered_map containers to access individual elements by their key
+	 * , but they allow the direct iteration on subsets based on their order.
      * The mapped values in a map can be accessed directly by their corresponding key using the bracket operator ((operator[]).
      * Maps are typically implemented as binary search trees.
 	 */
@@ -1653,6 +1654,7 @@ int main(int argc, char *argv[])
 	 * pair<iterator,bool> std::map::insert(const value_type& val) - (1)
 	 * iterator std::map::insert(iterator position, const value_type& val) - (2)
 	 * void std::map::insert(InputIterator first, InputIterator last) - (3)
+	 *
 	 * Extends the container by inserting new elements, effectively increasing the container size by the number of elements inserted.
      * Because element keys in a map are unique, the insertion operation checks whether each inserted element has a key equivalent to an element already in the container
 	 * , and if so, the element is not inserted, returning an iterator to this existing element (if the function returns a value).
@@ -1660,6 +1662,7 @@ int main(int argc, char *argv[])
      * An alternative way to insert elements in a map is by using member function map::operator[].
      * Internally, map containers keep all their elements sorted by their key following the criterion specified by its comparison object.
 	 * The elements are always inserted in its respective position following this ordering.
+	 *
      * The parameters determine how many elements are inserted and to which values they are initialized:
      * val: Value to be copied to (or moved as) the inserted element.
      *      Member type value_type is the type of the elements in the container, defined in map as pair<const key_type,mapped_type> (see map member types).
@@ -1668,6 +1671,12 @@ int main(int argc, char *argv[])
      *           Notice that this is just a hint and does not force the new element to be inserted at that position within the map container 
 	 *           (the elements in a map always follow a specific order depending on their key).
      * first, last: Iterators specifying a range of elements. Copies of the elements in the range [first,last) are inserted in the container.
+	 *
+	 * Return value:
+     * The single element versions (1) return a pair, with its member pair::first set to an iterator pointing to 
+	 * either the newly inserted element or to the element with an equivalent key in the map. 
+	 * The pair::second element in the pair is set to true if a new element was inserted or false if an equivalent key already existed.
+     * The versions with a hint (2) return an iterator pointing to either the newly inserted element or to the element that already had an equivalent key in the map.
 	 */
 	std::map<int, MyMath> map;
 	std::pair<std::map<int,MyMath>::iterator,bool> ret;
@@ -2447,10 +2456,11 @@ int main(int argc, char *argv[])
 	std::cout << GREEN << "Reverse polish notation:" << rpn << WHITE << std::endl;
 	std::cout << GREEN << "Evaluation:" << amo::Number::getInstance().evaluate(rpn) << WHITE << std::endl;
 #endif	
+	std::cout << GREEN << "****************** Eight queens puzzle ******************\n" << WHITE << std::endl;
 
 	//amo::Queen::getInstance().traverse();
-	amo::Queen::getInstance().place(0,4);
-	std::cout << GREEN << "Answer of queens:" << amo::Queen::getInstance().getAnswer() << WHITE << std::endl;
+	amo::Queen::getInstance().place(0,8);
+	std::cout << GREEN << "Answer of Eight queens puzzle:" << amo::Queen::getInstance().answer() << WHITE << std::endl;
 	
 	std::cout << GREEN << "\n****************** main return ******************" << WHITE << std::endl;
 	return 0;

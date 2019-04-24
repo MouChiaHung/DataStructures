@@ -3,22 +3,24 @@
 
 #include <stdio.h>
 #include <stack.h>
+#include <map>
+
 
 namespace amo {
 
 class Queen {
 private:
 	static Queen* instance;
-	static int** chess; //A dynamic 2D array is basically an array of pointers to arrays.
 	Queen();
 	~Queen();
 public:
 	static Queen& getInstance();
-	int getAnswer();
+	int answer();
 	void place(int probing, int n);
 	bool check(int row, int column);
 	void traverse();
 	void traverse(int marki, int markj);
+	void traverse(std::map<int,int>& map);
 };
 
 };
