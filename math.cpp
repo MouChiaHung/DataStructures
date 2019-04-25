@@ -148,6 +148,29 @@ MyMath& MyMath::decodeWithRef(MyMath& math) {
 	std::cout << "[MyMath::decodeWithRef()]: return instance:" << &instance << std::endl;
 	return instance;
 }
+
+/**
+ * This is perfectly fine to return a self-defined object because every compiler nowadays implements some form of return value optimization.
+ * See local variable will not be destroyed when function finishes and can be accessed outside.
+ * This way to return a object and access it is just like Java does.
+ *
+ * The criteria of compiler NRVO for elision can be combined to eliminate two calls to the copy constructor of Class: 
+ * the copying of the local object into the temporary object for the return value of function
+ * and the copying of that temporary object into object outside of scope of local function. 
+ * Effectively, the construction of the local object can be viewed as directly initializing the object outside
+ * , and that object’s destruction will occur at program exit. 
+ * Adding a move constructor to Class has the same effect, but it is the move construction from the temporary object to the object outside that is elided.
+ */
+MyMath MyMath::decodeWithRefRVO(MyMath& math) {
+	std::cout << "[MyMath::decodeWithRefRVO()]: got math:" << &math << std::endl;
+	MyMath m = math;
+	return m;
+}
+
+MyMath& MyMath::decodeWithRefReturnRef(MyMath& math) {
+	std::cout << "[MyMath::decodeWithRefReturnRef()]: got and return math:" << &math << std::endl;
+	return math;
+}
 #endif
 
 #if 0

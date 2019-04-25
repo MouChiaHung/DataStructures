@@ -36,6 +36,7 @@
 
 #include <char.h>
 #include <queen.h>
+#include <maze.h>
 
 using namespace std;
 using namespace amo;
@@ -220,6 +221,32 @@ std::ostream &operator<<(std::ostream &stream, MyMath &math){
 	}	
 	stream << std::endl;
 	return stream;
+}
+
+std::istream& amo::operator>>(std::istream& is, Maze::Cell& cell) {
+	is >> cell.status;
+	return is;
+}
+
+std::ostream& amo::operator<<(std::ostream& os, Maze::Cell& cell) {
+	switch (cell.status) {
+		case AVAL:
+			os << "AVAL";
+			break;
+		case ROUTE:
+			os << "ROUTE";
+			break;
+		case BACK:
+			os << "BACK";
+			break;
+		case WALL:
+			os << "WALL";
+			break;
+		default:
+			os << "WALL";
+			break;
+	}
+	return os;
 }
 
 namespace mystd::myfstream {
@@ -504,6 +531,7 @@ int main(int argc, char *argv[])
 	mathC.setData(data, sizeof(data)/sizeof(data[0]));
 	std::cout << "object mathC:" << &mathC << std::endl;
 	
+#if 0	
 	std::cout << "\ngoing to MyMath& mathD = mathC\n" << std::endl;
 	MyMath& mathD = mathC;
 	std::cout << "reference mathD:" << &mathD << std::endl;
@@ -524,7 +552,16 @@ int main(int argc, char *argv[])
 	std::cout << "\ngoing to MyMath mathF2 = mathC.decode(mathC)\n" << std::endl;
 	MyMath mathF2 = mathC.decode(mathC);//invokes TWO callings to copy constructor for object creating and  parameter duplicating 
 	std::cout << "object mathF2:" << &mathF2 << std::endl;
-	std::cout << "mathF2:" <<mathF2;
+	std::cout << "mathF2:" << mathF2;
+#endif
+	
+	std::cout << GREEN << "\ngoing to 'MyMath mathRVO = mathC.decodeWithRefRVO(mathC)'\n" << WHITE <<std::endl;
+	MyMath mathRVO = mathC.decodeWithRefRVO(mathC);
+	std::cout << "mathRVO:" << mathRVO;
+	
+	std::cout << GREEN << "\ngoing to 'MyMath mathRef& = mathC.decodeWithRefReturnRef(mathC)'\n" << WHITE <<std::endl;
+	MyMath& mathRef = mathC.decodeWithRefReturnRef(mathC);
+	std::cout << "mathRef:" << mathRef;
 	
 	std::cout << "\n****************** main return ******************" << std::endl;
 	return 0;
@@ -2455,12 +2492,16 @@ int main(int argc, char *argv[])
 	rpn[strlen(rpn)] = '\0';
 	std::cout << GREEN << "Reverse polish notation:" << rpn << WHITE << std::endl;
 	std::cout << GREEN << "Evaluation:" << amo::Number::getInstance().evaluate(rpn) << WHITE << std::endl;
-#endif	
+
 	std::cout << GREEN << "****************** Eight queens puzzle ******************\n" << WHITE << std::endl;
 
-	//amo::Queen::getInstance().traverse();
 	amo::Queen::getInstance().place(0,8);
 	std::cout << GREEN << "Answer of Eight queens puzzle:" << amo::Queen::getInstance().answer() << WHITE << std::endl;
+#endif
+	
+	std::cout << GREEN << "****************** Maze ******************\n" << WHITE << std::endl;
+	amo::Maze::getInstance(4, 4).labyrinth(0, 0, 1, 1);
+	
 	
 	std::cout << GREEN << "\n****************** main return ******************" << WHITE << std::endl;
 	return 0;

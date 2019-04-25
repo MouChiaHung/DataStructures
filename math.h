@@ -24,6 +24,8 @@ public:
 #if 1	
 	static MyMath& 	decode(MyMath math);
 	static MyMath& 	decodeWithRef(MyMath& math);
+	static MyMath	decodeWithRefRVO(MyMath& math);
+	static MyMath&  decodeWithRefReturnRef(MyMath& math);
 #else	
 	static MyMath& decode(MyMath math) {
 		std::cout << "[MyMath::decode()]: ... got math:" << &math << std::endl;
