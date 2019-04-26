@@ -91,4 +91,6 @@ public:
 	~MyMath();
 };
 
+std::istream &operator>>(std::istream &stream, MyMath &math);
+std::ostream &operator<<(std::ostream &stream, MyMath &math);
 #endif

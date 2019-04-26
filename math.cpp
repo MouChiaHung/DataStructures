@@ -26,6 +26,27 @@ MyMath MyMath::instance(num_instance);
 /* -------------------------------------------------------------------- */
 /* implements                                                           */
 /* -------------------------------------------------------------------- */
+//input operator overload
+std::istream &operator>>(std::istream &stream, MyMath &math) {
+	std::cout << "[main::operator>>(std::istream&, MyMath&)]: >>>" << std::endl;
+	stream >> math.number;
+	return stream;
+} 
+
+//output stream overload
+std::ostream &operator<<(std::ostream &stream, MyMath &math){
+	std::cout << "[main::operator<<(std::ostream&, MyMath&)]: >>>" << std::endl;
+	stream << "output math.data_length:" << math.data_length << "\n";
+	stream << "output math.number     :" << math.number << "\n";
+	stream << "output math.data       :\n"; 
+	for(int i=0; i<math.data_length; i++){
+		stream << math.data[i]; 
+		if (i != (math.data_length)-1) stream << "\n";
+	}	
+	stream << std::endl;
+	return stream;
+}
+
 MyMath::MyMath(){
 	number = 0;
 	data = new int[8];

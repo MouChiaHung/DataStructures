@@ -37,6 +37,7 @@
 #include <char.h>
 #include <queen.h>
 #include <maze.h>
+#include <cell.h>
 
 using namespace std;
 using namespace amo;
@@ -200,53 +201,6 @@ int operator-(MyMath& m1, MyMath& m2) {
 void operator++(MyMath &math) {
 	std::cout << "[main::operator++(MyMath&)]: >>>" << std::endl;
 	++math.number;
-}
-
-//input operator overload
-std::istream &operator>>(std::istream &stream, MyMath &math) {
-	std::cout << "[main::operator>>(std::istream&, MyMath&)]: >>>" << std::endl;
-	stream >> math.number;
-	return stream;
-} 
-
-//output stream overload
-std::ostream &operator<<(std::ostream &stream, MyMath &math){
-	std::cout << "[main::operator<<(std::ostream&, MyMath&)]: >>>" << std::endl;
-	stream << "output math.data_length:" << math.data_length << "\n";
-	stream << "output math.number     :" << math.number << "\n";
-	stream << "output math.data       :\n"; 
-	for(int i=0; i<math.data_length; i++){
-		stream << math.data[i]; 
-		if (i != (math.data_length)-1) stream << "\n";
-	}	
-	stream << std::endl;
-	return stream;
-}
-
-std::istream& amo::operator>>(std::istream& is, Maze::Cell& cell) {
-	is >> cell.status;
-	return is;
-}
-
-std::ostream& amo::operator<<(std::ostream& os, Maze::Cell& cell) {
-	switch (cell.status) {
-		case AVAL:
-			os << "AVAL";
-			break;
-		case ROUTE:
-			os << "ROUTE";
-			break;
-		case BACK:
-			os << "BACK";
-			break;
-		case WALL:
-			os << "WALL";
-			break;
-		default:
-			os << "WALL";
-			break;
-	}
-	return os;
 }
 
 namespace mystd::myfstream {
@@ -2500,7 +2454,7 @@ int main(int argc, char *argv[])
 #endif
 	
 	std::cout << GREEN << "****************** Maze ******************\n" << WHITE << std::endl;
-	amo::Maze::getInstance(4, 4).labyrinth(0, 0, 1, 1);
+	amo::Maze::getInstance(4, 4).labyrinth(1, 1, 3, 3);
 	
 	
 	std::cout << GREEN << "\n****************** main return ******************" << WHITE << std::endl;

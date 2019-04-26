@@ -7,10 +7,13 @@
 #include <stack.h>
 #include <map>
 
+#include <cell.h>
+
 namespace amo {
 
 typedef enum {AVAL, ROUTE, BACK, WALL} STATUS;
-
+typedef enum {INIT, EAST, SOUTH, WEST, NORTH, DEAD} DIRECTION;
+class Cell;
 /**
  * Enclosing class
  */
@@ -19,36 +22,28 @@ public:
 	/**
 	 * Nested class
 	 */
-	class Cell { 
+	class Inner { 
 	private:
-		int x;
-		int y;
-		int in;
-		int out;
+		
 	public:
-		Cell():x(0),y(0){};
-		Cell(int i, int j);
-		~Cell();
-		int status;
-		Cell& operator=(const Cell& cell);
+		Inner();		
+		~Inner();
 	friend class Maze;
-	friend std::istream& operator>>(std::istream& is, Maze::Cell& cell);
-	friend std::ostream& operator<<(std::ostream& os, Maze::Cell& cell);
 	};
 	static Maze& getInstance(int n, int m);
-	void traverse(std::map<int,int>& map);
+	void traverse(std::vector<Cell*>& vector);
 	bool labyrinth(int sx, int sy, int tx, int ty);
+	Cell* pry(Cell& c);
+	void probe(Cell** c);
 private:
 	static Maze* instance;
 	Maze(int i, int j);
 	~Maze();
 	int row;
 	int col;
-	Maze::Cell** mz;
+	Cell **mz;
 	static int t;	
-friend class Cell; 
-friend std::istream& operator>>(std::istream& is, Maze::Cell& cell);
-friend std::ostream& operator<<(std::ostream& os, Maze::Cell& cell);
+friend class Inner; 
 };
 
 };
