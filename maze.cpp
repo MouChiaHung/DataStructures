@@ -240,16 +240,11 @@ void amo::Maze::probe(amo::Cell** c) {
 	} 
 	switch ((**c).out) {
 		case INIT:
-			std::cout << YELLOW << "[Maze::probe()]: INIT" << WHITE << std::endl;
+			std::cout << YELLOW << "[Maze::probe()]: INIT at [" << (**c).x << "][" << (**c).y << "]" << WHITE << std::endl;
 			(**c).out = next_available(**c);
-			probe(c); 
+			probe(c); //recurs to probe a certain position
 			return;
 		case EAST:
-			if (((**c).y+1)>=col) {
-				std::cout << YELLOW << "[Maze::probe()]: Beyond EAST and Recur" << WHITE << std::endl;
-				probe(c);
-				return;
-			}
 			std::cout << YELLOW << "[Maze::probe()]: GO EAST from [" << (**c).x << "][" << (**c).y << "]"
 								<< " onto [" << (**c).x << "][" << (**c).y+1 << "]" << WHITE << std::endl;		
 			(**c).status = ROUTE; //marks old moves for avoiding to go out of then go back to the same position
@@ -258,11 +253,6 @@ void amo::Maze::probe(amo::Cell** c) {
 			(**c).out = next_available(**c);
 			return;
 		case SOUTH:
-			if (((**c).x+1)>=row) {
-				std::cout << YELLOW << "[Maze::probe()]: Beyond SOUTH and Recur" << WHITE << std::endl;
-				probe(c); 
-				return;
-			}
 			std::cout << YELLOW << "[Maze::probe()]: GO SOUTH from [" << (**c).x << "][" << (**c).y << "]"
 								<< " onto [" << (**c).x+1 << "][" << (**c).y << "]" << WHITE << std::endl;
 			(**c).status = ROUTE;
@@ -271,11 +261,6 @@ void amo::Maze::probe(amo::Cell** c) {
 			(**c).out = next_available(**c);
 			return;
 		case WEST:
-			if (((**c).y-1)<0) {
-				std::cout << YELLOW << "[Maze::probe()]: Beyond WEST and Recur" << WHITE << std::endl;
-				probe(c); 
-				return;
-			}
 			std::cout << YELLOW << "[Maze::probe()]: GO WEST from [" << (**c).x << "][" << (**c).y << "]"
 								<< " onto [" << (**c).x << "][" << (**c).y-1 << "]" << WHITE << std::endl;
 			(**c).status = ROUTE;
@@ -284,11 +269,6 @@ void amo::Maze::probe(amo::Cell** c) {
 			(**c).out = next_available(**c);
 			return;
 		case NORTH:
-			if (((**c).x-1)<0) {
-				std::cout << YELLOW << "[Maze::probe()]: Beyond NORTH and Recur" << WHITE << std::endl;
-				probe(c); 
-				return;
-			}
 			std::cout << YELLOW << "[Maze::probe()]: GO NORTH from [" << (**c).x << "][" << (**c).y << "]"
 								<< " onto [" << (**c).x-1 << "][" << (**c).y << "]" << WHITE << std::endl;
 			(**c).status = ROUTE;
