@@ -229,18 +229,13 @@ int amo::Maze::next_available(Cell& c) {
 		}
 	}
 	std::cout << "[Maze::next_available()]: returns DEAD:" << dir << WHITE << std::endl;
-	return dir;//DEAD
+	return dir-1;//DEAD
 } 
  
 void amo::Maze::probe(amo::Cell** c) {
-	if (((**c)).out >= DEAD) { //as BACK
-		std::cout << YELLOW << "[Maze::probe()]: [" << (**c).x << "][" << (**c).y << "] is DEAD:" << (**c).out << WHITE << std::endl;
-		*c = NULL;
-		return;
-	} 
 	switch ((**c).out) {
 		case INIT:
-			std::cout << YELLOW << "[Maze::probe()]: INIT at [" << (**c).x << "][" << (**c).y << "]" << WHITE << std::endl;
+			std::cout << YELLOW << "[Maze::probe()]: MEET INIT at [" << (**c).x << "][" << (**c).y << "]" << WHITE << std::endl;
 			(**c).out = next_available(**c);
 			probe(c); //recurs to probe a certain position
 			return;
@@ -277,11 +272,11 @@ void amo::Maze::probe(amo::Cell** c) {
 			(**c).out = next_available(**c);
 			return;
 		case DEAD:
-			std::cout << YELLOW << "[Maze::probe()]: DEAD" << WHITE << std::endl;
+			std::cout << YELLOW << "[Maze::probe()]: MEET DEAD at [" << (**c).x << "][" << (**c).y << "]" << WHITE << std::endl;
 			*c = NULL;
 			return;
 		default:
-			std::cout << YELLOW << "[Maze::probe()]: ERROR" << WHITE << std::endl;
+			std::cout << YELLOW << "[Maze::probe()]: ERROR at [" << (**c).x << "][" << (**c).y << "]" << WHITE << std::endl;
 			*c = NULL; 
 			return;
 	}
