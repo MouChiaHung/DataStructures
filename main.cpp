@@ -2454,7 +2454,7 @@ int main(int argc, char *argv[])
 #endif
 	
 	std::cout << GREEN << "****************** Maze ******************\n" << WHITE << std::endl;
-	amo::Maze::getInstance(4, 4).labyrinth(1, 1, 3, 3);
+	amo::Maze::getInstance(4, 4).labyrinth(1, 1, 1, 1);
 	
 	
 	std::cout << GREEN << "\n****************** main return ******************" << WHITE << std::endl;

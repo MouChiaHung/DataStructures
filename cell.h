@@ -16,7 +16,7 @@ private:
 
 public:
 	Cell();
-	Cell(Cell& c);
+	Cell(const Cell& c);
 	Cell(int i, int j);
 	~Cell();
 	int x; //row

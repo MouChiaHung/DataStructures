@@ -121,7 +121,7 @@ amo::Cell::Cell(int i, int j): x(i), y(j), status(AVAL), in(INIT), out(INIT) {
 	std::cout << "[Cell::Cell(int,int)]:" << this << ", x:" << x << ", y:" << y << std::endl;
 }
 
-amo::Cell::Cell(Cell& c) {
+amo::Cell::Cell(const Cell& c) {
 	x = c.x;
 	y = c.y;
 	status = c.status;
