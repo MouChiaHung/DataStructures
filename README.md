@@ -1,8 +1,9 @@
 # DataStructures
-****************** Eight queens puzzle ******************
+Demostration:
+ - Eight queens puzzle
 ![image](https://github.com/MouChiaHung/DataStructures/blob/master/Q.JPG)
 
-****************** Labyrinth ******************
+ -Labyrinth
 ![image](https://github.com/MouChiaHung/DataStructures/blob/master/Maze.JPG)
 
 Practices includes:
