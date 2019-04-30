@@ -11,13 +11,15 @@
 #include <bitset>
 #include <cmath>
 #include <vector>
-
+#include <list>
+#include <stack>
+#include <map>
 
 #include <maze.h>
 #include <algorithm>    // std::for_each
+#include <iterator>     // std::back_inserter
 
-#include <stack>
-#include <map>
+#
 
 using namespace amo;
 
@@ -60,6 +62,7 @@ amo::Maze::Maze(int n, int m): row(n), col(m) {
 		//*(mz+i) = (Cell*) malloc(sizeof(Cell)*col);
 		for (int j=0; j<col; j++) {
 			mz[i][j] = Cell(i, j);
+			if (i == 1 && j == 3) mz[i][j].status = WALL;
 			if (i == 2 && j == 0) mz[i][j].status = WALL;
 			if (i == 2 && j == 1) mz[i][j].status = WALL;
 			if (i == 3 && j == 0) mz[i][j].status = WALL;
@@ -114,7 +117,32 @@ void amo::Maze::traverse(std::vector<amo::Cell*>& vector) {
 	for (int i=0; i<row; i++) {
 		for (int j=0; j<col; j++) {
 			if (is_move(vector, i, j)) {
-				if (mz[i][j].status == WALL) std::cout << RED << "[" << i <<"][" << j << "]" << mz[i][j] << WHITE;  
+				if (mz[i][j].status == WALL) std::cout << RED << "[" << i <<"][" << j << "]" << mz[i][j] << WHITE; 
+				else if (mz[i][j].status == BACK) std::cout  << CYAN << "["<< i <<"][" << j << "]" << mz[i][j] << WHITE;  
+				else if (mz[i][j].status == ROUTE) std::cout  << YELLOW << "["<< i <<"][" << j << "]" << mz[i][j] << WHITE;  
+				else std::cout << GREEN << "[" << i <<"][" << j << "]" << mz[i][j] << WHITE; 
+			}
+			else {
+				if (mz[i][j].status == WALL) std::cout  << MAGENTA << "["<< i <<"][" << j << "]" << mz[i][j] << WHITE;  
+				else std::cout << "[" << i <<"][" << j << "]" << mz[i][j] << WHITE;  
+			}
+			if (j==col-1) std::cout << "" << std::endl;
+		}
+	}	
+	std::cout << BLUE << "[Maze::traverse()]: --- Traverse end ---" << WHITE << std::endl;
+}
+
+void amo::Maze::traverse(std::stack<amo::Cell*>& stack) {
+	std::cout << BLUE <<"[Maze::traverse()]: --- Traverse begin ---" << WHITE << std::endl;
+	std::vector<amo::Cell*> vector;
+	while(!stack.empty()) {
+		vector.push_back(stack.top());
+		stack.pop();
+	}
+	for (int i=0; i<row; i++) {
+		for (int j=0; j<col; j++) {
+			if (is_move(vector, i, j)) {
+				if (mz[i][j].status == WALL) std::cout << RED << "[" << i <<"][" << j << "]" << mz[i][j] << WHITE; 
 				else std::cout << GREEN << "[" << i <<"][" << j << "]" << mz[i][j] << WHITE; 
 			}
 			else {
@@ -130,32 +158,40 @@ void amo::Maze::traverse(std::vector<amo::Cell*>& vector) {
 bool amo::Maze::labyrinth(int sx, int sy, int tx, int ty) {
 	Cell* s = new Cell(sx, sy);
 	Cell* t = new Cell(tx, ty);
-	std::stack<amo::Cell> path;
-	int repeat = 7;
+	Cell* before;
+	int repeat = 0;
 	Cell* probing = s;
+	std::stack<amo::Cell*> path;
+	std::list<amo::Cell*> tmp;
 	do {
-		if (!(0<repeat--)){ //retry limit
+		if (!(64>repeat++)){ //retry limit
 			std::cout << RED << "[Maze::labyrinth()]: No solution" << WHITE << std::endl;
 			break;
-		} 
+		}
+		
+		if (!moves.empty() && moves.size()>1) { //resets status of the one before current one if it's recorded as route to move like the game Snake
+			before = moves.at(moves.size()-2); 
+			if (before->status == ROUTE) before->status = AVAL; //Route(Before)|Route(Current)|Aval(Next) -> Aval(Before)|Route(Current)|Aval(Next)
+		}			
 		probe(&probing); //probes and decides the next direction
-		if (probing == NULL) { //met dead
-			std::cout << RED << "[Maze::labyrinth()]: met DEAD" << WHITE << std::endl;
-			break;
-		}
-		path.push(*probing); //records moves
-		std::cout << CYAN << "[Maze::labyrinth()]: loop:" << repeat << ", probing:[" << probing->x << "][" << probing->y << "]:" << *probing << WHITE << std::endl;
+		if (probing == NULL) break; //error
+		std::cout << GREEN << "[Maze::labyrinth()]: tried:" << repeat << " times, probing:[" << probing->x << "][" << probing->y << "]:" << *probing << WHITE << std::endl;
 		collect_move(moves, probing);
+		
 		if (probing->x == t->x && probing->y == t->y) { //checks if arrived target or goes ahead to probe
-			std::cout << CYAN << "[Maze::labyrinth()]: Got solution" << WHITE << std::endl;
+			std::cout << GREEN << "[Maze::labyrinth()]: Got solution" << WHITE << std::endl;
+			std::copy(moves.begin(), moves.end(), back_inserter(tmp));
+			tmp.unique();
+			for (std::list<Cell*>::iterator it=tmp.begin(); it!=tmp.end(); it++) path.push(*it);
+			traverse(path);
 			break;
 		}
+		traverse(moves);
 	} while(true);
 	
 	//collect_move(moves, s);
 	//collect_move(moves, t);
-	
-	traverse(moves);
+	//traverse(moves);
 	return false;
 }
 
@@ -167,68 +203,68 @@ int amo::Maze::next_available(Cell& c) {
 	int i = c.x;
 	int j = c.y;
 	amo::Cell* next;
-	int dir = INIT;
+	int dir = c.out;
 	while (DEAD>dir++) {
 		switch (dir) {
 		case EAST:
 			if ((j+1)>=col) {
-				std::cout << "[Maze::next_available()]: NOT EAST" << WHITE << std::endl;
+				std::cout << "[Maze::next_available()]: NOT EAST at [" << i << "][" << j << "]" << WHITE << std::endl;
 				break;
 			}
 			next = &mz[i][j+1];
 			if (next->status == AVAL) {
-				std::cout << "[Maze::next_available()]: NEXT EAST from [" << i << "][" << j << "]" << c
-						  << " onto [" << i << "][" << j+1 << "]" << *next << WHITE << std::endl;
+				std::cout << "[Maze::next_available()]: NEXT EAST from [" << i << "][" << j << "]"
+						  << " onto [" << i << "][" << j+1 << "]" << WHITE << std::endl;
 				return dir;
 			} else {
-				std::cout << "[Maze::next_available()]: NO AVAL EAST" << WHITE << std::endl;
+				std::cout << "[Maze::next_available()]: NOT AVAL EAST at [" << i << "][" << j << "]" << WHITE << std::endl;
 				break;
 			}
 		case SOUTH:
 			if ((i+1)>=row) {
-				std::cout << "[Maze::next_available()]: NOT SOUTH" << WHITE << std::endl;
+				std::cout << "[Maze::next_available()]: NOT SOUTH at [" << i << "][" << j << "]" << WHITE << std::endl;
 				break;
 			}
 			next = &mz[i+1][j];
 			if (next->status == AVAL) {
-				std::cout << "[Maze::next_available()]: NEXT SOUTH from [" << i << "][" << j << "]" << c
-					      << " onto [" << i+1 << "][" << j << "]" << *next << WHITE << std::endl;
+				std::cout << "[Maze::next_available()]: NEXT SOUTH from [" << i << "][" << j << "]"
+					      << " onto [" << i+1 << "][" << j << "]" << WHITE << std::endl;
 				return dir;
 			} else {
-				std::cout << "[Maze::next_available()]: NO AVAL SOUTH" << WHITE << std::endl;
+				std::cout << "[Maze::next_available()]: NOT AVAL SOUTH at [" << i << "][" << j << "]" << WHITE << std::endl;
 				break;
 			}
 		case WEST:
 			if ((j-1)<0) {
-				std::cout << "[Maze::next_available()]: NOT WEST" << WHITE << std::endl;
+				std::cout << "[Maze::next_available()]: NOT WEST at [" << i << "][" << j << "]" << WHITE << std::endl;
 				break;
 			}
 			next = &mz[i][j-1];
 			if (next->status == AVAL) {
-				std::cout << "[Maze::next_available()]: NEXT WEST from [" << i << "][" << j << "]" << c
-						  << " onto [" << i << "][" << j-1 << "]" << *next << WHITE << std::endl;
+				std::cout << "[Maze::next_available()]: NEXT WEST from [" << i << "][" << j << "]"
+						  << " onto [" << i << "][" << j-1 << "]" << WHITE << std::endl;
 				return dir;
 			} else {
-				std::cout << "[Maze::next_available()]: NO AVAL WEST" << WHITE << std::endl;
+				std::cout << "[Maze::next_available()]: NOT AVAL WEST at [" << i << "][" << j << "]" << WHITE << std::endl;
 				break;
 			}
 		case NORTH:
 			if ((i-1)<0) {
-				std::cout << "[Maze::next_available()]: NOT NORTH" << WHITE << std::endl;
+				std::cout << "[Maze::next_available()]: NOT NORTH at [" << i << "][" << j << "]" << WHITE << std::endl;
 				break;
 			}
 			next = &mz[i-1][j];
 			if (next->status == AVAL) {
-				std::cout << "[Maze::next_available()]: NEXT NORTH from [" << i << "][" << j << "]" << c
-						  << " onto [" << i-1 << "][" << j << "]" << *next << WHITE << std::endl;
+				std::cout << "[Maze::next_available()]: NEXT NORTH from [" << i << "][" << j << "]"
+						  << " onto [" << i-1 << "][" << j << "]" << WHITE << std::endl;
 				return dir;
 			} else {
-				std::cout << "[Maze::next_available()]: NOT AVAL NORTH" << WHITE << std::endl;
+				std::cout << "[Maze::next_available()]: NOT AVAL NORTH at [" << i << "][" << j << "]" << WHITE << std::endl;
 				break;
 			}
 		}
 	}
-	std::cout << "[Maze::next_available()]: returns DEAD:" << dir << WHITE << std::endl;
+	std::cout << "[Maze::next_available()]: returns DEAD:" << dir << " at [" << i << "][" << j << "]" << WHITE << std::endl;
 	return dir-1;//DEAD
 } 
  
@@ -273,7 +309,13 @@ void amo::Maze::probe(amo::Cell** c) {
 			return;
 		case DEAD:
 			std::cout << YELLOW << "[Maze::probe()]: MEET DEAD at [" << (**c).x << "][" << (**c).y << "]" << WHITE << std::endl;
-			*c = NULL;
+			(**c).status = BACK;
+			(**c).out = (**c).in;
+			(**c).in = INIT;
+			*c = pry(**c); // backtracks
+			if (*c == NULL) return; //error
+			(**c).out = next_available(**c); //decides another different move from the backtracking position
+			(**c).in = INIT;
 			return;
 		default:
 			std::cout << YELLOW << "[Maze::probe()]: ERROR at [" << (**c).x << "][" << (**c).y << "]" << WHITE << std::endl;
@@ -284,64 +326,60 @@ void amo::Maze::probe(amo::Cell** c) {
 
 amo::Cell* amo::Maze::pry(amo::Cell& c) {
 	amo::Cell* next = NULL;
-	int direction;
 	if (c.out >= DEAD) {
-		std::cout << YELLOW << "[Maze::pry()]: [" << c.x << "][" << c.y << "] is DEAD:" << c.out << WHITE << std::endl;
+		std::cout << "[Maze::pry()]: [" << c.x << "][" << c.y << "] is DEAD:" << c.out << WHITE << std::endl;
 		return NULL;
 	} 
-	else {
-		direction = c.out+1;
-	}
-	switch (direction) {
+	switch (c.out) {
 		case INIT:
-			std::cout << YELLOW << "[Maze::pry()]: INIT" << WHITE << std::endl;
+			std::cout << "[Maze::pry()]: INIT" << WHITE << std::endl;
 			next = NULL; 
 			break;
 		case EAST:
 			if ((c.y+1)>=col) {
-				std::cout << YELLOW << "[Maze::pry()]: Beyond EAST" << WHITE << std::endl;
+				std::cout << "[Maze::pry()]: Beyond EAST" << WHITE << std::endl;
 				return NULL;
 			}
 			else {
-				std::cout << YELLOW << "[Maze::pry()]: EAST" << WHITE << std::endl;
+				std::cout << "[Maze::pry()]: EAST" << WHITE << std::endl;
 				next = &mz[c.x][c.y+1];
 			}
 			break;	
 		case SOUTH:
 			if ((c.x+1)>=row) {
-				std::cout << YELLOW << "[Maze::pry()]: Beyond SOUTH" << WHITE << std::endl;
+				std::cout << "[Maze::pry()]: Beyond SOUTH" << WHITE << std::endl;
 				return NULL;
 			}
 			else {
-				std::cout << YELLOW << "[Maze::pry()]: SOUTH" << WHITE << std::endl;
+				std::cout << "[Maze::pry()]: SOUTH" << WHITE << std::endl;
 				next = &mz[c.x+1][c.y];
 			}
 			break;
 		case WEST:
 			if ((c.y-1)<0) {
-				std::cout << YELLOW << "[Maze::pry()]: Beyond WEST" << WHITE << std::endl;
+				std::cout << "[Maze::pry()]: Beyond WEST" << WHITE << std::endl;
 				return NULL;
 			}
 			else {
-				std::cout << YELLOW << "[Maze::pry()]: WEST" << WHITE << std::endl;
+				std::cout << "[Maze::pry()]: WEST" << WHITE << std::endl;
 				next = &mz[c.x][c.y-1];
 			}
 			break;
 		case NORTH:
 			if ((c.x-1)<0) {
-				std::cout << YELLOW << "[Maze::pry()]: Beyond NORTH" << WHITE << std::endl;
+				std::cout << "[Maze::pry()]: Beyond NORTH" << WHITE << std::endl;
 				return NULL;
 			}
 			else {
-				std::cout << YELLOW << "[Maze::pry()]: NORTH" << WHITE << std::endl;
+				std::cout << "[Maze::pry()]: NORTH" << WHITE << std::endl;
 				next = &mz[c.x-1][c.y];
 			}
 			break;
 		case DEAD:
-			std::cout << YELLOW << "[Maze::pry()]: DEAD" << WHITE << std::endl;
+			std::cout << "[Maze::pry()]: DEAD" << WHITE << std::endl;
 			return NULL;
 		default:
-			std::cout << YELLOW << "[Maze::pry()]: ERROR" << WHITE << std::endl;
+			std::cout << "[Maze::pry()]: ERROR" << WHITE << std::endl;
 			return NULL;
 	}
 	return next;

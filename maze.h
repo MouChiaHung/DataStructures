@@ -33,6 +33,7 @@ public:
 	};
 	static Maze& getInstance(int n, int m);
 	void traverse(std::vector<Cell*>& vector);
+	void traverse(std::stack<Cell*>& stack);
 	bool labyrinth(int sx, int sy, int tx, int ty);
 	Cell* pry(Cell& c);
 	void probe(Cell** c);

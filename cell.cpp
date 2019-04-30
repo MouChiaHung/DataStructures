@@ -14,7 +14,8 @@
 
 
 #include <cell.h>
-#include <algorithm>    // std::for_each
+#include <algorithm> // std::for_each, copy
+#include <iterator>   // std::back_inserter
 
 #include <stack>
 #include <map>
@@ -151,7 +152,7 @@ bool amo::Cell::operator==(const amo::Cell& c) {
 	ret &= (status == c.status);
 	ret &= (in == c.in);
 	ret &= (out = c.out);
-	std::cout << "[Cell::operator=(Cell&)]:" << this << ", returns:" << ret << std::endl;
+	//std::cout << "[Cell::operator==(Cell&)]:" << this << ", returns:" << ret << std::endl;
 	return ret;
 }
 
