@@ -82,7 +82,7 @@ public:
 				node = node->pred;
 				if (node == n) 	break;
 			}
-		std::cout << "[List::functor_traverse(Node<T>*)]: node:" << n->data << " at " << n << " and index:" << index << WHITE << std::endl;
+			std::cout << "[List::functor_traverse(Node<T>*)]: node:" << n->data << " at " << n << " and index:" << index << WHITE << std::endl;
 		}
 	} VST_INDEX;
 	void traverse(VST& functor);

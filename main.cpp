@@ -39,6 +39,8 @@
 #include <maze.h>
 #include <cell.h>
 
+#include <bin_node.h>
+
 using namespace std;
 using namespace amo;
 using namespace mystd::myfstream;
@@ -674,7 +676,7 @@ int main(int argc, char *argv[])
 #endif	
 #endif		
 
-#if 0
+#if 1
 	std::vector<char> v;
 	cout << GREEN << "going to input" << WHITE << endl;
 	input(v);
@@ -2378,7 +2380,7 @@ int main(int argc, char *argv[])
 	return 0;
 #endif 
 
-#if 1
+#if 0
 	std::cout << GREEN << "****************** stack ******************\n" << WHITE << std::endl;
 	
 #if 0	
@@ -2459,7 +2461,22 @@ int main(int argc, char *argv[])
 	
 	std::cout << GREEN << "\n****************** main return ******************" << WHITE << std::endl;
 	return 0;
+#endif
+
+#if 1
+	std::cout << GREEN << "****************** tree ******************\n" << WHITE << std::endl;
+ 
+	amo::BinNode<int> root(0);
+	amo::BinNode<int>* lchild1 = root.insertLeftChild(10);
+	amo::BinNode<int>* lchild2 = lchild1->insertLeftChild(20);
+	amo::BinNode<int>* rchild2 = lchild1->insertRightChild(21);
+	amo::BinNode<int>* rchild1 = root.insertRightChild(11);
+	root.traverse();
+ 
+	std::cout << GREEN << "\n****************** main return ******************" << WHITE << std::endl;
+	return 0;
 #endif 
+ 
 	std::cout << GREEN << "\n****************** main return ******************" << WHITE << std::endl;
 	return 0;
 }
