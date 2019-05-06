@@ -48,7 +48,8 @@ view.o: view.cpp view.h
 text_view.o: text_view.cpp text_view.h view.h text.h screen.h
 	g++ $(CINC) -c $< 
 	
-main.o: main.cpp screen.h text_view.h text.h view.h space.h node.h linked_queue.h queue.h array_queue.h list.h list_node.h stack.h char.h queen.h maze.h cell.h bin_node.h
+main.o: main.cpp screen.h text_view.h text.h view.h space.h node.h linked_queue.h \
+		queue.h array_queue.h list.h list_node.h stack.h char.h queen.h maze.h cell.h bin_node.h bin_tree.h
 	g++ $(CINC) -c $<
 	
 clean:

@@ -39,6 +39,7 @@
 #include <maze.h>
 #include <cell.h>
 
+#include <bin_tree.h>
 #include <bin_node.h>
 
 using namespace std;
@@ -2467,10 +2468,13 @@ int main(int argc, char *argv[])
 	std::cout << GREEN << "****************** tree ******************\n" << WHITE << std::endl;
  
 	amo::BinNode<int> root(0);
-	amo::BinNode<int>* lchild1 = root.insertLeftChild(10);
-	amo::BinNode<int>* lchild2 = lchild1->insertLeftChild(20);
-	amo::BinNode<int>* rchild2 = lchild1->insertRightChild(21);
-	amo::BinNode<int>* rchild1 = root.insertRightChild(11);
+	amo::BinNode<int> lchild0 = root.insertLeftChild(111);
+	amo::BinNode<int> lchild00 = lchild0.insertLeftChild(1110);
+	amo::BinNode<int> rchild01 = lchild0.insertRightChild(1111);
+	
+	amo::BinNode<int> rchild1 = root.insertRightChild(222);
+	amo::BinNode<int> lchild10 = rchild1.insertLeftChild(2220);
+	amo::BinNode<int> rchild11 = rchild1.insertRightChild(2221);
 	root.traverse();
  
 	std::cout << GREEN << "\n****************** main return ******************" << WHITE << std::endl;

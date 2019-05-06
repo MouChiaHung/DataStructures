@@ -30,9 +30,9 @@ typedef struct functor_traverse {
 } FUNCTOR_TRAVERSER;
 private:
 	T data;
+	RB_COLOR color;
 	int height;
 	int npl;
-	RB_COLOR color;
 	BinNode<T>* parent;
 	BinNode<T>* lchild;
 	BinNode<T>* rchild;
@@ -42,10 +42,13 @@ public:
 		data(e), parent(p), lchild(lc), rchild(rc), height(h), npl(l), color(c) {
 			std::cout << "[BinNode::BinNode(T&)]: data:" << e << WHITE << std::endl;
 		}
-	~BinNode() {}
-	BinNode<T>* insertLeftChild(const T& t);
-	BinNode<T>* insertRightChild(const T& t);
+	~BinNode() {
+		std::cout << "[BinNode::~BinNode()]: data:" << data << WHITE << std::endl;
+	}
+	BinNode<T> insertLeftChild(const T& t);
+	BinNode<T> insertRightChild(const T& t);
 	BinNode<T>* succ();
+	int stature() { return height; }
 	int size();
 	bool operator<(const BinNode<T>& n);
 	bool operator==(const BinNode<T>& c);
@@ -79,8 +82,11 @@ friend std::ostream& operator<<(std::ostream& os, const BinNode<T>& node) {
 	//if (node.rchild!=NULL) os << WHITE << "rchild:" << *(node.rchild) << endl;
 	return os;
 }
+class BinTree;
+friend class BinTree;
 };
 
+#if 0
 template<typename T>
 void amo::BinNode<T>::traverse() {
 	FUNCTOR_TRAVERSER functor;
@@ -96,6 +102,23 @@ void amo::BinNode<T>::traverse() {
 	}
 	if (isRoot()) std::cout << "[BinNode::traverseLevel()]: --- TREE TOP ------" << WHITE << std::endl;
 }
+#else
+template<typename T>
+void amo::BinNode<T>::traverse() {
+	FUNCTOR_TRAVERSER functor;
+	if (isRoot()) std::cout << "[BinNode::traverseLevel()]: --- TREE TOP ------" << WHITE << std::endl;
+	if (isLeaf()) {
+		std::cout << GREEN << "leaf" << WHITE << std::endl;
+		functor(*this);
+	} else {
+		std::cout << GREEN << "vertex" << WHITE << std::endl;
+		functor(*this);
+		lchild->traverse();
+		rchild->traverse();
+	}
+	if (isRoot()) std::cout << "[BinNode::traverseLevel()]: --- TREE BOTTOM ------" << WHITE << std::endl;
+}
+#endif
 
 template<typename T>
 bool amo::BinNode<T>::isRoot() {
@@ -181,17 +204,18 @@ BinNode<T>* amo::BinNode<T>::fromParentTo() {
 	}
 }
 
-template<typename T>
-BinNode<T>* amo::BinNode<T>::insertLeftChild(const T& t) {
-	BinNode<T>* child = new BinNode(t, this);
-	lchild = child;
+//NRVO
+template<typename T> 
+BinNode<T> amo::BinNode<T>::insertLeftChild(const T& t) {
+	BinNode<T> child(t, this);
+	lchild = &child;
 	return child;
 }
 
 template<typename T>
-BinNode<T>* amo::BinNode<T>::insertRightChild(const T& t) {
-	BinNode<T>* child = new BinNode(t, this);
-	rchild = child;
+BinNode<T> amo::BinNode<T>::insertRightChild(const T& t) {
+	BinNode<T> child(t, this);
+	rchild = &child;
 	return child;
 }
 
