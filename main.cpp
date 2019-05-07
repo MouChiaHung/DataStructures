@@ -2467,21 +2467,33 @@ int main(int argc, char *argv[])
 #if 1
 	std::cout << GREEN << "****************** tree ******************\n" << WHITE << std::endl;
  
- #if 0
+#if 1
 	amo::BinNode<int> root(0);
-	amo::BinNode<int>* lchild0 = root.insertLeftChild(111);
-	amo::BinNode<int>* lchild00 = lchild0->insertLeftChild(1110);
-	amo::BinNode<int>* rchild01 = lchild0->insertRightChild(1111);
-	
-	amo::BinNode<int>* rchild1 = root.insertRightChild(222);
-	amo::BinNode<int>* lchild10 = rchild1->insertLeftChild(2220);
-	amo::BinNode<int>* rchild11 = rchild1->insertRightChild(2221);
-	root.traverse();
+	amo::BinNode<int>* lchild0 = root.insertLeftChild(1);
+	amo::BinNode<int>* lchild00 = lchild0->insertLeftChild(11);
+#if 0
+	std::cout << GREEN << "node:" << lchild00 << WHITE << std::endl;
+	std::cout << GREEN << "node->parent:" << lchild00->parent << WHITE << std::endl;
+	std::cout << GREEN << "&node->parent:" << &lchild00->parent << WHITE << std::endl;
+	lchild00->test(lchild00);
+	std::cout << GREEN << "node:" << lchild00 << WHITE << std::endl;
+	std::cout << GREEN << "node->parent:" << lchild00->parent << WHITE << std::endl;
+	std::cout << GREEN << "&node->parent:" << &lchild00->parent << WHITE << std::endl;
 #endif	
+	amo::BinNode<int>* rchild01 = lchild0->insertRightChild(12);
+	
+	amo::BinNode<int>* rchild1 = root.insertRightChild(2);
+	amo::BinNode<int>* lchild10 = rchild1->insertLeftChild(21);
+	amo::BinNode<int>* rchild11 = rchild1->insertRightChild(22);
+	root.traversePre();
+	root.traversePreLoop();
+	root.traversePost();
+#endif	
+
 	amo::BinTree<int> tree;
-	tree.insertRoot(1111);
-	tree.insertLeftChild(tree.root(), 22220);
-	tree.insertRightChild(tree.root(), 22221);
+	tree.insertRoot(0);
+	tree.insertLeftChild(tree.root(), 1);
+	tree.insertRightChild(tree.root(), 2);
  
 	std::cout << GREEN << "\n****************** main return ******************" << WHITE << std::endl;
 	return 0;

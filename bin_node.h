@@ -57,6 +57,7 @@ public:
 	void traverse();
 	void traverseLevel();
 	void traversePre();
+	void traversePreLoop();
 	void traverseIn();
 	void traversePost();
 	bool isRoot();
@@ -70,7 +71,8 @@ public:
 	bool hasRightChild();
 	BinNode<T>* sibling();
 	BinNode<T>* uncle();
-	BinNode<T>* parentLink();
+	BinNode<T>*& parentLink();
+	void test(BinNode<T>* node);
 	
 //friend std::istream& operator>>(std::istream& is, BinNode<T>& node);
 friend std::ostream& operator<<(std::ostream& os, const BinNode<T>& node) {
@@ -87,11 +89,20 @@ class BinTree;
 friend class BinTree;
 };
 
+template<typename T>
+void amo::BinNode<T>::test(BinNode<T>* node) {
+	std::cout << YELLOW << "[BinNode::test(BinNode<T>*)]: node:" << node << WHITE << std::endl;
+	std::cout << YELLOW << "[BinNode::test(BinNode<T>*)]: node->parent:" << node->parent << WHITE << std::endl;
+	std::cout << YELLOW << "[BinNode::test(BinNode<T>*)]: &node->parent:" << &node->parent << WHITE << std::endl;
+	node->parent = new BinNode(); //pointer could access and modify the member, even a pointer, of the object being pointed on its own. 
+}
+
+
 #if 0
 template<typename T>
 void amo::BinNode<T>::traverse() {
 	FUNCTOR_TRAVERSER functor;
-	if (isRoot()) std::cout << "[BinNode::traverseLevel()]: --- TREE BOTTOM ------" << WHITE << std::endl;
+	if (isRoot()) std::cout << GREEN << "[BinNode::traverse()]: --- TREE BOTTOM ------" << WHITE << std::endl;
 	if (isLeaf()) {
 		std::cout << GREEN << "leaf" << WHITE << std::endl;
 		functor(*this);
@@ -101,25 +112,103 @@ void amo::BinNode<T>::traverse() {
 		std::cout << GREEN << "vertex" << WHITE << std::endl;
 		functor(*this);
 	}
-	if (isRoot()) std::cout << "[BinNode::traverseLevel()]: --- TREE TOP ------" << WHITE << std::endl;
+	if (isRoot()) std::cout << GREEN << "[BinNode::traverse()]: --- TREE TOP ------" << WHITE << std::endl;
 }
 #else
 template<typename T>
 void amo::BinNode<T>::traverse() {
 	FUNCTOR_TRAVERSER functor;
-	if (isRoot()) std::cout << "[BinNode::traverseLevel()]: --- TREE TOP ------" << WHITE << std::endl;
 	if (isLeaf()) {
 		std::cout << GREEN << "leaf" << WHITE << std::endl;
 		functor(*this);
+		return;
 	} else {
+		if (isRoot()) std::cout << GREEN << "[BinNode::traverse()]: --- TREE TOP ------" << WHITE << std::endl;
 		std::cout << GREEN << "vertex" << WHITE << std::endl;
 		functor(*this);
 		lchild->traverse();
 		rchild->traverse();
+		if (isRoot()) std::cout << GREEN << "[BinNode::traverse()]: --- TREE BOTTOM ------" << WHITE << std::endl;
+		return;
 	}
-	if (isRoot()) std::cout << "[BinNode::traverseLevel()]: --- TREE BOTTOM ------" << WHITE << std::endl;
 }
 #endif
+
+template<typename T>
+void amo::BinNode<T>::traversePre() {
+	FUNCTOR_TRAVERSER functor;
+	if (isLeaf()) {
+		std::cout << GREEN << "leaf" << WHITE << std::endl;
+		functor(*this);
+		return;
+	}
+	else {
+		if (isRoot()) std::cout << GREEN << "\n[BinNode::traversePre()]: --- TREE TOP ------" << WHITE << std::endl;
+		std::cout << GREEN << "vertex" << WHITE << std::endl;
+		functor(*this);
+		lchild->traverse();
+		rchild->traverse();
+		if (isRoot()) std::cout << GREEN << "[BinNode::traversePre()]: --- TREE BOTTOM ------" << WHITE << std::endl;
+		return;
+	}
+}
+
+template<typename T>
+void amo::BinNode<T>::traversePreLoop() {
+	FUNCTOR_TRAVERSER functor;
+	std::stack<BinNode<T>*> stack;
+	BinNode<T>* node;
+	stack.push(this);
+	std::cout << GREEN << "\n[BinNode::traversePreLoop()]: --- TREE TOP ------" << WHITE << std::endl;
+	while (!stack.empty()) {
+		node = stack.top();
+		stack.pop();
+		if (node->isLeaf()) std::cout << GREEN << "leaf" << WHITE << std::endl;
+		else std::cout << GREEN << "vertex" << WHITE << std::endl;
+		functor(*node);
+		if (node->hasRightChild()) stack.push(node->rchild);
+		if (node->hasLeftChild()) stack.push(node->lchild);
+	}
+	std::cout << GREEN << "\n[BinNode::traversePreLoop()]: --- TREE TOP ------" << WHITE << std::endl;
+}
+
+template<typename T>
+void amo::BinNode<T>::traversePost() {
+	FUNCTOR_TRAVERSER functor;
+	if (isLeaf()) {
+		std::cout << GREEN << "leaf" << WHITE << std::endl;
+		functor(*this);
+		return;
+	}
+	else {
+		if (isRoot()) std::cout << GREEN << "\n[BinNode::traversePost()]: --- TREE TOP ------" << WHITE << std::endl;
+		lchild->traversePost();
+		rchild->traversePost();
+		std::cout << GREEN << "vertex" << WHITE << std::endl;
+		functor(*this);
+		if (isRoot()) std::cout << GREEN << "[BinNode::traversePost()]: --- TREE BOTTOM ------" << WHITE << std::endl;
+		return;
+	}
+}
+
+template<typename T>
+void amo::BinNode<T>::traverseIn() {
+	FUNCTOR_TRAVERSER functor;
+	if (isLeaf()) {
+		std::cout << GREEN << "leaf" << WHITE << std::endl;
+		functor(*this);
+		return;
+	}
+	else {
+		if (isRoot()) std::cout << GREEN << "\n[BinNode::traversePost()]: --- TREE TOP ------" << WHITE << std::endl;
+		lchild->traversePost();
+		std::cout << GREEN << "vertex" << WHITE << std::endl;
+		functor(*this);
+		rchild->traversePost();
+		if (isRoot()) std::cout << GREEN << "[BinNode::traversePost()]: --- TREE BOTTOM ------" << WHITE << std::endl;
+		return;
+	}
+}
 
 template<typename T>
 bool amo::BinNode<T>::isRoot() {
@@ -179,9 +268,10 @@ BinNode<T>* amo::BinNode<T>::sibling() {
 	if (isLeftChild()) {
 		return parent->rchild;
 	}
-	else {
+	else if (isRightChild()) {
 		return parent->lchild;
 	}
+	else NULL;
 }
 
 template<typename T>
@@ -189,19 +279,21 @@ BinNode<T>* amo::BinNode<T>::uncle() {
 	if (parent->isLeftChild()) {
 		return parent->parent->rchild;
 	}
-	else {
+	else if (isRightChild()) {
 		return parent->parent->lchild;
 	}
+	else NULL;
 }
 
 template<typename T>
-BinNode<T>* amo::BinNode<T>::parentLink() {
+BinNode<T>*& amo::BinNode<T>::parentLink() {
 	if (isRoot()) {
-		return NULL;
+		return parent;
 	}
 	else {
 		if (isLeftChild()) return parent->lchild; 
-		else return parent->rchild;
+		else if (isRightChild()) return parent->rchild;
+		else return parent;
 	}
 }
 

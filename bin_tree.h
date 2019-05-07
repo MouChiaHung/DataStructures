@@ -36,9 +36,12 @@ public:
 	BinTree() : _size(0), _root(NULL) {
 		std::cout << "[BinTree::BinTree()]: this:" << this << ", type:" << typeid(T).name() << WHITE << std::endl;
 	}
+	BinTree(BinNode<T>* node) : _size(node->height), _root(node) {
+		std::cout << "[BinTree::BinTree(BinNode<T>*)]: this:" << this << ", root:" << _root->data << ", size:" << _size << WHITE << std::endl;
+	}
 	~BinTree() {
 		std::cout << "[BinTree::~BinTree()]: size:" << _size << WHITE << std::endl;
-		if (0<size()) removeTree(_root);
+		if (0<size() && _root!=NULL) remove(_root);
 	}
 	
 	int size() const { return _size; }
@@ -56,6 +59,7 @@ public:
 	BinNode<T>* attachRightChild(BinNode<T>* node, BinTree<T>* &tree);
 	
 	int removeTree(BinNode<T>* node);
+	int remove(BinNode<T>* node);
 	BinTree<T>* secede(BinNode<T>* node);
 	
 	void traverse();
@@ -162,6 +166,7 @@ NO_ROOT_AR:
 template<typename T>
 int amo::BinTree<T>::removeTree(BinNode<T>* node) {
 	int removed = 0;
+	
 	if (node == NULL) return 0;
 	if (node->isLeaf()) {
 		std::cout << "[BinTree::removeTree()]: going to delete leaf:" << node->data << WHITE << std::endl;
@@ -179,7 +184,32 @@ int amo::BinTree<T>::removeTree(BinNode<T>* node) {
 	}
 }
 
+template<typename T>
+int amo::BinTree<T>::remove(BinNode<T>* node) {
+	if (!node->isRoot()) {
+		if (node->isLeftChild()) 
+			std::cout << "[BinTree::remove()]: node(" << node->data << ") parent left link at:" << &(node->parent->lchild) << ", link at:" << &(node->parentLink()) << WHITE << endl;
+		else if (node->isRightChild()) 
+			std::cout << "[BinTree::remove()]: node(" << node->data << ") parent right link at:" << &(node->parent->rchild) << ", link at:" << &(node->parentLink()) << WHITE << endl;
+		node->parentLink() = NULL;
+		updateHeightAbove(node->parent);
+	}	
+	int removed_count = removeTree(node);
+	_size -= removed_count;
+	return removed_count;
+}
 
+template<typename T>
+BinTree<T>* amo::BinTree<T>::secede(BinNode<T>* node) {
+	if (!node->isRoot()) {
+		node->parentLink() = NULL;
+		updateHeightAbove(node->parent);
+		node->parent = NULL;
+	}
+	BinTree<T>* sub_tree = new BinTree(node);
+	_size -= sub_tree->size();
+	return sub_tree;
+}
 
 
 
