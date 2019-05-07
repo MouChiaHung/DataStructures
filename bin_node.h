@@ -29,6 +29,8 @@ typedef struct functor_traverse {
 	}
 } FUNCTOR_TRAVERSER;
 private:
+
+public:
 	T data;
 	RB_COLOR color;
 	int height;
@@ -36,7 +38,7 @@ private:
 	BinNode<T>* parent;
 	BinNode<T>* lchild;
 	BinNode<T>* rchild;
-public:
+	
 	BinNode() : height(0), npl(1), color(RB_RED), parent(NULL), lchild(NULL), rchild(NULL) {}
 	BinNode(const T& e, BinNode<T>* p=NULL, BinNode<T>* lc=NULL, BinNode<T>* rc=NULL, int h=0, int l=1, RB_COLOR c=RB_RED) : 
 		data(e), parent(p), lchild(lc), rchild(rc), height(h), npl(l), color(c) {
@@ -45,10 +47,9 @@ public:
 	~BinNode() {
 		std::cout << "[BinNode::~BinNode()]: data:" << data << WHITE << std::endl;
 	}
-	BinNode<T> insertLeftChild(const T& t);
-	BinNode<T> insertRightChild(const T& t);
+	BinNode<T>* insertLeftChild(const T& t);
+	BinNode<T>* insertRightChild(const T& t);
 	BinNode<T>* succ();
-	int stature() { return height; }
 	int size();
 	bool operator<(const BinNode<T>& n);
 	bool operator==(const BinNode<T>& c);
@@ -69,7 +70,7 @@ public:
 	bool hasRightChild();
 	BinNode<T>* sibling();
 	BinNode<T>* uncle();
-	BinNode<T>* fromParentTo();
+	BinNode<T>* parentLink();
 	
 //friend std::istream& operator>>(std::istream& is, BinNode<T>& node);
 friend std::ostream& operator<<(std::ostream& os, const BinNode<T>& node) {
@@ -165,12 +166,12 @@ bool amo::BinNode<T>::hasBothChild() {
 
 template<typename T>
 bool amo::BinNode<T>::hasLeftChild() {
-	return lchild ? true : false;
+	return lchild != NULL ? true : false;
 }
 
 template<typename T>
 bool amo::BinNode<T>::hasRightChild() {
-	return rchild ? true : false;
+	return rchild != NULL ? true : false;
 }
 
 template<typename T>
@@ -194,9 +195,9 @@ BinNode<T>* amo::BinNode<T>::uncle() {
 }
 
 template<typename T>
-BinNode<T>* amo::BinNode<T>::fromParentTo() {
+BinNode<T>* amo::BinNode<T>::parentLink() {
 	if (isRoot()) {
-		return this;
+		return NULL;
 	}
 	else {
 		if (isLeftChild()) return parent->lchild; 
@@ -204,19 +205,18 @@ BinNode<T>* amo::BinNode<T>::fromParentTo() {
 	}
 }
 
-//NRVO
 template<typename T> 
-BinNode<T> amo::BinNode<T>::insertLeftChild(const T& t) {
-	BinNode<T> child(t, this);
-	lchild = &child;
-	return child;
+BinNode<T>* amo::BinNode<T>::insertLeftChild(const T& t) {
+	BinNode<T>* child = new BinNode(t, this);
+	lchild = child;
+	return lchild;
 }
 
 template<typename T>
-BinNode<T> amo::BinNode<T>::insertRightChild(const T& t) {
-	BinNode<T> child(t, this);
-	rchild = &child;
-	return child;
+BinNode<T>* amo::BinNode<T>::insertRightChild(const T& t) {
+	BinNode<T>* child = new BinNode(t, this);
+	rchild = child;
+	return rchild;
 }
 
 

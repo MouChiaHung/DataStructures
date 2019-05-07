@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stack.h>
 #include <map>
+#include <typeinfo> 
 
 #include <bin_node.h>
 
@@ -30,31 +31,31 @@ typedef struct functor_traverse {
 } FUNCTOR_TRAVERSER;
 private:
 	int _size; //0 if root is null
-	BinTree<T>* _root;
+	BinNode<T>* _root;
 public:
 	BinTree() : _size(0), _root(NULL) {
-		std::cout << "[BinTree::~BinTree()]: this:" << this << WHITE << std::endl;
+		std::cout << "[BinTree::BinTree()]: this:" << this << ", type:" << typeid(T).name() << WHITE << std::endl;
 	}
 	~BinTree() {
 		std::cout << "[BinTree::~BinTree()]: size:" << _size << WHITE << std::endl;
-		if (0<size) remove(_root);
+		if (0<size()) removeTree(_root);
 	}
 	
 	int size() const { return _size; }
 	bool empty() const { return !_root;};
-	BinTree<T>* root() const { return _root; }
+	BinNode<T>* root() const { return _root; }
 	
 	bool operator<(const BinTree<T>& tree) { return (_root && tree.root() && _root<*tree.root()); }
 	bool operator==(const BinTree<T>& tree) { return (_root && tree.root() && _root==*tree.root()); }
 	BinTree<T>& operator=(const BinTree& c);
 	
-	BinNode<T> insertRoot(const T& t);
-	BinNode<T> insertLeftChild(BinNode<T>* node, const T& t);
+	BinNode<T>* insertRoot(const T& t);
+	BinNode<T>* insertLeftChild(BinNode<T>* node, const T& t);
 	BinNode<T>* attachLeftChild(BinNode<T>* node, BinTree<T>* &tree);
-	BinNode<T> insertRightChild(BinNode<T>* node, const T& t);
+	BinNode<T>* insertRightChild(BinNode<T>* node, const T& t);
 	BinNode<T>* attachRightChild(BinNode<T>* node, BinTree<T>* &tree);
 	
-	int remove(BinNode<T>* node);
+	int removeTree(BinNode<T>* node);
 	BinTree<T>* secede(BinNode<T>* node);
 	
 	void traverse();
@@ -77,41 +78,55 @@ friend std::ostream& operator<<(std::ostream& os, const BinTree<T>& tree) {
 
 template<typename T>
 int amo::BinTree<T>::updateHeight(BinNode<T>* node) {
-	BinNode<T>* lchild = node->lchild;
-	BinNode<T>* rchild = node->rchild;
-	return node->height = 1+std::max(lchild->stature(), rchild->stature());
+	if (node->isLeaf()) {
+		node->height = 0;
+		std::cout << "[BinTree::updateHeight()]: leaf(" << node->data << ") height:" << node->height << WHITE << std::endl;
+		return node->height;
+	}
+	else {
+		BinNode<T>* lchild = node->lchild;
+		BinNode<T>* rchild = node->rchild;
+		if (lchild && rchild) node->height = 1 + std::max(lchild->height, rchild->height);
+		else if (lchild && rchild == NULL) node->height = 1 + lchild->height;
+		else if (rchild && lchild == NULL) node->height = 1 + rchild->height;
+		else node->height = 0;
+		std::cout << "[BinTree::updateHeight()]: vertex(" << node->data << ") height:" << node->height << WHITE << std::endl;
+		return node->height;
+	}
 }
 
 template<typename T>
 void amo::BinTree<T>::updateHeightAbove(BinNode<T>* node) {
-	while (node) {
+	while (node!=NULL) {
 		updateHeight(node);
 		node = node->parent;
 	}
 }
 
 template<typename T>
-BinNode<T> amo::BinTree<T>::insertRoot(T const& t) {
-	BinNode<T> r(t);
-	_root = &r;
+BinNode<T>* amo::BinTree<T>::insertRoot(T const& t) {
+	BinNode<T>* r = new BinNode<T>(t);
+	_root = r;
 	_size = 1;
 	return r;
 }
 
 
 template<typename T>
-BinNode<T> amo::BinTree<T>::insertLeftChild(BinNode<T>* node, const T& t) {
-	BinNode<T> insert = node->insertLeftChild(t);
+BinNode<T>* amo::BinTree<T>::insertLeftChild(BinNode<T>* node, const T& t) {
+	BinNode<T>* insert = node->insertLeftChild(t);
+	std::cout << "[BinTree::insertLeftChild()]: inserted node:" << insert->data << WHITE << std::endl;
 	updateHeightAbove(node);
-	size++;
+	_size++;
 	return insert;
 }
 
 template<typename T>
-BinNode<T> amo::BinTree<T>::insertRightChild(BinNode<T>* node, const T& t) {
-	BinNode<T> insert = node->insertRightChild(t);
+BinNode<T>* amo::BinTree<T>::insertRightChild(BinNode<T>* node, const T& t) {
+	BinNode<T>* insert = node->insertRightChild(t);
+	std::cout << "[BinTree::insertRightChild()]: inserted node:" << insert->data << WHITE << std::endl;
 	updateHeightAbove(node);
-	size++;
+	_size++;
 	return insert;
 }
 
@@ -143,6 +158,32 @@ NO_ROOT_AR:
 	tree = NULL;
 	return node;
 }
+
+template<typename T>
+int amo::BinTree<T>::removeTree(BinNode<T>* node) {
+	int removed = 0;
+	if (node == NULL) return 0;
+	if (node->isLeaf()) {
+		std::cout << "[BinTree::removeTree()]: going to delete leaf:" << node->data << WHITE << std::endl;
+		delete node;
+		removed++;
+		return removed;
+	}
+	else {
+		if (node->hasLeftChild()) removed += removeTree(node->lchild);
+		if (node->hasRightChild()) removed += removeTree(node->rchild);
+		std::cout << "[BinTree::removeTree()]: going to delete vertex:" << node->data << WHITE << std::endl;
+		delete node;
+		removed++;
+		return removed;
+	}
+}
+
+
+
+
+
+
 
 
 
