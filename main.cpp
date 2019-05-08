@@ -2469,25 +2469,33 @@ int main(int argc, char *argv[])
  
 #if 1
 	amo::BinNode<int> root(0);
-	amo::BinNode<int>* lchild0 = root.insertLeftChild(1);
-	amo::BinNode<int>* lchild00 = lchild0->insertLeftChild(11);
-#if 0
-	std::cout << GREEN << "node:" << lchild00 << WHITE << std::endl;
-	std::cout << GREEN << "node->parent:" << lchild00->parent << WHITE << std::endl;
-	std::cout << GREEN << "&node->parent:" << &lchild00->parent << WHITE << std::endl;
-	lchild00->test(lchild00);
-	std::cout << GREEN << "node:" << lchild00 << WHITE << std::endl;
-	std::cout << GREEN << "node->parent:" << lchild00->parent << WHITE << std::endl;
-	std::cout << GREEN << "&node->parent:" << &lchild00->parent << WHITE << std::endl;
-#endif	
-	amo::BinNode<int>* rchild01 = lchild0->insertRightChild(12);
+	amo::BinNode<int>* lchild1 = root.insertLeftChild(1);
+	amo::BinNode<int>* rchild2 = root.insertRightChild(2);
+	amo::BinNode<int>* lchild3 = lchild1->insertLeftChild(3);
+	amo::BinNode<int>* rchild4 = lchild1->insertRightChild(4);
+	amo::BinNode<int>* lchild5 = rchild2->insertLeftChild(5);
+	amo::BinNode<int>* rchild6 = rchild2->insertRightChild(6);
+	amo::BinNode<int>* lchild7 = lchild3->insertLeftChild(7);
+	amo::BinNode<int>* rchild8 = lchild3->insertRightChild(8);
+	amo::BinNode<int>* lchild9 = rchild6->insertLeftChild(9);
+	amo::BinNode<int>* rchild10 = rchild6->insertRightChild(10);
 	
-	amo::BinNode<int>* rchild1 = root.insertRightChild(2);
-	amo::BinNode<int>* lchild10 = rchild1->insertLeftChild(21);
-	amo::BinNode<int>* rchild11 = rchild1->insertRightChild(22);
+#if 0	
+	std::cout << GREEN << "going to root.traversePre()" << WHITE << std::endl;
 	root.traversePre();
+	std::cout << GREEN << "going to root.traversePreLoop()" << WHITE << std::endl;
 	root.traversePreLoop();
+	std::cout << GREEN << "going to root.traversePreLoop2()" << WHITE << std::endl;
+	root.traversePreLoop2();
+#elif 1	
+	std::cout << GREEN << "going to root.traverseIn()" << WHITE << std::endl;
+	root.traverseIn();
+	std::cout << GREEN << "going to root.traverseInLoop()" << WHITE << std::endl;
+	root.traverseInLoop();
+#else	
+	std::cout << GREEN << "going to root.traversePost()" << WHITE << std::endl;
 	root.traversePost();
+#endif
 #endif	
 
 	amo::BinTree<int> tree;

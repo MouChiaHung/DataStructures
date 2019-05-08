@@ -32,6 +32,7 @@ typedef struct functor_traverse {
 private:
 	int _size; //0 if root is null
 	BinNode<T>* _root;
+	int removeTree(BinNode<T>* node);
 public:
 	BinTree() : _size(0), _root(NULL) {
 		std::cout << "[BinTree::BinTree()]: this:" << this << ", type:" << typeid(T).name() << WHITE << std::endl;
@@ -58,7 +59,6 @@ public:
 	BinNode<T>* insertRightChild(BinNode<T>* node, const T& t);
 	BinNode<T>* attachRightChild(BinNode<T>* node, BinTree<T>* &tree);
 	
-	int removeTree(BinNode<T>* node);
 	int remove(BinNode<T>* node);
 	BinTree<T>* secede(BinNode<T>* node);
 	
@@ -152,7 +152,7 @@ NO_ROOT:
 template<typename T>
 BinNode<T>* amo::BinTree<T>::attachRightChild(BinNode<T>* node, BinTree<T>* &tree) {
 	if (tree->root == NULL) goto NO_ROOT_AR;
-	node->rchild = tree;
+	node->rchild = tree->root;
 	tree->parent = node;
 	size += tree->size();
 	updateHeightAbove(node);
