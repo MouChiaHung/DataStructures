@@ -2480,14 +2480,14 @@ int main(int argc, char *argv[])
 	amo::BinNode<int>* lchild9 = rchild6->insertLeftChild(9);
 	amo::BinNode<int>* rchild10 = rchild6->insertRightChild(10);
 	
-#if 0	
+#if 0
 	std::cout << GREEN << "going to root.traversePre()" << WHITE << std::endl;
 	root.traversePre();
 	std::cout << GREEN << "going to root.traversePreLoop()" << WHITE << std::endl;
 	root.traversePreLoop();
 	std::cout << GREEN << "going to root.traversePreLoop2()" << WHITE << std::endl;
 	root.traversePreLoop2();
-#elif 1	
+#elif 1
 	std::cout << GREEN << "going to root.traverseIn()" << WHITE << std::endl;
 	root.traverseIn();
 	std::cout << GREEN << "going to root.traverseInLoop()" << WHITE << std::endl;
