@@ -2479,6 +2479,8 @@ int main(int argc, char *argv[])
 	amo::BinNode<int>* rchild8 = lchild3->insertRightChild(8);
 	amo::BinNode<int>* lchild9 = rchild6->insertLeftChild(9);
 	amo::BinNode<int>* rchild10 = rchild6->insertRightChild(10);
+	amo::BinNode<int>* lchild11 = rchild8->insertLeftChild(11);
+	amo::BinNode<int>* rchild12 = rchild8->insertRightChild(12);
 	
 #if 0
 	std::cout << GREEN << "going to root.traversePre()" << WHITE << std::endl;
@@ -2492,6 +2494,10 @@ int main(int argc, char *argv[])
 	root.traverseIn();
 	std::cout << GREEN << "going to root.traverseInLoop()" << WHITE << std::endl;
 	root.traverseInLoop();
+	std::cout << GREEN << "going to root.traverseInLoop2()" << WHITE << std::endl;
+	root.traverseInLoop2();
+	std::cout << GREEN << "going to root.traverseInLoop3()" << WHITE << std::endl;
+	root.traverseInLoop3();
 #else	
 	std::cout << GREEN << "going to root.traversePost()" << WHITE << std::endl;
 	root.traversePost();

@@ -50,7 +50,6 @@ public:
 	}
 	BinNode<T>* insertLeftChild(const T& t);
 	BinNode<T>* insertRightChild(const T& t);
-	BinNode<T>* succ();
 	bool operator<(const BinNode<T>& n);
 	bool operator==(const BinNode<T>& c);
 	BinNode<T>& operator=(const BinNode& c);
@@ -61,6 +60,8 @@ public:
 	void traversePreLoop2();
 	void traverseIn();
 	void traverseInLoop();
+	void traverseInLoop2();
+	void traverseInLoop3();
 	void traversePost();
 	bool isRoot();
 	bool isLeftChild();
@@ -73,14 +74,15 @@ public:
 	bool hasRightChild();
 	BinNode<T>* sibling();
 	BinNode<T>* uncle();
+	BinNode<T>* succ();
 	BinNode<T>*& parentLink();
 	void test(BinNode<T>* node);
 	
 //friend std::istream& operator>>(std::istream& is, BinNode<T>& node);
 friend std::ostream& operator<<(std::ostream& os, const BinNode<T>& node) {
-	os  << WHITE << "[this]:" << &node << endl;
+	//os  << WHITE << "[this]:" << &node << endl;
 	os  << WHITE << "[data]:" << node.data << endl;
-	os  << WHITE << "[height]:" << node.height << endl;
+	//os  << WHITE << "[height]:" << node.height << endl;
 	//os  << WHITE << "[npl]:" << node.npl << endl;
 	//if (node.parent!=NULL) os << WHITE << "parent:" << *(node.parent) << endl;
 	//if (node.lchild!=NULL) os << WHITE << "lchild:" << *(node.lchild) << endl;
@@ -289,6 +291,75 @@ void amo::BinNode<T>::traverseInLoop() {
 	}
 	std::cout << GREEN << "\n[BinNode::traverseInLoop()]: --- TREE BOTTOM ------" << WHITE << std::endl;
 }
+
+template<typename T>
+void amo::BinNode<T>::traverseInLoop2() {
+	std::stack<BinNode<T>*> stack;
+	FUNCTOR_TRAVERSER functor;
+	BinNode<T>* node = this;
+	std::cout << GREEN << "\n[BinNode::traverseInLoop2()]: --- TREE TOP ------" << WHITE << std::endl;
+	while (true) {
+		if (node) { //while-loop task1
+			stack.push(node);
+			node = node->lchild;
+		}
+		else if (!stack.empty()){ //while-loop task2
+			node = stack.top();
+			stack.pop();
+			if (node->isLeaf()) std::cout << GREEN << "leaf" << WHITE << std::endl;
+			else std::cout << GREEN << "vertex" << WHITE << std::endl;
+			functor(*node);
+			node = node->rchild;
+		}
+		else break;
+	}
+	std::cout << GREEN << "\n[BinNode::traverseInLoop2()]: --- TREE BOTTOM ------" << WHITE << std::endl;
+}
+
+template<typename T>
+BinNode<T>* amo::BinNode<T>::succ() {
+	BinNode<T>* node = this;
+	if (node->hasRightChild()) {
+		node = node->rchild;
+		while (node->hasLeftChild()) node = node->lchild;
+	}
+	else {
+		while (node->isRightChild()) node = node->parent;
+		node = node->parent;
+	}
+	return node;
+}
+
+template<typename T>
+void amo::BinNode<T>::traverseInLoop3() {
+	FUNCTOR_TRAVERSER functor;
+	std::stack<BinNode<T>*> stack;
+	BinNode<T>* node = this;
+	bool backtrack = false;
+	std::cout << GREEN << "\n[BinNode::traverseInLoop3()]: --- TREE TOP ------" << WHITE << std::endl;
+	while (true) {
+		if (!backtrack && node->hasLeftChild()) { //firstly dig into the deepest left child
+			stack.push(node);
+			node = node->lchild;
+		}
+		else { //backtrack onto a vertex or arrive a leaf 
+			if (node->isLeaf()) std::cout << GREEN << "leaf" << WHITE << std::endl;
+			else std::cout << GREEN << "vertex" << WHITE << std::endl;
+			functor(*node);
+			if (node->hasRightChild()) { //a vertex
+				//node = node->rchild; //the pattern traversing a sub tree equals the pattern traversing root tree
+				node = node->succ();
+				backtrack = false;
+			}
+			else { //a leaf
+				node = node->succ(); //backtrack
+				if (node == NULL) break; 
+				backtrack = true;
+			}
+		}
+	}
+	std::cout << GREEN << "\n[BinNode::traverseInLoop3()]: --- TREE BOTTOM ------" << WHITE << std::endl;
+} 
 
 template<typename T>
 bool amo::BinNode<T>::isRoot() {
