@@ -223,25 +223,6 @@ void amo::BinNode<T>::traversePreLoop2() {
 }
 
 template<typename T>
-void amo::BinNode<T>::traversePost() {
-	FUNCTOR_TRAVERSER functor;
-	if (isLeaf()) {
-		std::cout << GREEN << "leaf" << WHITE << std::endl;
-		functor(*this);
-		return;
-	}
-	else {
-		if (isRoot()) std::cout << GREEN << "\n[BinNode::traversePost()]: --- TREE TOP ------" << WHITE << std::endl;
-		if (hasLeftChild()) lchild->traversePost();
-		if (hasRightChild()) rchild->traversePost();
-		std::cout << GREEN << "vertex" << WHITE << std::endl;
-		functor(*this);
-		if (isRoot()) std::cout << GREEN << "[BinNode::traversePost()]: --- TREE BOTTOM ------" << WHITE << std::endl;
-		return;
-	}
-}
-
-template<typename T>
 void amo::BinNode<T>::traverseIn() {
 	FUNCTOR_TRAVERSER functor;
 	if (isLeaf()) {
@@ -327,19 +308,17 @@ BinNode<T>* amo::BinNode<T>::succ() {
 		while (node->isRightChild()) node = node->parent;
 		node = node->parent;
 	}
-	return node;
+	return node;	
 }
 
 template<typename T>
 void amo::BinNode<T>::traverseInLoop3() {
 	FUNCTOR_TRAVERSER functor;
-	std::stack<BinNode<T>*> stack;
 	BinNode<T>* node = this;
 	bool backtrack = false;
 	std::cout << GREEN << "\n[BinNode::traverseInLoop3()]: --- TREE TOP ------" << WHITE << std::endl;
 	while (true) {
 		if (!backtrack && node->hasLeftChild()) { //firstly dig into the deepest left child
-			stack.push(node);
 			node = node->lchild;
 		}
 		else { //backtrack onto a vertex or arrive a leaf 
@@ -357,9 +336,28 @@ void amo::BinNode<T>::traverseInLoop3() {
 				backtrack = true;
 			}
 		}
-	}
+	}	
 	std::cout << GREEN << "\n[BinNode::traverseInLoop3()]: --- TREE BOTTOM ------" << WHITE << std::endl;
 } 
+
+template<typename T>
+void amo::BinNode<T>::traversePost() {
+	FUNCTOR_TRAVERSER functor;
+	if (isLeaf()) {
+		std::cout << GREEN << "leaf" << WHITE << std::endl;
+		functor(*this);
+		return;
+	}
+	else {
+		if (isRoot()) std::cout << GREEN << "\n[BinNode::traversePost()]: --- TREE TOP ------" << WHITE << std::endl;
+		if (hasLeftChild()) lchild->traversePost();
+		if (hasRightChild()) rchild->traversePost();
+		std::cout << GREEN << "vertex" << WHITE << std::endl;
+		functor(*this);
+		if (isRoot()) std::cout << GREEN << "[BinNode::traversePost()]: --- TREE BOTTOM ------" << WHITE << std::endl;
+		return;
+	}
+}
 
 template<typename T>
 bool amo::BinNode<T>::isRoot() {

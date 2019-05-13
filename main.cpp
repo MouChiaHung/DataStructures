@@ -2489,7 +2489,7 @@ int main(int argc, char *argv[])
 	root.traversePreLoop();
 	std::cout << GREEN << "going to root.traversePreLoop2()" << WHITE << std::endl;
 	root.traversePreLoop2();
-#elif 1
+#elif 0
 	std::cout << GREEN << "going to root.traverseIn()" << WHITE << std::endl;
 	root.traverseIn();
 	std::cout << GREEN << "going to root.traverseInLoop()" << WHITE << std::endl;
