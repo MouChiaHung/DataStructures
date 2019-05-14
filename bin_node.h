@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stack.h>
 #include <map>
+#include <queue>
 
 namespace amo {
 
@@ -54,7 +55,6 @@ public:
 	bool operator==(const BinNode<T>& c);
 	BinNode<T>& operator=(const BinNode& c);
 	void traverse();
-	void traverseLevel();
 	void traversePre();
 	void traversePreLoop();
 	void traversePreLoop2();
@@ -63,6 +63,9 @@ public:
 	void traverseInLoop2();
 	void traverseInLoop3();
 	void traversePost();
+	void traversePostLoop();
+	void traverseLevel();
+	void bro(std::stack<BinNode<T>*> &stack);
 	bool isRoot();
 	bool isLeftChild();
 	bool isRightChild();
@@ -356,6 +359,55 @@ void amo::BinNode<T>::traversePost() {
 		functor(*this);
 		if (isRoot()) std::cout << GREEN << "[BinNode::traversePost()]: --- TREE BOTTOM ------" << WHITE << std::endl;
 		return;
+	}
+}
+
+template<typename T>
+void amo::BinNode<T>::bro(std::stack<BinNode<T>*> &stack) {
+	BinNode<T>* node;
+	while (node = stack.top()) {
+		if (node->hasRightChild()) {
+			stack.push(node->rchild);
+			stack.push(node->lchild); //null is good to break 
+		}
+		else {
+			stack.push(node->lchild);
+		}
+	}
+	stack.pop(); //pops null
+}
+
+template<typename T>
+void amo::BinNode<T>::traversePostLoop() {
+	FUNCTOR_TRAVERSER functor;
+	std::stack<BinNode<T>*> stack;
+	BinNode<T>* node = this;
+	stack.push(node);
+	while (true) {
+		if (stack.empty()) break;
+		if (stack.top() != node->parent) { //met a right child and goes to collect bros of sub-tree of this right child 
+			bro(stack);
+		}
+		else {} ////stack top met a left child which could be a leaf or a vertex as the current node's parent
+		node = stack.top();
+		stack.pop();
+		functor(*node);
+	}	
+}
+
+template<typename T>
+void amo::BinNode<T>::traverseLevel() {
+	FUNCTOR_TRAVERSER functor;
+	std::queue<BinNode<T>*> queue;
+	BinNode<T>* node = this;
+	queue.push(node);
+	while (true) {
+		if (queue.empty()) break;
+		node = queue.front();
+		queue.pop();
+		functor(*node);
+		if (node->hasLeftChild()) queue.push(node->lchild);
+		if (node->hasRightChild()) queue.push(node->rchild);
 	}
 }
 

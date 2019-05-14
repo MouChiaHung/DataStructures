@@ -2465,7 +2465,7 @@ int main(int argc, char *argv[])
 #endif
 
 #if 1
-	std::cout << GREEN << "****************** tree ******************\n" << WHITE << std::endl;
+	std::cout << GREEN << "****************** tree node ******************\n" << WHITE << std::endl;
  
 #if 1
 	amo::BinNode<int> root(0);
@@ -2498,12 +2498,19 @@ int main(int argc, char *argv[])
 	root.traverseInLoop2();
 	std::cout << GREEN << "going to root.traverseInLoop3()" << WHITE << std::endl;
 	root.traverseInLoop3();
-#else	
+#elis 0
 	std::cout << GREEN << "going to root.traversePost()" << WHITE << std::endl;
 	root.traversePost();
+	root.traversePostLoop();
+#elif 1
+	std::cout << GREEN << "going to root.traverseLevel()" << WHITE << std::endl;
+	root.traverseLevel();
+
+#else	
 #endif
 #endif	
 
+	std::cout << GREEN << "****************** tree ******************\n" << WHITE << std::endl;
 	amo::BinTree<int> tree;
 	tree.insertRoot(0);
 	tree.insertLeftChild(tree.root(), 1);
