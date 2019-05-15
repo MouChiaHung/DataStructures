@@ -41,6 +41,7 @@
 
 #include <bin_tree.h>
 #include <bin_node.h>
+#include <huffman_tree.h>
 
 using namespace std;
 using namespace amo;
@@ -627,7 +628,7 @@ int main(int argc, char *argv[])
 	 * To hold the null character at the end of the array, the size of the character array containing
 	 * the string is one more than the number of characters in the word "Hello."
 	 */
-	char str1[8];
+	char str1[4];
 	std::cout << "****************** stream: get(char &) *** not more than " << sizeof(str1)-1 << " words ***************" << std::endl;
 	for(int i=0; i<sizeof(str1); i++){
 		std::cin.get(str1[i]); 
@@ -666,7 +667,7 @@ int main(int argc, char *argv[])
 	char str3[8] = {'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a'};	
 	std::cin.getline(str3, 8); //getline() doesn't leave '\n' in stream buffer
 	std::cout << str3 << std::endl;;
-#if 0	
+#if 0
 	std::cin.get(); //discard '\n' left in stream buffer
 #else
 	char tmp;
@@ -677,7 +678,7 @@ int main(int argc, char *argv[])
 #endif	
 #endif		
 
-#if 1
+#if 0
 	std::vector<char> v;
 	cout << GREEN << "going to input" << WHITE << endl;
 	input(v);
@@ -710,7 +711,7 @@ int main(int argc, char *argv[])
 	/**
 	 * write to fos
 	 */
-#if 0
+#if 1
 	int	data_fos[6] = {10, 20, 30, 40, 50, 60};
 	//std::cout << "sizeof(data_fos):" << sizeof(data_fos) << " and sizeof(data_fos[0]):" << sizeof(data_fos[0]) << std::endl;
 	std::cout << "going to std::ofstream fos(test.log)" << std::endl;
@@ -739,7 +740,7 @@ int main(int argc, char *argv[])
 	/**
 	 * read from fis
 	 */
-#if 0
+#if 1
 	std::cout << "going to std::ifstream fis" << std::endl;
 	std::ifstream fis;
 	std::cout << "going to fis.open(test.log, std::ifstream::in)" << std::endl;
@@ -777,7 +778,7 @@ int main(int argc, char *argv[])
     /**
 	 * display
 	 */
-#if 0
+#if 1
 	for(int i=0; i<sizeof(buf)/sizeof(buf[0]); i++) std::cout << "buf[" << i << "]:" << buf[i] << std::endl; 	
 	std::cout << "str_buf:" << str_buf << std::endl;
 #else
@@ -2510,11 +2511,20 @@ int main(int argc, char *argv[])
 #endif
 #endif	
 
+#if 0
 	std::cout << GREEN << "****************** tree ******************\n" << WHITE << std::endl;
 	amo::BinTree<int> tree;
 	tree.insertRoot(0);
 	tree.insertLeftChild(tree.root(), 1);
 	tree.insertRightChild(tree.root(), 2);
+#endif
+	
+	std::cout << GREEN << "****************** Huffman tree ******************\n" << WHITE << std::endl;
+	amo::HuffmanTree<int> tree;
+	tree.insertRoot(0);
+	tree.insertLeftChild(tree.root(), 1);
+	tree.insertRightChild(tree.root(), 2);
+	tree.traverseIn();
  
 	std::cout << GREEN << "\n****************** main return ******************" << WHITE << std::endl;
 	return 0;

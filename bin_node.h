@@ -385,10 +385,10 @@ void amo::BinNode<T>::traversePostLoop() {
 	stack.push(node);
 	while (true) {
 		if (stack.empty()) break;
-		if (stack.top() != node->parent) { //met a right child and goes to collect bros of sub-tree of this right child 
+		if (stack.top() != node->parent) { //stack top met a right child and goes to collect bros of sub-tree of this right child 
 			bro(stack);
 		}
-		else {} ////stack top met a left child which could be a leaf or a vertex as the current node's parent
+		else {} //stack top met a left child which could be a leaf or a vertex as the current node's parent
 		node = stack.top();
 		stack.pop();
 		functor(*node);

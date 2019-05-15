@@ -30,9 +30,10 @@ typedef struct functor_traverse {
 	}
 } FUNCTOR_TRAVERSER;
 private:
+	int removeTree(BinNode<T>* node);
+protected:
 	int _size; //0 if root is null
 	BinNode<T>* _root;
-	int removeTree(BinNode<T>* node);
 public:
 	BinTree() : _size(0), _root(NULL) {
 		std::cout << "[BinTree::BinTree()]: this:" << this << ", type:" << typeid(T).name() << WHITE << std::endl;
@@ -211,12 +212,20 @@ BinTree<T>* amo::BinTree<T>::secede(BinNode<T>* node) {
 	return sub_tree;
 }
 
+template<typename T>
+void amo::BinTree<T>::traversePre() {
+	_root->traversePre();
+}
 
+template<typename T>
+void amo::BinTree<T>::traverseIn() {
+	_root->traverseIn();
+}
 
-
-
-
-
+template<typename T>
+void amo::BinTree<T>::traversePost() {
+	_root->traversePost();
+}
 
 
 };
