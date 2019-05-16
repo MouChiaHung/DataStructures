@@ -2525,6 +2525,7 @@ int main(int argc, char *argv[])
 	tree.insertLeftChild(tree.root(), 1);
 	tree.insertRightChild(tree.root(), 2);
 	tree.traverseIn();
+	tree.encode("in.log", "out.log");
  
 	std::cout << GREEN << "\n****************** main return ******************" << WHITE << std::endl;
 	return 0;

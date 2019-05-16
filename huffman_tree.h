@@ -2,7 +2,7 @@
 #define _HUFFMAN_TREE_H_
 
 #include <iostream>
-
+#include <fstream>
 #include <stdio.h>
 #include <stack.h>
 #include <map>
@@ -43,6 +43,8 @@ public:
 		std::cout << "[HuffmanTree::~HuffmanTree()]: size:" << this->_size << WHITE << std::endl;
 		if (0<this->size() && this->_root!=NULL) this->remove(this->_root);
 	}
+	void encode(const char* inputFilePath, const char* outputFilePath);
+	
 	
 friend std::ostream& operator<<(std::ostream& os, const HuffmanTree<T>& tree) {
 	os  << WHITE << "[this]:" << &tree << endl;
@@ -52,7 +54,37 @@ friend std::ostream& operator<<(std::ostream& os, const HuffmanTree<T>& tree) {
 }
 };
 
+template<typename T>
+void amo::HuffmanTree<T>::encode(const char* inputFilePath, const char* outputFilePath) {
+	std::map<char, int> probs;
+	std::ifstream fis(inputFilePath, std::ios::binary|std::ios::in);
+	char c;
+	int len;
+	int len_tmp;
+	
+	while(fis.get(c)) {
+		std::cout << "got char:" << c << std::endl;
+		probs[c]++;
+		len++;
+	}
 
+	if(fis.eof()) std::cout << "EOF reached" << std::endl;
+	else std::cout << "error read:" << fis.fail() << std::endl;
+
+	for (std::map<char, int>::iterator it=probs.begin();it!=probs.end();it++) {
+		cout << YELLOW << "probs[" << distance(probs.begin(),it) << "]: a pair at " << &(*it)
+			<< " holding key:" << it->first << " at " << &it->first
+			<< " => value:" << it->second << " at " << &it->second << WHITE << endl; 
+	}
+
+	fis.clear();
+	fis.seekg(0, fis.end);
+	len_tmp = fis.tellg();
+	fis.seekg(0, fis.beg);
+	
+	if (len == len_tmp) std::cout << "completed to read" << ", len:" << len << " and len_tmp:" << len_tmp << std::endl;
+	else std::cout << "not completed to read:" << ", len:" << len << " and len_tmp:" << len_tmp << std::endl;
+}
 
 
 

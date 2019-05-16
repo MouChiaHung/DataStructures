@@ -51,9 +51,10 @@ public:
 	}
 	BinNode<T>* insertLeftChild(const T& t);
 	BinNode<T>* insertRightChild(const T& t);
-	bool operator<(const BinNode<T>& n);
-	bool operator==(const BinNode<T>& c);
-	BinNode<T>& operator=(const BinNode& c);
+	bool operator==(const BinNode<T>& node);
+	bool operator<(const BinNode<T>& node);
+	bool operator>(const BinNode<T>& node);
+	BinNode<T>& operator=(const BinNode& node);
 	void traverse();
 	void traversePre();
 	void traversePreLoop();
@@ -115,6 +116,34 @@ void amo::BinNode<T>::test(BinNode<T>* node) {
 	delete m;
 }
 
+template<typename T>
+bool amo::BinNode<T>::operator==(const BinNode<T>& node) {
+	bool ret =  (data == node->data) ? true : false;
+	return ret;
+} 
+
+template<typename T>
+bool amo::BinNode<T>::operator<(const BinNode<T>& node) {
+	bool ret =  (data < node->data) ? true : false;
+	return ret;
+} 
+
+template<typename T>
+bool amo::BinNode<T>::operator>(const BinNode<T>& node) {
+	bool ret =  (data > node->data) ? true : false;
+	return ret;
+} 
+
+template<typename T>
+BinNode<T>& amo::BinNode<T>::operator=(const BinNode<T>& node) {
+	parent = node->parent;
+	lchild = node->lchild;
+	rchild = node->rchild;
+	data = node->data;
+	height = node->height;
+	npl = node->npl;
+	color = node->color;
+}
 
 #if 0
 template<typename T>
