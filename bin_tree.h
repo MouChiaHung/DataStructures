@@ -25,8 +25,8 @@ namespace amo {
 template<typename T>
 class BinTree { 
 typedef struct functor_traverse {
-	void operator() (BinTree<T> const& tree) {
-		std::cout << tree << WHITE << std::endl;
+	void operator() (BinNode<T> const& node) {
+		std::cout << node;
 	}
 } FUNCTOR_TRAVERSER;
 private:
@@ -64,6 +64,7 @@ public:
 	BinTree<T>* secede(BinNode<T>* node);
 	
 	void traverse();
+	void traverse(FUNCTOR_TRAVERSER& functor);
 	void traverseLevel();
 	void traversePre();
 	void traverseIn();
@@ -213,6 +214,11 @@ BinTree<T>* amo::BinTree<T>::secede(BinNode<T>* node) {
 }
 
 template<typename T>
+void amo::BinTree<T>::traverse() {
+	_root->traverse();
+}
+
+template<typename T>
 void amo::BinTree<T>::traversePre() {
 	_root->traversePre();
 }
@@ -227,6 +233,9 @@ void amo::BinTree<T>::traversePost() {
 	_root->traversePost();
 }
 
-
+template<typename T>
+void amo::BinTree<T>::traverseLevel() {
+	_root->traverseLevel();
+}
 };
 #endif

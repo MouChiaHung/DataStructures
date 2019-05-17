@@ -2503,10 +2503,9 @@ int main(int argc, char *argv[])
 	std::cout << GREEN << "going to root.traversePost()" << WHITE << std::endl;
 	root.traversePost();
 	root.traversePostLoop();
-#elif 1
+#elif 0
 	std::cout << GREEN << "going to root.traverseLevel()" << WHITE << std::endl;
 	root.traverseLevel();
-
 #else	
 #endif
 #endif	
@@ -2517,18 +2516,18 @@ int main(int argc, char *argv[])
 	tree.insertRoot(0);
 	tree.insertLeftChild(tree.root(), 1);
 	tree.insertRightChild(tree.root(), 2);
+	std::cout << GREEN << "going to traverse tree" << WHITE << std::endl;
+	tree.traverse();		
 #endif
 	
+#if 1	
 	std::cout << GREEN << "****************** Huffman tree ******************\n" << WHITE << std::endl;
-	amo::HuffmanTree<int> tree;
-	tree.insertRoot(0);
-	tree.insertLeftChild(tree.root(), 1);
-	tree.insertRightChild(tree.root(), 2);
-	tree.traverseIn();
+	amo::HuffmanTree<amo::Model> tree;
 	tree.encode("in.log", "out.log");
  
 	std::cout << GREEN << "\n****************** main return ******************" << WHITE << std::endl;
 	return 0;
+#endif 
 #endif 
  
 	std::cout << GREEN << "\n****************** main return ******************" << WHITE << std::endl;

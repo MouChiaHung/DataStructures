@@ -41,11 +41,11 @@ public:
 	BinNode<T>* lchild;
 	BinNode<T>* rchild;
 	
-	BinNode() : height(0), npl(1), color(RB_RED), parent(NULL), lchild(NULL), rchild(NULL) {}
-	BinNode(const T& e, BinNode<T>* p=NULL, BinNode<T>* lc=NULL, BinNode<T>* rc=NULL, int h=0, int l=1, RB_COLOR c=RB_RED) : 
+	BinNode(): height(0), npl(1), color(RB_RED), parent(NULL), lchild(NULL), rchild(NULL) {}
+	BinNode(const T& e, BinNode<T>* p=NULL, BinNode<T>* lc=NULL, BinNode<T>* rc=NULL, int h=0, int l=1, RB_COLOR c=RB_RED): 
 		data(e), parent(p), lchild(lc), rchild(rc), height(h), npl(l), color(c) {
-			std::cout << "[BinNode::BinNode(T&)]: data:" << e << WHITE << std::endl;
-		}
+			//std::cout << "[BinNode::BinNode(T&)]: data:" << e << WHITE << std::endl;
+	}
 	~BinNode() {
 		std::cout << "[BinNode::~BinNode()]: data:" << data << WHITE << std::endl;
 	}
@@ -56,6 +56,7 @@ public:
 	bool operator>(const BinNode<T>& node);
 	BinNode<T>& operator=(const BinNode& node);
 	void traverse();
+	void traverse(FUNCTOR_TRAVERSER& functor);
 	void traversePre();
 	void traversePreLoop();
 	void traversePreLoop2();
@@ -84,8 +85,11 @@ public:
 	
 //friend std::istream& operator>>(std::istream& is, BinNode<T>& node);
 friend std::ostream& operator<<(std::ostream& os, const BinNode<T>& node) {
+	os  << WHITE << node.data;
+	
+	//os  << WHITE << "" << endl;
 	//os  << WHITE << "[this]:" << &node << endl;
-	os  << WHITE << "[data]:" << node.data << endl;
+	//os  << WHITE << "[data]:" << node.data << endl;
 	//os  << WHITE << "[height]:" << node.height << endl;
 	//os  << WHITE << "[npl]:" << node.npl << endl;
 	//if (node.parent!=NULL) os << WHITE << "parent:" << *(node.parent) << endl;
@@ -180,6 +184,23 @@ void amo::BinNode<T>::traverse() {
 	}
 }
 #endif
+
+template<typename T>
+void amo::BinNode<T>::traverse(FUNCTOR_TRAVERSER& functor) {
+	if (isLeaf()) {
+		std::cout << GREEN << "leaf" << WHITE << std::endl;
+		functor(*this);
+		return;
+	} else {
+		if (isRoot()) std::cout << GREEN << "[BinNode::traverse()]: --- TREE TOP ------" << WHITE << std::endl;
+		std::cout << GREEN << "vertex" << WHITE << std::endl;
+		functor(*this);
+		if (hasLeftChild()) lchild->traverse();
+		if (hasRightChild()) rchild->traverse();
+		if (isRoot()) std::cout << GREEN << "[BinNode::traverse()]: --- TREE BOTTOM ------" << WHITE << std::endl;
+		return;
+	}
+}
 
 template<typename T>
 void amo::BinNode<T>::traversePre() {
@@ -430,6 +451,7 @@ void amo::BinNode<T>::traverseLevel() {
 	std::queue<BinNode<T>*> queue;
 	BinNode<T>* node = this;
 	queue.push(node);
+	if (isRoot()) std::cout << GREEN << "\n[BinNode::traverseLevel()]: --- TREE TOP ------" << WHITE << std::endl;
 	while (true) {
 		if (queue.empty()) break;
 		node = queue.front();
@@ -438,6 +460,7 @@ void amo::BinNode<T>::traverseLevel() {
 		if (node->hasLeftChild()) queue.push(node->lchild);
 		if (node->hasRightChild()) queue.push(node->rchild);
 	}
+	if (isRoot()) std::cout << GREEN << "\n[BinNode::traverseLevel()]: --- TREE BOTTOM ------" << WHITE << std::endl;
 }
 
 template<typename T>
