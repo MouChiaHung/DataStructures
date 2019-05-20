@@ -23,6 +23,8 @@ namespace amo {
 #define CYAN    "\033[36m"      /* Cyan */
 #define WHITE   "\033[37m"      /* White */
 
+#define CHAR_VERTEX   ' '
+
 class Model {
 public:
 	char c;
@@ -31,8 +33,8 @@ public:
 	Model(int character, int probability):c(character),  prob(probability) {}
 	~Model() {}
 	bool operator==(Model& node) {
-		bool ret = (prob == node.prob) ? true : false;
-		//std::cout << "[Model::operator==()]:" << ret << WHITE << std::endl;
+		bool ret = (prob==node.prob && c==node.c) ? true : false;
+		std::cout << "[Model::operator==()]: this:" << c << " , node:" << node.c << " and ret:" << ret << WHITE << std::endl;
 		return ret;
 	}
 	bool operator<(Model& node) {
@@ -99,7 +101,6 @@ template<typename T>
 void amo::HuffmanTree<T>::encode(const char* inputFilePath, const char* outputFilePath) {
 	std::map<char, int> probs;
 	std::list<Model*> table;
-	//std::stack<Model*> stack;
 	std::ifstream fis(inputFilePath, std::ios::binary|std::ios::in);
 	char c;
 	int len;
@@ -137,18 +138,8 @@ void amo::HuffmanTree<T>::encode(const char* inputFilePath, const char* outputFi
 	table.sort(compare);
 	for (std::list<Model*>::iterator it=table.begin();it!=table.end();it++) {
 		cout << CYAN << "table[" << distance(table.begin(),it) << "]:" << **it;
-		//stack.push(*it);
 	}
 	
-#if 0	
-	int i = 0;
-	int size = stack.size();	
-	while (!stack.empty()) {
-		cout << GREEN <<  "stack[" << (size-1)-i << "]:" << *stack.top();
-		i++;
-		stack.pop();
-	}
-#endif
 	std::cout << GREEN << "going to grow" << WHITE << std::endl;
 	grow(table);
 }
@@ -162,39 +153,86 @@ void amo::HuffmanTree<T>::grow(std::list<Model*>& list) { //ascendantly sorted l
 	BinNode<T>* rchild;
 	BinNode<T>* vertex;
 	std::list<Model*>::iterator it = list.begin();
+	std::vector<BinNode<T>*> subs; //roots of sub-trees
+	typename std::vector<BinNode<T>*>::iterator it_subs = subs.begin();
+	int i = 0;
 	while (it!=list.end()) {
-		if (std::next(it,1) == list.end()) { //a tail
-			r = *it;
-			m = new Model('*', (this->_root->data.prob)+(r->prob));
-			lchild = this->_root;
-			rchild = new BinNode<T>(*r);
-			vertex = new BinNode<T>(*m);
-			lchild->parent = vertex;
-			rchild->parent = vertex;
-			vertex->lchild = lchild;
-			vertex->rchild = rchild;
-			this->_root = vertex;
-			break;
+		lchild = NULL;
+		rchild = NULL;
+		vertex = NULL;
+		cout << YELLOW << "while-loop:" << ++i << WHITE << endl;
+		if (std::next(it,1) == list.end()) { //met the last and single leaf or sub-tree 
+			if (subs.size() > 1) {
+				cout << RED << "size of sub-tree is more than 1:" << subs.size() << WHITE << endl;
+				this->_root = subs.back();
+				subs.pop_back();
+				break;
+			}
+			else if (subs.size() == 1){ 
+				if (**it == subs.back()->data) { //met the last sub-tree 
+					cout << GREEN << "going to attach the last sub-tree" << WHITE << endl;
+					vertex = subs.back();
+					subs.pop_back();
+				} 
+				else { //met the last leaf 
+					cout << GREEN << "going to attach the last leaf" << WHITE << endl;
+					r = *it;
+					lchild = subs.back();
+					subs.pop_back();
+					cout << CYAN << "lchild points to the root of the last sub-tree:" << *lchild;
+					rchild = new BinNode<T>(*r);
+					cout << CYAN << "rchild points to a new node:" << *rchild;
+					m = new Model(CHAR_VERTEX, (lchild->data.prob)+(r->prob));
+					vertex = new BinNode<T>(*m);
+					lchild->parent = vertex;
+					rchild->parent = vertex;
+					vertex->lchild = lchild;
+					vertex->rchild = rchild;
+				}	
+				this->_root = vertex;
+				cout << GREEN << "root:" << *this->_root <<  WHITE << endl;
+				break;
+			}
+			else {
+				cout << RED << "size of sub-tree is less than 1:" << subs.size() << WHITE << endl;
+				this->_root = subs.back();
+				subs.pop_back();
+				break;
+			}
 		}
 		else {
 			l = *it;
 			it++;
 			r = *it;
-			m = new Model('*', l->prob+r->prob);		
-			if (this->_root!=NULL && *l == (this->_root)->data) {
-				lchild = this->_root;
+			m = new Model(CHAR_VERTEX, l->prob+r->prob);		
+
+			for (it_subs=subs.begin(); it_subs!=subs.end(); it_subs++) { //set lchild if any sub-tree corresponds with this l model iterated currently 
+				if (*l == (*it_subs)->data) {
+					cout << CYAN << "lchild points to the root of sub-tree:" << **it_subs;
+					lchild = *it_subs;
+					--(it_subs = subs.erase(it_subs));
+				}
+				if (lchild != NULL) break; //tricky but important
 			}
-			else {
+			for (it_subs=subs.begin(); it_subs!=subs.end(); it_subs++) { //set rchild if any sub-tree corresponds with this r model iterated currently 
+				if (*r == (*it_subs)->data) {
+					cout << CYAN << "rchild points to the root of sub-tree:" << **it_subs;
+					rchild = *it_subs;
+					--(it_subs = subs.erase(it_subs));
+				}
+				if (rchild != NULL) break; //tricky but important
+			}
+			if (lchild == NULL) { //set lchild with a new node if no any sub-tree corresponds with this l model iterated currently, which means meeting a row leaf 
 				lchild = new BinNode<T>(*l);
+				cout << CYAN << "lchild points to a new node:" << *lchild;
 			}
-			if (this->_root!=NULL && *r == (this->_root)->data) {
-				rchild = this->_root;
-			}
-			else {
+			if (rchild == NULL) { //set rchild with a new node if no any sub-tree corresponds with this r model iterated currently, which means meeting a row leaf
 				rchild = new BinNode<T>(*r);
+				cout << CYAN << "rchild points to a new node:" << *rchild;
 			}
 			
 			vertex = new BinNode<T>(*m);
+			std::cout << GREEN << "growing..." << WHITE << endl;
 			std::cout << CYAN << "lchild" << *lchild << WHITE;
 			std::cout << CYAN << "rchild" << *rchild << WHITE;
 			std::cout << CYAN << "vertex" << *vertex << WHITE;
@@ -202,7 +240,7 @@ void amo::HuffmanTree<T>::grow(std::list<Model*>& list) { //ascendantly sorted l
 			rchild->parent = vertex;
 			vertex->lchild = lchild;
 			vertex->rchild = rchild;
-			this->_root = vertex;
+			subs.push_back(vertex);
 			for (std::list<Model*>::iterator itt=it;itt!=list.end();itt++) {
 				if ((*m < **itt) || (*m == **itt)) {
 					list.insert(itt, m);
@@ -215,11 +253,17 @@ void amo::HuffmanTree<T>::grow(std::list<Model*>& list) { //ascendantly sorted l
 			}
 			it++;
 		}
-		this->traverseLevel();
+		if (!subs.empty()) {
+			for (it_subs=subs.begin(); it_subs!=subs.end(); it_subs++) {
+			cout << YELLOW << "-*-*-*-*-*-*-*-* sub tree top " << std::distance(subs.begin(), it_subs)+1 << " -*-*-*-*-*-*-*-*" << WHITE << endl;
+			(*it_subs)->traverseLevel();
+			cout << YELLOW << "-*-*-*-*-*-*-*-* sub tree bottom " << std::distance(subs.begin(), it_subs)+1 << " -*-*-*-*-*-*-*-*" << WHITE << endl;
+			}
+		}
 	}
-	for (std::list<Model*>::iterator iterator=list.begin();iterator!=list.end();iterator++) cout << CYAN << "list[" << distance(list.begin(),iterator) << "]:" << **iterator;
+	cout << GREEN << "-*-*-*-*-*-*-*-* Huffman tree top -*-*-*-*-*-*-*-*" << WHITE << endl;
 	this->traverseLevel();
-	
+	cout << GREEN << "-*-*-*-*-*-*-*-* Huffman tree bottom -*-*-*-*-*-*-*-*" << WHITE << endl;
 }
 
 

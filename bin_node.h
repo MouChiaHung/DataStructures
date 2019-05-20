@@ -451,7 +451,7 @@ void amo::BinNode<T>::traverseLevel() {
 	std::queue<BinNode<T>*> queue;
 	BinNode<T>* node = this;
 	queue.push(node);
-	if (isRoot()) std::cout << GREEN << "\n[BinNode::traverseLevel()]: --- TREE TOP ------" << WHITE << std::endl;
+	if (isRoot()) std::cout << GREEN << "[BinNode::traverseLevel()]: --- TREE TOP ------" << WHITE << std::endl;
 	while (true) {
 		if (queue.empty()) break;
 		node = queue.front();
