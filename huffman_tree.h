@@ -67,6 +67,7 @@ typedef struct functor_traverse {
 private:
 
 public:
+	std::map<char, string> codes;
 	HuffmanTree() : BinTree<T>() {
 		std::cout << "[HuffmanTree::HuffmanTree()]: this:" << this << ", type:" << typeid(T).name() << WHITE << std::endl;
 	}
@@ -78,7 +79,9 @@ public:
 		if (0<this->size() && this->_root!=NULL) this->remove(this->_root);
 	}
 	void encode(const char* inputFilePath, const char* outputFilePath);
+	void decode(const char* inputFilePath, const char* outputFilePath);
 	void grow(std::list<Model*>& list);
+	void generate();
 	
 friend std::ostream& operator<<(std::ostream& os, const HuffmanTree<T>& tree) {
 	os  << WHITE << "[this]:" << &tree << endl;
@@ -102,6 +105,7 @@ void amo::HuffmanTree<T>::encode(const char* inputFilePath, const char* outputFi
 	std::map<char, int> probs;
 	std::list<Model*> table;
 	std::ifstream fis(inputFilePath, std::ios::binary|std::ios::in);
+	std::ofstream fos(outputFilePath, std::ios::binary|std::ios::out);
 	char c;
 	int len;
 	int len_tmp;
@@ -117,9 +121,7 @@ void amo::HuffmanTree<T>::encode(const char* inputFilePath, const char* outputFi
 	else std::cout << "error read:" << fis.fail() << std::endl;
 
 	for (std::map<char,int>::iterator it=probs.begin();it!=probs.end();it++) {
-		cout << YELLOW << "probs[" << distance(probs.begin(),it) << "]: a pair at " << &(*it)
-			<< " holding key:" << it->first << " at " << &it->first
-			<< " => value:" << it->second << WHITE << endl; 
+		cout << YELLOW << "probs[" << distance(probs.begin(),it) << "]:" << " key:" << it->first << " => value:" << it->second << WHITE << endl; 
 	}
 
 	fis.clear();
@@ -140,8 +142,23 @@ void amo::HuffmanTree<T>::encode(const char* inputFilePath, const char* outputFi
 		cout << CYAN << "table[" << distance(table.begin(),it) << "]:" << **it;
 	}
 	
-	std::cout << GREEN << "going to grow" << WHITE << std::endl;
+	std::cout << GREEN << "going to grow Huffman tree" << WHITE << std::endl;
 	grow(table);
+	std::cout << GREEN << "going to generate codes" << WHITE << std::endl;
+	generate();
+	
+	for (std::map<char,string>::iterator it=codes.begin();it!=codes.end();it++) {
+		fos << it->first;
+		fos << it->second;
+		fos << '\n';
+	}
+	
+	fos.close();
+	fis.close();
+	this->removeTree(this->_root);
+	table.clear();
+	probs.clear();
+	codes.clear();
 }
 
 template<typename T> 
@@ -190,7 +207,7 @@ void amo::HuffmanTree<T>::grow(std::list<Model*>& list) { //ascendantly sorted l
 					vertex->rchild = rchild;
 				}	
 				this->_root = vertex;
-				cout << GREEN << "root:" << *this->_root <<  WHITE << endl;
+				cout << CYAN << "root:" << *this->_root <<  WHITE << endl;
 				break;
 			}
 			else {
@@ -253,6 +270,7 @@ void amo::HuffmanTree<T>::grow(std::list<Model*>& list) { //ascendantly sorted l
 			}
 			it++;
 		}
+#if 0		
 		if (!subs.empty()) {
 			for (it_subs=subs.begin(); it_subs!=subs.end(); it_subs++) {
 			cout << YELLOW << "-*-*-*-*-*-*-*-* sub tree top " << std::distance(subs.begin(), it_subs)+1 << " -*-*-*-*-*-*-*-*" << WHITE << endl;
@@ -260,15 +278,76 @@ void amo::HuffmanTree<T>::grow(std::list<Model*>& list) { //ascendantly sorted l
 			cout << YELLOW << "-*-*-*-*-*-*-*-* sub tree bottom " << std::distance(subs.begin(), it_subs)+1 << " -*-*-*-*-*-*-*-*" << WHITE << endl;
 			}
 		}
+#endif
 	}
+
+	this->updateHeightAll();
 	cout << GREEN << "-*-*-*-*-*-*-*-* Huffman tree top -*-*-*-*-*-*-*-*" << WHITE << endl;
 	this->traverseLevel();
 	cout << GREEN << "-*-*-*-*-*-*-*-* Huffman tree bottom -*-*-*-*-*-*-*-*" << WHITE << endl;
+	
+	subs.clear();
 }
 
+template<typename T>
+void amo::HuffmanTree<T>::generate() {
+	std::string code = "";
+	std::queue<BinNode<T>*> queue;
+	BinNode<T>* node = this->_root;
+	BinNode<T>* tmp;
+	queue.push(node);
+	int i = 0;
+	while (true) {
+		if (queue.empty()) break;
+		node = queue.front();
+		queue.pop();
+		cout << YELLOW << "while-loop:" << ++i << ", node:" << *node << WHITE << endl;
+		
+		if (node->data.c == CHAR_VERTEX) {
+			//do nothing
+		} 
+		else {
+			if (node->isLeaf()) code = "";
+			tmp = node;
+			while (tmp!=NULL) {
+				if (tmp->isLeftChild()) code += '0';
+				else if (tmp->isRightChild()) code += '1';
+				tmp = tmp->parent;
+			}
+			if (node->data.c != CHAR_VERTEX) codes[node->data.c] = code;
+		}
+		
+		if (node->hasLeftChild()) queue.push(node->lchild);
+		if (node->hasRightChild()) queue.push(node->rchild);
+	}
+	
+	for (std::map<char,string>::iterator it=codes.begin();it!=codes.end();it++) {
+		cout << YELLOW << "codes[" << distance(codes.begin(),it) << "]:" << " key:" << it->first << " => value:" << it->second << WHITE << endl; 
+	}
+}
 
+template<typename T>
+void amo::HuffmanTree<T>::decode(const char* inputFilePath, const char* outputFilePath) {
+	std::ifstream fis(inputFilePath, std::ios::binary|std::ios::in);
+	std::ofstream fos(outputFilePath, std::ios::binary|std::ios::out);
+	std::list<Model*> table;
+	char buf[128];
+	char c;
+	char* code;
+	while (fis.getline(buf, sizeof(buf)/sizeof(buf[0]))) {
+		//cout << buf;
+		//cout << endl;
+		sscanf(buf, "%c%s", &c, code);
+		cout << YELLOW << "decoded [c]:" << c << " and [code]:" << code << WHITE << endl;
+		codes[c] = "ffff";
+	}
 
-
+	
+	for (std::map<char,string>::iterator it=codes.begin();it!=codes.end();it++) {
+		cout << YELLOW << "decoded codes[" << distance(codes.begin(),it) << "]:" << " key:" << it->first << " => value:" << it->second << WHITE << endl; 
+	}
+	
+}
 
 
 };

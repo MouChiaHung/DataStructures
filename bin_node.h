@@ -47,7 +47,7 @@ public:
 			//std::cout << "[BinNode::BinNode(T&)]: data:" << e << WHITE << std::endl;
 	}
 	~BinNode() {
-		std::cout << "[BinNode::~BinNode()]: data:" << data << WHITE << std::endl;
+		//std::cout << "[BinNode::~BinNode()]: " << data << WHITE << std::endl;
 	}
 	BinNode<T>* insertLeftChild(const T& t);
 	BinNode<T>* insertRightChild(const T& t);
@@ -85,12 +85,12 @@ public:
 	
 //friend std::istream& operator>>(std::istream& is, BinNode<T>& node);
 friend std::ostream& operator<<(std::ostream& os, const BinNode<T>& node) {
-	os  << WHITE << node.data;
+	//os  << WHITE << node.data;
 	
 	//os  << WHITE << "" << endl;
 	//os  << WHITE << "[this]:" << &node << endl;
-	//os  << WHITE << "[data]:" << node.data << endl;
-	//os  << WHITE << "[height]:" << node.height << endl;
+	os  << WHITE << "[data]:" << node.data;
+	os  << WHITE << "[height]:" << node.height;
 	//os  << WHITE << "[npl]:" << node.npl << endl;
 	//if (node.parent!=NULL) os << WHITE << "parent:" << *(node.parent) << endl;
 	//if (node.lchild!=NULL) os << WHITE << "lchild:" << *(node.lchild) << endl;

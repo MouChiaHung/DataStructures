@@ -807,7 +807,7 @@ int main(int argc, char *argv[])
 	std::cout << "going to mFin(in.log)" << std::endl;
 	std::ifstream mFin("in.log", std::ios::binary|std::ios::in);
 	std::cout << "going to mFout(out.log)" << std::endl;
-	std::ofstream mFout("out.log", std::ios::binary|std::ios::in);
+	std::ofstream mFout("out.log", std::ios::binary|std::ios::out);
 #endif	
 	std::streampos pos;
 	/**
@@ -2524,6 +2524,7 @@ int main(int argc, char *argv[])
 	std::cout << GREEN << "****************** Huffman tree ******************\n" << WHITE << std::endl;
 	amo::HuffmanTree<amo::Model> tree;
 	tree.encode("in.log", "out.log");
+	tree.decode("out.log", "copy.log");
  
 	std::cout << GREEN << "\n****************** main return ******************" << WHITE << std::endl;
 	return 0;

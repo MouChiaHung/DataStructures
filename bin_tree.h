@@ -30,7 +30,7 @@ typedef struct functor_traverse {
 	}
 } FUNCTOR_TRAVERSER;
 private:
-	int removeTree(BinNode<T>* node);
+	
 protected:
 	int _size; //0 if root is null
 	BinNode<T>* _root;
@@ -62,6 +62,7 @@ public:
 	
 	int remove(BinNode<T>* node);
 	BinTree<T>* secede(BinNode<T>* node);
+	int removeTree(BinNode<T>* node);
 	
 	void traverse();
 	void traverse(FUNCTOR_TRAVERSER& functor);
@@ -72,6 +73,7 @@ public:
 
 	virtual int updateHeight(BinNode<T>* node);
 	void updateHeightAbove(BinNode<T>* node);
+	void updateHeightAll();
 	
 friend std::ostream& operator<<(std::ostream& os, const BinTree<T>& tree) {
 	os  << WHITE << "[this]:" << &tree << endl;
@@ -86,7 +88,7 @@ template<typename T>
 int amo::BinTree<T>::updateHeight(BinNode<T>* node) {
 	if (node->isLeaf()) {
 		node->height = 0;
-		std::cout << "[BinTree::updateHeight()]: leaf(" << node->data << ") height:" << node->height << WHITE << std::endl;
+		std::cout << "[BinTree::updateHeight()]: leaf:" << node->data << WHITE << std::endl;
 		return node->height;
 	}
 	else {
@@ -95,8 +97,11 @@ int amo::BinTree<T>::updateHeight(BinNode<T>* node) {
 		if (lchild && rchild) node->height = 1 + std::max(lchild->height, rchild->height);
 		else if (lchild && rchild == NULL) node->height = 1 + lchild->height;
 		else if (rchild && lchild == NULL) node->height = 1 + rchild->height;
-		else node->height = 0;
-		std::cout << "[BinTree::updateHeight()]: vertex(" << node->data << ") height:" << node->height << WHITE << std::endl;
+		else {
+			std::cout << RED << "[BinTree::updateHeight()]: error vertex" << WHITE << std::endl;
+			node->height = 0;
+		}
+		std::cout << "[BinTree::updateHeight()]: vertex:" << node->data << WHITE << std::endl;
 		return node->height;
 	}
 }
@@ -107,6 +112,26 @@ void amo::BinTree<T>::updateHeightAbove(BinNode<T>* node) {
 		updateHeight(node);
 		node = node->parent;
 	}
+}
+
+template<typename T>
+void amo::BinTree<T>::updateHeightAll() {
+	std::queue<BinNode<T>*> queue;
+	BinNode<T>* node = _root;
+	queue.push(node);
+	std::cout << GREEN << "[BinTree::updateHeightAll()]: --- TREE TOP ------" << WHITE << std::endl;
+	while (true) {
+		if (queue.empty()) break;
+		node = queue.front();
+		queue.pop();
+		
+		if (node->isLeaf()) updateHeightAbove(node);
+		
+		
+		if (node->hasLeftChild()) queue.push(node->lchild);
+		if (node->hasRightChild()) queue.push(node->rchild);
+	}
+	std::cout << GREEN << "\n[BinTree::updateHeightAll()]: --- TREE BOTTOM ------" << WHITE << std::endl;
 }
 
 template<typename T>
