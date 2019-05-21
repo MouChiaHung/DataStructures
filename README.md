@@ -7,6 +7,9 @@ Demostration:
  - Labyrinth
 ![image](https://github.com/MouChiaHung/DataStructures/blob/master/Maze.JPG)
 
+- Huffaman coding
+![image](https://github.com/MouChiaHung/DataStructures/blob/master/Huffman.jpg)
+
 Practices includes:
  - C++ skills 
  - STL
