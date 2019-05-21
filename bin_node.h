@@ -87,10 +87,11 @@ public:
 friend std::ostream& operator<<(std::ostream& os, const BinNode<T>& node) {
 	//os  << WHITE << node.data;
 	
-	//os  << WHITE << "" << endl;
+	os  << WHITE << "" << endl;
 	//os  << WHITE << "[this]:" << &node << endl;
-	os  << WHITE << "[data]:" << node.data;
-	os  << WHITE << "[height]:" << node.height;
+	os  << MAGENTA << "[data]:" << node.data;
+	os  << MAGENTA << "[height]:" << node.height;
+	os  << WHITE << "" << endl;
 	//os  << WHITE << "[npl]:" << node.npl << endl;
 	//if (node.parent!=NULL) os << WHITE << "parent:" << *(node.parent) << endl;
 	//if (node.lchild!=NULL) os << WHITE << "lchild:" << *(node.lchild) << endl;

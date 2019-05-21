@@ -23,7 +23,8 @@ namespace amo {
 #define CYAN    "\033[36m"      /* Cyan */
 #define WHITE   "\033[37m"      /* White */
 
-#define CHAR_VERTEX   ' '
+#define CHAR_VERTEX   '\0'
+#define PATH_TABLE   "table"
 
 class Model {
 public:
@@ -68,8 +69,10 @@ private:
 
 public:
 	std::map<char, string> codes;
+	string path_table;
 	HuffmanTree() : BinTree<T>() {
 		std::cout << "[HuffmanTree::HuffmanTree()]: this:" << this << ", type:" << typeid(T).name() << WHITE << std::endl;
+		path_table = PATH_TABLE;
 	}
 	HuffmanTree(BinNode<T>* node) : BinTree<T>(node) {
 		std::cout << "[HuffmanTree::HuffmanTree(BinNode<T>*)]: this:" << this << ", root:" << this->_root->data << ", size:" << this->_size << WHITE << std::endl;
@@ -106,15 +109,24 @@ void amo::HuffmanTree<T>::encode(const char* inputFilePath, const char* outputFi
 	std::list<Model*> table;
 	std::ifstream fis(inputFilePath, std::ios::binary|std::ios::in);
 	std::ofstream fos(outputFilePath, std::ios::binary|std::ios::out);
+	std::ofstream fos_table(path_table, std::ios::binary|std::ios::out);
 	char c;
 	int len;
 	int len_tmp;
 	
 	while(fis.get(c)) {
-		std::cout << "got char:" << c << std::endl;
-		if (c < 32) continue; //space is 32
-		probs[c]++;
-		len++;
+		std::cout << "got char:" << c << "(" << (int)c << ")" << std::endl;
+		if (c < 32 && c != 10) continue; //space is 32, 10 used to mark a LF
+		if (c == 10) {
+			c = 10;
+			probs[c]++;
+			len++;
+		}
+		else {
+			probs[c]++;
+			len++;
+		}
+		
 	}
 
 	if(fis.eof()) std::cout << "EOF reached" << std::endl;
@@ -127,9 +139,9 @@ void amo::HuffmanTree<T>::encode(const char* inputFilePath, const char* outputFi
 	fis.clear();
 	fis.seekg(0, fis.end);
 	len_tmp = fis.tellg();
-	fis.seekg(0, fis.beg);
 	if (len == len_tmp) std::cout << "completed to read" << ", len:" << len << " and len_tmp:" << len_tmp << std::endl;
 	else std::cout << "not completed to read:" << ", len:" << len << " and len_tmp:" << len_tmp << std::endl;
+	fis.seekg(0, fis.beg);
 	
 	for (std::map<char,int>::iterator it=probs.begin();it!=probs.end();it++) {
 		Model* node = new Model(it->first, it->second);
@@ -148,12 +160,23 @@ void amo::HuffmanTree<T>::encode(const char* inputFilePath, const char* outputFi
 	generate();
 	
 	for (std::map<char,string>::iterator it=codes.begin();it!=codes.end();it++) {
-		fos << it->first;
-		fos << it->second;
-		fos << '\n';
+		fos_table << it->first;
+		fos_table << it->second;
+		if (std::next(it,1)!=codes.end()) fos_table << '\n';
 	}
 	
-	fos.close();
+	while(fis.get(c)) {
+		//std::cout << "got char:" << c << std::endl;
+		if (c < 32 && c != 10) continue; //space is 32, 10 used to mark a LF
+		if (c == 10) {
+			c = 10;
+			fos << codes[c];
+		}
+		else fos << codes[c];
+	}
+	
+	
+	fos_table.close();
 	fis.close();
 	this->removeTree(this->_root);
 	table.clear();
@@ -310,8 +333,8 @@ void amo::HuffmanTree<T>::generate() {
 			if (node->isLeaf()) code = "";
 			tmp = node;
 			while (tmp!=NULL) {
-				if (tmp->isLeftChild()) code += '0';
-				else if (tmp->isRightChild()) code += '1';
+				if (tmp->isLeftChild()) code.insert(0, "0");
+				else if (tmp->isRightChild()) code.insert(0, "1");
 				tmp = tmp->parent;
 			}
 			if (node->data.c != CHAR_VERTEX) codes[node->data.c] = code;
@@ -329,25 +352,59 @@ void amo::HuffmanTree<T>::generate() {
 template<typename T>
 void amo::HuffmanTree<T>::decode(const char* inputFilePath, const char* outputFilePath) {
 	std::ifstream fis(inputFilePath, std::ios::binary|std::ios::in);
+	std::ifstream fis_table(path_table, std::ios::binary|std::ios::in);
 	std::ofstream fos(outputFilePath, std::ios::binary|std::ios::out);
 	std::list<Model*> table;
 	char buf[128];
 	char c;
 	char* code;
-	while (fis.getline(buf, sizeof(buf)/sizeof(buf[0]))) {
+	while (fis_table.getline(buf, sizeof(buf)/sizeof(buf[0]))) {
 		//cout << buf;
 		//cout << endl;
 		sscanf(buf, "%c%s", &c, code);
-		cout << YELLOW << "decoded [c]:" << c << " and [code]:" << code << WHITE << endl;
-		codes[c] = "ffff";
+		if (c < 32) {
+			cout << GREEN << "got null-character:" << (int)c << WHITE << endl;
+			fis_table.getline(buf, sizeof(buf)/sizeof(buf[0]));
+			sscanf(buf, "%s", code);
+			c = 10;
+		}
+		codes[c] = code;
+		//if (c < 32 && c == 10) cout << WHITE << "Huffman table [" << GREEN << "LR" << WHITE << "]:" << GREEN <<codes[c] << WHITE << endl;
+		//else cout << WHITE << "Huffman table [" << GREEN << c << WHITE << "]:" << GREEN <<codes[c] << WHITE << endl;
+		cout << WHITE << "Huffman table [" << GREEN << c << WHITE << "]:" << GREEN <<codes[c] << WHITE << endl;
 	}
 
-	
-	for (std::map<char,string>::iterator it=codes.begin();it!=codes.end();it++) {
-		cout << YELLOW << "decoded codes[" << distance(codes.begin(),it) << "]:" << " key:" << it->first << " => value:" << it->second << WHITE << endl; 
+	string str;
+	char lf = 10;
+	while (fis.get(c)) {
+		//std::cout << "got char:" << c << std::endl;
+		if (c < 32 && c != 10) continue; //space is 32, 10 used to mark a LF
+		str += c;
+		for (std::map<char,string>::iterator it=codes.begin();it!=codes.end();it++) {
+			if (!str.compare(it->second)) {
+				cout << GREEN << "got:" << it->first << WHITE << endl;
+				if (it->first == lf) fos << endl;
+				else fos << it->first;
+				str.clear();
+			}
+		}
 	}
+	if (!str.empty()) cout << RED << "unsolved str:" << str;
 	
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 };

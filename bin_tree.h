@@ -196,7 +196,7 @@ int amo::BinTree<T>::removeTree(BinNode<T>* node) {
 	
 	if (node == NULL) return 0;
 	if (node->isLeaf()) {
-		std::cout << "[BinTree::removeTree()]: going to delete leaf:" << node->data << WHITE << std::endl;
+		//std::cout << "[BinTree::removeTree()]: going to delete leaf:" << node->data << WHITE << std::endl;
 		delete node;
 		removed++;
 		return removed;
@@ -204,7 +204,7 @@ int amo::BinTree<T>::removeTree(BinNode<T>* node) {
 	else {
 		if (node->hasLeftChild()) removed += removeTree(node->lchild);
 		if (node->hasRightChild()) removed += removeTree(node->rchild);
-		std::cout << "[BinTree::removeTree()]: going to delete vertex:" << node->data << WHITE << std::endl;
+		//std::cout << "[BinTree::removeTree()]: going to delete vertex:" << node->data << WHITE << std::endl;
 		delete node;
 		removed++;
 		return removed;

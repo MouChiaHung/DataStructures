@@ -2523,8 +2523,8 @@ int main(int argc, char *argv[])
 #if 1	
 	std::cout << GREEN << "****************** Huffman tree ******************\n" << WHITE << std::endl;
 	amo::HuffmanTree<amo::Model> tree;
-	tree.encode("in.log", "out.log");
-	tree.decode("out.log", "copy.log");
+	tree.encode("source", "encode");
+	tree.decode("encode", "decode");
  
 	std::cout << GREEN << "\n****************** main return ******************" << WHITE << std::endl;
 	return 0;
