@@ -43,6 +43,8 @@
 #include <bin_node.h>
 #include <huffman_tree.h>
 
+#include <graph.h>
+
 using namespace std;
 using namespace amo;
 using namespace mystd::myfstream;
@@ -2520,7 +2522,7 @@ int main(int argc, char *argv[])
 	tree.traverse();		
 #endif
 	
-#if 1	
+#if 0
 	std::cout << GREEN << "****************** Huffman tree ******************\n" << WHITE << std::endl;
 	amo::HuffmanTree<amo::Model> tree;
 	tree.encode("source", "encode");
@@ -2529,6 +2531,20 @@ int main(int argc, char *argv[])
 	std::cout << GREEN << "\n****************** main return ******************" << WHITE << std::endl;
 	return 0;
 #endif 
+
+#if 1
+	std::cout << GREEN << "****************** Graph tree ******************\n" << WHITE << std::endl;
+	//amo::Graph<int, int> graph;
+	amo::AdjaMatrix<int, int> matrix;
+	matrix.insert(1);
+	matrix.insert(2);
+	matrix.print();
+	std::cout << matrix << WHITE << endl;
+ 
+	std::cout << GREEN << "\n****************** main return ******************" << WHITE << std::endl;
+	return 0;
+#endif
+
 #endif 
  
 	std::cout << GREEN << "\n****************** main return ******************" << WHITE << std::endl;
