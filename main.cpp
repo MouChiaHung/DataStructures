@@ -2538,9 +2538,17 @@ int main(int argc, char *argv[])
 	amo::AdjaMatrix<int, int> matrix;
 	matrix.insert(1);
 	matrix.insert(2);
-	matrix.print();
+	matrix.insert(3);
 	std::cout << matrix << WHITE << endl;
- 
+	std::cout << "matrix.type(0, 1):" << matrix.type(0, 1) << WHITE << endl;
+	std::cout << "matrix.edge(0, 1):" << matrix.edge(0, 1) << WHITE << endl;
+	std::cout << "matrix.weight(0, 1):" << matrix.weight(0, 1) << WHITE << endl;
+
+	
+	
+	
+	
+	
 	std::cout << GREEN << "\n****************** main return ******************" << WHITE << std::endl;
 	return 0;
 #endif
