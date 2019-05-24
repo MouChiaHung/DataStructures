@@ -2535,19 +2535,30 @@ int main(int argc, char *argv[])
 #if 1
 	std::cout << GREEN << "****************** Graph tree ******************\n" << WHITE << std::endl;
 	//amo::Graph<int, int> graph;
-	amo::AdjaMatrix<int, int> matrix;
-	matrix.insert(1);
-	matrix.insert(2);
-	matrix.insert(3);
+	amo::AdjaMatrix<char, string> matrix;
+	matrix.insert('a');
+	matrix.insert('b');
+	std::cout << GREEN << "going to matrix.insert(\"edge01\", 0, 1, 10)" << WHITE << endl;
+	matrix.insert("edge01", 0, 1, 10);
+	matrix.insert("edge10", 1, 0, 10);
+	matrix.insert('c');
+	matrix.insert("edge02", 0, 2, 10);
+	matrix.insert("edge12", 1, 2, 10);
+	matrix.insert("edge20", 2, 0, 10);
+	matrix.insert("edge21", 2, 1, 10);
+	std::cout << GREEN << "--- AdjaMatrix information start ---" << WHITE << endl;
 	std::cout << matrix << WHITE << endl;
-	std::cout << "matrix.type(0, 1):" << matrix.type(0, 1) << WHITE << endl;
-	std::cout << "matrix.edge(0, 1):" << matrix.edge(0, 1) << WHITE << endl;
-	std::cout << "matrix.weight(0, 1):" << matrix.weight(0, 1) << WHITE << endl;
-
+	std::cout << GREEN << "--- AdjaMatrix information end ---" << WHITE << endl;
 	
+	std::cout << GREEN << "going to matrix.remove(0)" << WHITE << endl;
+	matrix.remove(0);
 	
+	//std::cout << GREEN << "going to matrix.remove(1, 0)" << WHITE << endl;
+	//matrix.remove(1, 0);
 	
-	
+	std::cout << GREEN << "--- AdjaMatrix information start ---" << WHITE << endl;
+	std::cout << matrix;
+	std::cout << GREEN << "--- AdjaMatrix information end ---" << WHITE << endl;
 	
 	std::cout << GREEN << "\n****************** main return ******************" << WHITE << std::endl;
 	return 0;

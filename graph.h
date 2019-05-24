@@ -35,6 +35,8 @@ typedef struct functor_traverse {
 	}
 } FUNCTOR_TRAVERSER;
 private:
+
+public:
 	Tv data;
 	int inDegree;
 	int outDegree;
@@ -43,7 +45,6 @@ private:
 	int fTime;
 	int parent;
 	int priority;
-public:
 	Vertex(const Tv& d = (Tv) 0) : data(d), inDegree(0), outDegree(0), status(UNDISCOVERED), dTime(-1), fTime(-1), parent(-1), priority(INT_MAX) {
 		std::cout << "[Vertex::Vertex()]: this:" << this << ", Tv type:" << typeid(Tv).name() << WHITE << std::endl;
 	}
@@ -75,7 +76,7 @@ friend std::ostream& operator<<(std::ostream& os, const Vertex& vertex) {
 	os << WHITE << "[data]     :" << vertex.data << endl;
 	os << WHITE << "[inDegree] :" << vertex.inDegree << endl;
 	os << WHITE << "[outDegree]:" << vertex.outDegree << endl;
-	os << WHITE << "[status]   :" << vertex.status << endl;
+	os << WHITE << "[status]   :" << (int)vertex.status << endl;
 	os << WHITE << "[dTime]    :" << vertex.dTime << endl;
 	os << WHITE << "[fTime]    :" << vertex.fTime << endl;
 	os << WHITE << "[parent]   :" << vertex.parent << endl;
@@ -136,7 +137,7 @@ private:
 public:
 	int n;
 	int e;
-	Graph() {
+	Graph(): n(0), e(0) {
 		std::cout << "[Graph::Graph()]: this:" << this << ", Tv type:" << typeid(Tv).name() << ", Te type:" << typeid(Te).name() << WHITE << std::endl;
 	}
 	~Graph() {
@@ -199,8 +200,8 @@ private:
 public:
 	//Unhide members of base class template with a using declaration
 	//using amo::Graph<Tv, Te>::insert;
-	std::vector<Vertex<Tv>*> vertexes;
-	std::vector<std::vector<Edge<Te>*>> edges;
+	std::vector<Vertex<Tv>*> V;
+	std::vector<std::vector<Edge<Te>*>> E;
 	AdjaMatrix(): Graph<Tv, Te>() {
 		std::cout << "[AdjaMatrix::AdjaMatrix()]: this:" << this << ", Tv type:" << typeid(Tv).name() << ", Te type:" << typeid(Te).name() << WHITE << std::endl;
 	}
@@ -208,10 +209,10 @@ public:
 		std::cout << "[AdjaMatrix::~AdjaMatrix()]: this:" << this << WHITE << std::endl;
 		//doing something...
 	}
-	//overload for vertexes
-	Tv& vertex(int i) { return vertexes[i].data; }
-	int inDegree(int i) { return vertexes[i].inDegree; }
-	int outDegree(int i) { return vertexes[i].outDegree; }
+	//overload for V
+	Tv& vertex(int i) { return V[i].data; }
+	int inDegree(int i) { return V[i].inDegree; }
+	int outDegree(int i) { return V[i].outDegree; }
 	int firstNbr(int i) { return nextNbr(i, this->n-1); }
 	int nextNbr(int i, int j) {
 		while (j >= 0) {
@@ -221,14 +222,14 @@ public:
 		std::cout << "next nbr:" << j << WHITE << std::endl;
 		return j;
 	}
-	VStatus status(int i) { return vertexes[i].status; }
-	int dTime(int i) { return vertexes[i].dTime; }
-	int fTime(int i) { return vertexes[i].fTime; }
-	int parent(int i) { return vertexes[i].parent; }
-	int priority(int i) { return vertexes[i].priority; }
+	VStatus status(int i) { return V[i].status; }
+	int dTime(int i) { return V[i].dTime; }
+	int fTime(int i) { return V[i].fTime; }
+	int parent(int i) { return V[i].parent; }
+	int priority(int i) { return V[i].priority; }
 	int insert(const Tv& d);
 	Tv remove(int i); //[0, n)
-	//overload for edges
+	//overload for E
 	void insert(const Te& d, int i, int j, int weight); //[0, e)
 	Te remove(int i, int j);
 	bool exist(int i, int j);
@@ -246,31 +247,41 @@ friend std::ostream& operator<<(std::ostream& os, AdjaMatrix<Tv,Te>& matrix) {
 
 template<typename Tv, typename Te>
 void amo::AdjaMatrix<Tv, Te>::print(std::ostream& os) {
-	typename std::vector<Vertex<Tv>*>::iterator it_vertexes; //points to vertexes[i]
-	typename std::vector<std::vector<Edge<Te>*>>::iterator it_edges; //points to edges
-	typename std::vector<Edge<Te>*>::iterator it_adjs; //points to edges[i]
-	os << GREEN << "[AdjaMatrix::print()]: size of vertexes:" << vertexes.size() << WHITE << std::endl;
-	os << GREEN << "[AdjaMatrix::print()]: size of edges:" << edges.size() << WHITE << std::endl;
-	for (it_edges=edges.begin(); it_edges!=edges.end(); it_edges++) {
-		os << GREEN << "[AdjaMatrix::print()]: size of edges["<< distance(edges.begin(), it_edges) << "]:" << it_edges->size() << WHITE << std::endl;
+	typename std::vector<Vertex<Tv>*>::iterator itV; //points to V[i]
+	typename std::vector<std::vector<Edge<Te>*>>::iterator itE; //points to E
+	typename std::vector<Edge<Te>*>::iterator it_adjs; //points to E[i]
+	int n_check = 0;
+	int e_check = 0;
+	os << CYAN << "[AdjaMatrix::print()]: size of V:" << V.size() << WHITE << std::endl;
+	os << CYAN << "[AdjaMatrix::print()]: size of E:" << E.size() << WHITE << std::endl;
+	for (itE=E.begin(); itE!=E.end(); itE++) {
+		os << CYAN << "[AdjaMatrix::print()]: size of E["<< distance(E.begin(), itE) << "]:" << itE->size() << WHITE << std::endl;
 	}
-	os << GREEN << "\n--- VERTEX TOP ------" << WHITE << std::endl;
-	for (it_vertexes=vertexes.begin(); it_vertexes!=vertexes.end(); it_vertexes++) {
-		os << **it_vertexes; //prints vertex 
+	os << GREEN << "--- VERTEX TOP ------" << WHITE << std::endl;
+	for (itV=V.begin(); itV!=V.end(); itV++) {
+		os << CYAN << "V[" << distance(V.begin(), itV) << "]"  << WHITE << endl;
+		os << **itV; //prints vertex 
 		os << endl;
+		n_check++;
 	}
 	os << GREEN << "--- VERTEX BOTTOM ------" << WHITE << std::endl;
-	os << GREEN << "\n--- EDGE TOP ------" << WHITE << std::endl;
-	for (it_edges=edges.begin(); it_edges!=edges.end(); it_edges++) {
-		for (it_adjs=it_edges->begin(); it_adjs!=it_edges->end(); it_adjs++) {
+	os << GREEN << "--- EDGE TOP ------" << WHITE << std::endl;
+	for (itE=E.begin(); itE!=E.end(); itE++) {
+		for (it_adjs=itE->begin(); it_adjs!=itE->end(); it_adjs++) {
+			os << CYAN << "E[" << distance(E.begin(), itE) << "][" << distance(itE->begin(), it_adjs) << "]" << WHITE << endl;
 			os << **it_adjs;
 			os << endl;
+			if (*it_adjs != NULL) e_check++;
 		}
 	}
+	if (this->n == n_check) os << GREEN << "right n:" << this->n << WHITE << endl;
+	else os << RED << "wrong n:" << this->n << " and n_check:" << n_check << WHITE << endl;
+	if (this->e == e_check) os << GREEN << "right e:" << this->e << WHITE << endl;
+	else os << RED << "wrong e:" << this->e << " and e_check:" << e_check << WHITE << endl;
 	os << GREEN << "--- EDGE BOTTOM ------" << WHITE << std::endl;
 }
 
-//For vertexes
+//For V
 /**
  * When a class template derives from a base class template, the base members are not visible in the derived class template definition.
  * (This makes sense, until you specialize, there is no class, and so there are no members. 
@@ -280,69 +291,97 @@ template<typename Tv, typename Te>
 int amo::AdjaMatrix<Tv, Te>::insert(const Tv& data) {
 	std::cout << YELLOW << "[AdjaMatrix::insert()]: data:" << data << WHITE << std::endl;
 	Vertex<Tv>* vertex = new Vertex<Tv>(data);
-	std::vector<Edge<Te>*>* adjs = new std::vector<Edge<Te>*>();
-	typename std::vector<Vertex<Tv>*>::iterator it_vertexes;
-	typename std::vector<std::vector<Edge<Te>*>>::iterator it_edges;
+	typename std::vector<Vertex<Tv>*>::iterator itV;
+	typename std::vector<std::vector<Edge<Te>*>>::iterator itE;
 	typename std::vector<Edge<Te>*>::iterator it_adjs;
 	
-	std::cout << YELLOW << "[AdjaMatrix::insert()]: going to push a dummy edge to edges(size:" << this->edges.size() << ")" << WHITE << std::endl;
 	int tmp = this->n;
-	while (0<tmp--) adjs->push_back(NULL);
-	it_edges = this->edges.insert(edges.end(), *adjs);
-	std::cout << YELLOW << "[AdjaMatrix::insert()]: inserted an edges[" << distance(edges.begin(), it_edges) << "]" << WHITE << std::endl;
-	for (it_edges=edges.begin(); it_edges!=edges.end(); it_edges++) {
-		it_adjs = it_edges->insert(it_edges->end(), (Edge<Te>*)0);
-		std::cout << YELLOW << "[AdjaMatrix::insert()]: inserted an edges[" <<  distance(this->edges.begin(), it_edges)
-				  << "][" << distance(it_edges->begin(), it_adjs) << "]" << WHITE << std::endl;
+	std::vector<Edge<Te>*>* adjs = new std::vector<Edge<Te>*>();
+	while (0<tmp--) { 
+		adjs->push_back((Edge<Te>*)0); 
+	}
+	itE = this->E.insert(E.end(), *adjs);	
+	std::cout << YELLOW << "[AdjaMatrix::insert()]: inserted an vector at E[" << distance(E.begin(), itE) << "]" << WHITE << std::endl;
+	for (itE=E.begin(); itE!=E.end(); itE++) {
+		it_adjs = itE->insert(itE->end(), (Edge<Te>*)0);
+		std::cout << YELLOW << "[AdjaMatrix::insert()]: inserted an dummy at E[" <<  distance(this->E.begin(), itE)
+				  << "][" << distance(itE->begin(), it_adjs) << "]" 
+					<< " and size of E[" << distance(E.begin(), itE) << "]:" << itE->size() << WHITE << std::endl;		  
 	}
 	
-	std::cout << YELLOW << "[AdjaMatrix::insert()]: going to insert a vertex into vertexes(size:" << this->vertexes.size() << ")" << WHITE << std::endl;
-	it_vertexes = this->vertexes.insert(vertexes.end(), vertex);
-	this->n++;	
-
-	return distance(vertexes.begin(), it_vertexes);
+	itV = this->V.insert(V.end(), vertex);
+	(this->n)++;
+	std::cout << YELLOW << "[AdjaMatrix::insert()]: n:" << this->n << WHITE << std::endl;
+	return distance(V.begin(), itV);
 }
 
-template<typename Tv, typename Te>
+template<typename Tv, typename Te> //this time implement deploys operator[] instead of iterators but now n matters 
 Tv amo::AdjaMatrix<Tv, Te>::remove(int i) { 
-
-
-
-
+	for (int j=0; j<this->n; j++) { //i->j
+		if (exist(i, j)) {
+			delete this->E[i][j]; //delete the instance of edge pointed by E[i][j]
+			this->E[i][j] = NULL;
+			this->V[j]->inDegree--;
+			this->e--;
+		}
+	}
+	this->E.erase(std::next(this->E.begin(), i)); //delete instance of vector of E[i], which decreases size of E by 1
+	this->n--;
+	for (int j=0; j<this->n; j++) { //j->i
+		if (exist(j, i)) {
+			delete this->E[j][i]; //delete instance of edge pointed by E[j][i]
+			this->E[j][i] = NULL;
+			this->V[j]->outDegree--;
+			this->e--;
+		}
+		this->E[j].erase(std::next(this->E[j].begin(), i));
+	}
+	Tv data = this->V[i]->data;
+	this->V.erase(std::next(this->V.begin(), i));
+	return data;
 }
 
-//For edges
+//For E
 template<typename Tv, typename Te>
-void amo::AdjaMatrix<Tv, Te>::insert(const Te& d, int i, int j, int weight) {
+void amo::AdjaMatrix<Tv, Te>::insert(const Te& d, int i, int j, int weight) { //there should have been a space prepared since inserting a vertex before
 	if (exist(i, j)) {
 		cout << RED << "edge between " << i << " and " << j << " already exists" << WHITE << std::endl;
 		return;
 	}
-	Edge<Te>* e = new Edge<Te>(d, weight);
-	edges[i][j] = e;
-	e++;
-	vertexes[i]->outDegree++;
-	vertexes[j]->inDegree++;
+	Edge<Te>* edge = new Edge<Te>(d, weight);
+	E[i][j] = edge;
+	this->e++;
+	V[i]->outDegree++;
+	V[j]->inDegree++;
+	cout << CYAN << "inserted edge:" << this->E[i][j] << WHITE << std::endl;
 }
 
 template<typename Tv, typename Te>
-Te amo::AdjaMatrix<Tv, Te>::remove(int i, int j) {
+Te amo::AdjaMatrix<Tv, Te>::remove(int i, int j) { //keeps the space of but replaces E[i][j] with NULL 
 	if (!exist(i, j)) {
 		cout << RED << "edge between " << i << " and " << j << " doesn't exist" << WHITE << std::endl;
 		return NULL;
 	}
-	typename std::vector<std::vector<Edge<Te>*>>::iterator it_edges;
+#if 1	
+	typename std::vector<std::vector<Edge<Te>*>>::iterator itE;
 	typename std::vector<Edge<Te>*>::iterator it_adjs;
-	it_edges = std::next(this->edges.begin(), i);
-	it_adjs = std::next(it_edges->begin(), j);
+	itE = std::next(this->E.begin(), i);
+	it_adjs = std::next(itE->begin(), j);
 		
-	Te e = it_adjs->data;
-	cout << RED << "going to erase an edge form edges(data:" << e << ")" << WHITE << std::endl;
-	it_edges.erase(it_adjs);
-	e--;
-	vertexes[i]->outDegree--;
-	vertexes[j]->inDegree--;
-	return e;
+	Te data = (*it_adjs)->data;
+	cout << CYAN << "going to delete an edge form E and replace with NULL:" << data << WHITE << std::endl;
+	delete *it_adjs;
+	*it_adjs = NULL;
+#else	
+	Te data = E[i][j]->data;
+	cout << CYAN << "going to delete an edge form E and replace with NULL:" << data << WHITE << std::endl;
+	delete E[i][j];
+	E[i][j] = NULL;
+#endif	
+	this->e--;
+	V[i]->outDegree--;
+	V[j]->inDegree--;
+	return data;
 }
 
 template<typename Tv, typename Te>
@@ -369,9 +408,9 @@ bool amo::AdjaMatrix<Tv, Te>::exist(int i, int j) {
 		cout << RED << "out of limit, j >= " << this->n << WHITE << std::endl;
 		return ret;
 	}
-	ret &= (this->edges[i][j] != NULL);
+	ret &= (this->E[i][j] != NULL);
 	if (!ret) {
-		cout << RED << "edges[" << i << "][" << j << "] is NULL" << WHITE << std::endl;
+		cout << RED << "E[" << i << "][" << j << "] is NULL" << WHITE << std::endl;
 		return ret;
 	}
 	return ret;
@@ -383,7 +422,7 @@ EType amo::AdjaMatrix<Tv, Te>::type(int i, int j) {
 		cout << RED << "no edge exists and return UNDETERMINED" << WHITE << std::endl;
 		return UNDETERMINED;
 	}
-	Edge<Te>* edge = edges[i][j];
+	Edge<Te>* edge = E[i][j];
 	return edge->type;
 }
 
@@ -394,7 +433,7 @@ Te& amo::AdjaMatrix<Tv, Te>::edge(int i, int j) {
 		Te* dummy = new Te();
 		return *dummy;
 	}
-	Edge<Te>* edge = edges[i][j];
+	Edge<Te>* edge = E[i][j];
 	return edge->data;
 }
 
@@ -404,7 +443,7 @@ int amo::AdjaMatrix<Tv, Te>::weight(int i, int j) {
 		cout << RED << "no edge exists and return NULL" << WHITE << std::endl;
 		return ERROR_CODE;
 	}
-	Edge<Te>* edge = edges[i][j];
+	Edge<Te>* edge = E[i][j];
 	return edge->weight;
 }
 
