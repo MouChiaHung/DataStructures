@@ -315,7 +315,7 @@ int amo::AdjaMatrix<Tv, Te>::insert(const Tv& data) {
 	return distance(V.begin(), itV);
 }
 
-template<typename Tv, typename Te> //this time implement deploys operator[] instead of iterators but now n matters 
+template<typename Tv, typename Te> //This implement deploys operator[] instead of iterators but now n matters 
 Tv amo::AdjaMatrix<Tv, Te>::remove(int i) { 
 	for (int j=0; j<this->n; j++) { //i->j
 		if (exist(i, j)) {

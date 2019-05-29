@@ -2501,7 +2501,7 @@ int main(int argc, char *argv[])
 	root.traverseInLoop2();
 	std::cout << GREEN << "going to root.traverseInLoop3()" << WHITE << std::endl;
 	root.traverseInLoop3();
-#elis 0
+#elif 1
 	std::cout << GREEN << "going to root.traversePost()" << WHITE << std::endl;
 	root.traversePost();
 	root.traversePostLoop();
@@ -2532,7 +2532,7 @@ int main(int argc, char *argv[])
 	return 0;
 #endif 
 
-#if 1
+#if 0
 	std::cout << GREEN << "****************** Graph tree ******************\n" << WHITE << std::endl;
 	//amo::Graph<int, int> graph;
 	amo::AdjaMatrix<char, string> matrix;
