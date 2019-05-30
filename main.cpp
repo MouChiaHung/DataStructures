@@ -320,7 +320,7 @@ void input(vector<char>& input) {
 		std::cout << "going to push char:" << c << std::endl;
 		input.push_back(c);
 	}
- #else	
+#else
 	while (true) {
 		cin.get(c);
 		if(c == '\n') {
@@ -2467,7 +2467,7 @@ int main(int argc, char *argv[])
 	return 0;
 #endif
 
-#if 1
+#if 0
 	std::cout << GREEN << "****************** tree node ******************\n" << WHITE << std::endl;
  
 #if 1
@@ -2531,27 +2531,37 @@ int main(int argc, char *argv[])
 	std::cout << GREEN << "\n****************** main return ******************" << WHITE << std::endl;
 	return 0;
 #endif 
+#endif 
 
-#if 0
+#if 1
 	std::cout << GREEN << "****************** Graph tree ******************\n" << WHITE << std::endl;
 	//amo::Graph<int, int> graph;
 	amo::AdjaMatrix<char, string> matrix;
-	matrix.insert('a');
-	matrix.insert('b');
-	std::cout << GREEN << "going to matrix.insert(\"edge01\", 0, 1, 10)" << WHITE << endl;
-	matrix.insert("edge01", 0, 1, 10);
-	matrix.insert("edge10", 1, 0, 10);
-	matrix.insert('c');
-	matrix.insert("edge02", 0, 2, 10);
-	matrix.insert("edge12", 1, 2, 10);
-	matrix.insert("edge20", 2, 0, 10);
-	matrix.insert("edge21", 2, 1, 10);
+	matrix.insert('S'); //0
+	matrix.insert('A'); //1
+	matrix.insert('B'); //2
+	matrix.insert('C'); //3
+	matrix.insert('D'); //4
+	matrix.insert('E'); //5
+	matrix.insert('F'); //6
+	matrix.insert('G'); //7
+	matrix.insert("SA", 0, 1, 10);
+	matrix.insert("SC", 0, 3, 10);
+	matrix.insert("SD", 0, 4, 10);
+	matrix.insert("AC", 1, 3, 10);
+	matrix.insert("AE", 1, 5, 10);
+	matrix.insert("CB", 3, 2, 10);
+	matrix.insert("DB", 4, 2, 10);
+	matrix.insert("EF", 5, 6, 10);
+	matrix.insert("EG", 5, 7, 10);
+	matrix.insert("GB", 7, 2, 10);
+	matrix.insert("GF", 7, 6, 10);
 	std::cout << GREEN << "--- AdjaMatrix information start ---" << WHITE << endl;
 	std::cout << matrix << WHITE << endl;
 	std::cout << GREEN << "--- AdjaMatrix information end ---" << WHITE << endl;
 	
-	std::cout << GREEN << "going to matrix.remove(0)" << WHITE << endl;
-	matrix.remove(0);
+	//std::cout << GREEN << "going to matrix.remove(0)" << WHITE << endl;
+	//matrix.remove(0);
 	
 	//std::cout << GREEN << "going to matrix.remove(1, 0)" << WHITE << endl;
 	//matrix.remove(1, 0);
@@ -2564,7 +2574,6 @@ int main(int argc, char *argv[])
 	return 0;
 #endif
 
-#endif 
  
 	std::cout << GREEN << "\n****************** main return ******************" << WHITE << std::endl;
 	return 0;

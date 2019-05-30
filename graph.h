@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <stdio.h>
+#include <stdlib.h>
 #include <stack.h>
 #include <map>
 #include <typeinfo> 
@@ -101,7 +102,7 @@ public:
 	}
 friend std::ostream& operator<<(std::ostream& os, const Edge& edge) {
 	if (&edge == NULL) {
-		os << RED << "no edge instance";
+		os << RED << "no edge" << endl;
 		return os;
 	}
 	os << WHITE << "[this]  :" << &edge << endl;
@@ -261,7 +262,6 @@ void amo::AdjaMatrix<Tv, Te>::print(std::ostream& os) {
 	for (itV=V.begin(); itV!=V.end(); itV++) {
 		os << CYAN << "V[" << distance(V.begin(), itV) << "]"  << WHITE << endl;
 		os << **itV; //prints vertex 
-		os << endl;
 		n_check++;
 	}
 	os << GREEN << "--- VERTEX BOTTOM ------" << WHITE << std::endl;
@@ -270,7 +270,6 @@ void amo::AdjaMatrix<Tv, Te>::print(std::ostream& os) {
 		for (it_adjs=itE->begin(); it_adjs!=itE->end(); it_adjs++) {
 			os << CYAN << "E[" << distance(E.begin(), itE) << "][" << distance(itE->begin(), it_adjs) << "]" << WHITE << endl;
 			os << **it_adjs;
-			os << endl;
 			if (*it_adjs != NULL) e_check++;
 		}
 	}
@@ -279,6 +278,33 @@ void amo::AdjaMatrix<Tv, Te>::print(std::ostream& os) {
 	if (this->e == e_check) os << GREEN << "right e:" << this->e << WHITE << endl;
 	else os << RED << "wrong e:" << this->e << " and e_check:" << e_check << WHITE << endl;
 	os << GREEN << "--- EDGE BOTTOM ------" << WHITE << std::endl;
+	
+	os << GREEN << "--- GRAPH TOP ------" << WHITE << std::endl;
+	string bars, nbrs;
+	//char c[2];
+	string c;
+	for (int i=0; i<this->n; i++) {
+		os << CYAN << "-------" << WHITE << endl;
+		//os << CYAN << "[" << i << "]" << WHITE << endl;
+		os << CYAN << "[" << V[i]->data << "]" << WHITE << endl;
+		bars.clear();
+		nbrs.clear();
+		for (int j=0; j<this->n; j++) {
+			if (exist(i, j)) {
+				bars.insert(bars.length(), " | ");
+				nbrs.append("[");
+				//sprintf(c, "%d", j);
+				//nbrs.append(c);
+				c.insert(c.begin(), V[j]->data);
+				nbrs.append(c);
+				c.clear();
+				nbrs.append("]");
+			}
+		}
+		os << CYAN << bars << WHITE << endl;
+		os << CYAN << nbrs << WHITE << endl;
+	}
+	os << GREEN << "--- GRAPH BOTTOM ------" << WHITE << std::endl;
 }
 
 //For V
@@ -410,7 +436,7 @@ bool amo::AdjaMatrix<Tv, Te>::exist(int i, int j) {
 	}
 	ret &= (this->E[i][j] != NULL);
 	if (!ret) {
-		cout << RED << "E[" << i << "][" << j << "] is NULL" << WHITE << std::endl;
+		//cout << RED << "E[" << i << "][" << j << "] is NULL" << WHITE << std::endl;
 		return ret;
 	}
 	return ret;
