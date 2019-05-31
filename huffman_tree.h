@@ -250,7 +250,9 @@ void amo::HuffmanTree<T>::grow(std::list<Model*>& list) { //ascendantly sorted l
 				if (*l == (*it_subs)->data) {
 					cout << CYAN << "lchild points to the root of sub-tree:" << **it_subs;
 					lchild = *it_subs;
-					--(it_subs = subs.erase(it_subs));
+					//--(it_subs = subs.erase(it_subs));
+					subs.erase(it_subs);
+					break;
 				}
 				if (lchild != NULL) break; //tricky but important
 			}
@@ -258,7 +260,9 @@ void amo::HuffmanTree<T>::grow(std::list<Model*>& list) { //ascendantly sorted l
 				if (*r == (*it_subs)->data) {
 					cout << CYAN << "rchild points to the root of sub-tree:" << **it_subs;
 					rchild = *it_subs;
-					--(it_subs = subs.erase(it_subs));
+					//--(it_subs = subs.erase(it_subs));
+					subs.erase(it_subs);
+					break;
 				}
 				if (rchild != NULL) break; //tricky but important
 			}
@@ -386,6 +390,7 @@ void amo::HuffmanTree<T>::decode(const char* inputFilePath, const char* outputFi
 				if (it->first == lf) fos << endl;
 				else fos << it->first;
 				str.clear();
+				break;
 			}
 		}
 	}

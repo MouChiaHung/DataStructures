@@ -2521,8 +2521,8 @@ int main(int argc, char *argv[])
 	std::cout << GREEN << "going to traverse tree" << WHITE << std::endl;
 	tree.traverse();		
 #endif
-	
-#if 0
+#endif
+#if 1
 	std::cout << GREEN << "****************** Huffman tree ******************\n" << WHITE << std::endl;
 	amo::HuffmanTree<amo::Model> tree;
 	tree.encode("source", "encode");
@@ -2530,10 +2530,9 @@ int main(int argc, char *argv[])
  
 	std::cout << GREEN << "\n****************** main return ******************" << WHITE << std::endl;
 	return 0;
-#endif 
-#endif 
+#endif  
 
-#if 1
+#if 0
 	std::cout << GREEN << "****************** Graph tree ******************\n" << WHITE << std::endl;
 	//amo::Graph<int, int> graph;
 	amo::AdjaMatrix<char, string> matrix;
