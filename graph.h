@@ -121,6 +121,16 @@ typedef struct functor_traverse {
 	}
 } FUNCTOR_TRAVERSER;
 private:
+	
+public:
+	int n;
+	int e;
+	Graph(): n(0), e(0) {
+		std::cout << "[Graph::Graph()]: this:" << this << ", Tv type:" << typeid(Tv).name() << ", Te type:" << typeid(Te).name() << WHITE << std::endl;
+	}
+	~Graph() {
+		std::cout << "[Graph::~Graph()]: this:" << this << WHITE << std::endl;
+	}
 	void reset() {
 		for (int i=0; i<n; i++) {
 			status(i) = UNDISCOVERED;
@@ -134,15 +144,6 @@ private:
 				}
 			}
 		}
-	}
-public:
-	int n;
-	int e;
-	Graph(): n(0), e(0) {
-		std::cout << "[Graph::Graph()]: this:" << this << ", Tv type:" << typeid(Tv).name() << ", Te type:" << typeid(Te).name() << WHITE << std::endl;
-	}
-	~Graph() {
-		std::cout << "[Graph::~Graph()]: this:" << this << WHITE << std::endl;
 	}
 #if 0 //to be an abstract class
 	//vertex
@@ -211,23 +212,23 @@ public:
 		//doing something...
 	}
 	//overload for V
-	Tv& vertex(int i) { return V[i].data; }
-	int inDegree(int i) { return V[i].inDegree; }
-	int outDegree(int i) { return V[i].outDegree; }
+	Tv& vertex(int i) { return V[i]->data; }
+	int inDegree(int i) { return V[i]->inDegree; }
+	int outDegree(int i) { return V[i]->outDegree; }
 	int firstNbr(int i) { return nextNbr(i, this->n-1); }
-	int nextNbr(int i, int j) {
-		while (j >= 0) {
+	int nextNbr(int i, int j) { //next of [i, j)
+		while (--j >= 0) {
 			if (exist(i, j)) break;
-			j--;
 		}
-		std::cout << "next nbr:" << j << WHITE << std::endl;
+		if (j >= 0) std::cout << "i:" << i << ", next nbr:" << j << WHITE << std::endl;
+		//else std::cout << RED << "i:" << i << ", next nbr:" << j << WHITE << std::endl;
 		return j;
 	}
-	VStatus status(int i) { return V[i].status; }
-	int dTime(int i) { return V[i].dTime; }
-	int fTime(int i) { return V[i].fTime; }
-	int parent(int i) { return V[i].parent; }
-	int priority(int i) { return V[i].priority; }
+	VStatus status(int i) { return V[i]->status; }
+	int dTime(int i) { return V[i]->dTime; }
+	int fTime(int i) { return V[i]->fTime; }
+	int parent(int i) { return V[i]->parent; }
+	int priority(int i) { return V[i]->priority; }
 	int insert(const Tv& d);
 	Tv remove(int i); //[0, n)
 	//overload for E
@@ -239,6 +240,8 @@ public:
 	int weight(int i, int j);
 	//extend
 	void print(std::ostream& os);
+	//algorithm
+	void BFS(int v, int clock); 
 
 friend std::ostream& operator<<(std::ostream& os, AdjaMatrix<Tv,Te>& matrix) {
 	matrix.print(os);
@@ -416,22 +419,22 @@ bool amo::AdjaMatrix<Tv, Te>::exist(int i, int j) {
 	ret &= (0<=i);
 	//'this' is always implicitly dependent in a template and the lookup is therefore deferred until the template is actually instantiated.
 	if (!ret) { 
-		cout << RED << "out of limit, i < 0" << WHITE << std::endl;
+		//cout << RED << "out of limit, i < 0" << WHITE << std::endl;
 		return ret;
 	}
 	ret &= i<this->n;
 	if (!ret) {
-		cout << RED << "out of limit, i >= " << this->n << WHITE << std::endl;
+		//cout << RED << "out of limit, i >= " << this->n << WHITE << std::endl;
 		return ret;
 	}
 	ret &= (0<=j);
 	if (!ret) {
-		cout << RED << "out of limit, j < 0" << WHITE << std::endl;
+		//cout << RED << "out of limit, j < 0" << WHITE << std::endl;
 		return ret;
 	}
 	ret &= (j<this->n);
 	if (!ret) {
-		cout << RED << "out of limit, j >= " << this->n << WHITE << std::endl;
+		//cout << RED << "out of limit, j >= " << this->n << WHITE << std::endl;
 		return ret;
 	}
 	ret &= (this->E[i][j] != NULL);
@@ -473,8 +476,29 @@ int amo::AdjaMatrix<Tv, Te>::weight(int i, int j) {
 	return edge->weight;
 }
 
-
-
+template<typename Tv, typename Te>
+void amo::AdjaMatrix<Tv, Te>::BFS(int v, int clock) {
+	string str;
+	char c[2]; //for a char and a null-terminated character
+	for (int u=firstNbr(v); u>=0; u=nextNbr(v, u)) {
+		str.clear();
+#if 0		
+		sprintf(c, "%d", v);
+		str.append(c, 1);
+		str.append(" - ");
+		sprintf(c, "%d", u);
+		str.append(c, 1);
+#else		
+		c[0] = vertex(v);
+		str.append(c, 1);
+		str.append(" - ");
+		c[0] = vertex(u);
+		str.append(c, 1);
+#endif
+		cout << YELLOW << str << WHITE << endl;
+		
+	}
+}
 
 
 

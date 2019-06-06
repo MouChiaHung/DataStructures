@@ -362,7 +362,7 @@ void amo::BinNode<T>::traverseInLoop3() {
 	BinNode<T>* node = this;
 	bool backtrack = false;
 	std::cout << CYAN << "\n[BinNode::traverseInLoop3()]: --- TREE TOP ------" << WHITE << std::endl;
-#if 1
+#if 0
 	while (true) {
 		if (!backtrack && node->hasLeftChild()) { //firstly dig into the deepest left child
 			std::cout << CYAN << "digs into the left child" << WHITE << std::endl;
@@ -385,7 +385,7 @@ void amo::BinNode<T>::traverseInLoop3() {
 		}
 	}	
 #else //new
-	while(node->hasLeftChild()) {
+	while(node->hasLeftChild()) { //leftmost
 		std::cout << CYAN << "digs into the left child" << WHITE << std::endl;
 		node = node->lchild;
 	}

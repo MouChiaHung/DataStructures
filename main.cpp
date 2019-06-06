@@ -2090,7 +2090,7 @@ int main(int argc, char *argv[])
 	
 	std::cout << GREEN << "\n****************** main return ******************" << WHITE << std::endl;
 	return 0;
-#elif 0 
+#elif 0
 	std::cout << GREEN << "****************** quick sort ******************\n" << WHITE << std::endl;
 	std::vector<int> vector = (amo::Sort::getInstance()).getRandomShuffledVector(8);
 	clock_t clk_start, clk_end;
@@ -2467,10 +2467,10 @@ int main(int argc, char *argv[])
 	return 0;
 #endif
 
-#if 0
+#if 1
 	std::cout << GREEN << "****************** tree node ******************\n" << WHITE << std::endl;
  
-#if 1
+#if 0
 	amo::BinNode<int> root(0);
 	amo::BinNode<int>* lchild1 = root.insertLeftChild(1);
 	amo::BinNode<int>* rchild2 = root.insertRightChild(2);
@@ -2492,7 +2492,7 @@ int main(int argc, char *argv[])
 	root.traversePreLoop();
 	std::cout << GREEN << "going to root.traversePreLoop2()" << WHITE << std::endl;
 	root.traversePreLoop2();
-#elif 0
+#elif 1
 	std::cout << GREEN << "going to root.traverseIn()" << WHITE << std::endl;
 	root.traverseIn();
 	std::cout << GREEN << "going to root.traverseInLoop()" << WHITE << std::endl;
@@ -2522,7 +2522,7 @@ int main(int argc, char *argv[])
 	tree.traverse();		
 #endif
 #endif
-#if 1
+#if 0
 	std::cout << GREEN << "****************** Huffman tree ******************\n" << WHITE << std::endl;
 	amo::HuffmanTree<amo::Model> tree;
 	tree.encode("source", "encode");
@@ -2532,7 +2532,7 @@ int main(int argc, char *argv[])
 	return 0;
 #endif  
 
-#if 0
+#if 1
 	std::cout << GREEN << "****************** Graph tree ******************\n" << WHITE << std::endl;
 	//amo::Graph<int, int> graph;
 	amo::AdjaMatrix<char, string> matrix;
@@ -2568,6 +2568,9 @@ int main(int argc, char *argv[])
 	std::cout << GREEN << "--- AdjaMatrix information start ---" << WHITE << endl;
 	std::cout << matrix;
 	std::cout << GREEN << "--- AdjaMatrix information end ---" << WHITE << endl;
+	
+	std::cout << GREEN << "going to BFS" << WHITE << endl;
+	matrix.BFS(0, 0);
 	
 	std::cout << GREEN << "\n****************** main return ******************" << WHITE << std::endl;
 	return 0;

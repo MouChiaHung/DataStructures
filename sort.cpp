@@ -185,13 +185,13 @@ std::vector<int> amo::Sort::merge(std::vector<int>& sorted_left, std::vector<int
 	}
 	std::cout << "[Sort::merge(std::vector<int>&, std::vector<int>&)]: merge:" << std::endl;
 	for_each(merge.begin(), merge.end(), my_functor_print);
-	return merge;	
+	return merge;
 }
 
 /**
  * The elements in [front, mid] and [mid+1, end] are internally sorted.
  */
-void amo::Sort::merge(std::vector<int>& partial_sorted_vector, int front, int mid, int end) {
+void amo::Sort::merge(std::vector<int>& partial_sorted_vector, int front, int mid, int end) {	
 	std::cout << "[Sort::merge(std::vector<int>&, int, int]: front:" << front << ", mid:" << mid << ", end:" << end << std::endl;
 	std::vector<int> sorted_left, sorted_right;
 	int index_left=0, index_right=0;
@@ -206,7 +206,7 @@ void amo::Sort::merge(std::vector<int>& partial_sorted_vector, int front, int mi
 	std::cout << "[Sort::merge(std::vector<int>&, int, int, int)]: sorted_right:" << std::endl;
 	for_each(sorted_right.begin(), sorted_right.end(), my_functor_print);
 	
-#if 0
+#if 1
 	for (int i=front; i<=end; i++) { //selection sort
 		if (sorted_left.at(index_left) <= sorted_right.at(index_right)) { 
 			partial_sorted_vector.at(i) = sorted_left.at(index_left);
@@ -243,7 +243,7 @@ std::vector<int> amo::Sort::mergeSort(std::vector<int>& vector) {
 	right = mergeSort(right);
 	sort = merge(left, right);
 	std::cout << "[Sort::mergeSort(std::vector<int>&]: returns sort vector with (size:" << sort.size() << ")" << std::endl;
-	return sort;
+	return sort;	
 }
 
 /**
@@ -331,8 +331,7 @@ void amo::Sort::insertionSort(std::vector<int>& vector) {
 					  << " vector[" << distance(vector.begin(), it) << "]:" << *it << std::endl;
 		}
 	}
-}	
-
+}
 #endif
 
 void amo::Sort::quickSort(std::vector<int>& vector) {
