@@ -102,7 +102,7 @@ public:
 	}
 friend std::ostream& operator<<(std::ostream& os, const Edge& edge) {
 	if (&edge == NULL) {
-		os << RED << "no edge" << endl;
+		os << BLUE << "null" << endl;
 		return os;
 	}
 	os << WHITE << "[this]  :" << &edge << endl;
@@ -175,18 +175,18 @@ public:
 	int outDegree(int i);
 	int firstNbr(int i);
 	int nextNbr(int i, int j);
-	VStatus status(int i);
-	int dTime(int i);
-	int fTime(int i);
-	int parent(int i);
-	int priority(int i);
+	VStatus& status(int i);
+	int& dTime(int i);
+	int& fTime(int i);
+	int& parent(int i);
+	int& priority(int i);
 	//edge
 	bool exist(int i, int j);
 	void insert(const Te& d, int i, int j, int weight);
 	Te remove(int i, int j);
-	EType type(int i, int j);
 	Te& edge(int i, int j);
-	int weight(int i, int j);
+	EType& type(int i, int j);
+	int& weight(int i, int j);
 #endif
 	
 friend std::ostream& operator<<(std::ostream& os, const Graph<Tv,Te>& graph) {
@@ -209,38 +209,57 @@ public:
 	}
 	~AdjaMatrix() {
 		std::cout << "[AdjaMatrix::~AdjaMatrix()]: this:" << this << WHITE << std::endl;
-		//doing something...
 	}
-	//overload for V
-	Tv& vertex(int i) { return V[i]->data; }
+	/**
+	 * overload for V
+	 */
 	int inDegree(int i) { return V[i]->inDegree; }
 	int outDegree(int i) { return V[i]->outDegree; }
+#if 0 //from tail	
 	int firstNbr(int i) { return nextNbr(i, this->n-1); }
-	int nextNbr(int i, int j) { //next of [i, j)
+	int nextNbr(int i, int j) { //next of [0, j)
 		while (--j >= 0) {
 			if (exist(i, j)) break;
 		}
-		if (j >= 0) std::cout << "i:" << i << ", next nbr:" << j << WHITE << std::endl;
+		if (j >= 0) std::cout << "i:" << i << ", j:" << j << WHITE << std::endl;
 		//else std::cout << RED << "i:" << i << ", next nbr:" << j << WHITE << std::endl;
 		return j;
 	}
-	VStatus status(int i) { return V[i]->status; }
-	int dTime(int i) { return V[i]->dTime; }
-	int fTime(int i) { return V[i]->fTime; }
-	int parent(int i) { return V[i]->parent; }
-	int priority(int i) { return V[i]->priority; }
+#else //from head
+	int firstNbr(int i) { return nextNbr(i, 0); }
+	int nextNbr(int i, int j) { //next of (j, n)
+		while (++j < this->n) {
+			if (exist(i, j)) break;
+		}
+		if (j < this->n) std::cout << "i:" << i << ", j:" << j << WHITE << std::endl;
+		//else std::cout << RED << "i:" << i << ", next nbr:" << j << WHITE << std::endl;
+		return j;
+	}
+#endif	
+	VStatus& status(int i) { return V[i]->status; }
+	Tv& vertex(int i) { return V[i]->data; }
+	int& dTime(int i) { return V[i]->dTime; }
+	int& fTime(int i) { return V[i]->fTime; }
+	int& parent(int i) { return V[i]->parent; }
+	int& priority(int i) { return V[i]->priority; }
 	int insert(const Tv& d);
 	Tv remove(int i); //[0, n)
-	//overload for E
+	/**
+	 * overload for E
+	 */
+	Te& edge(int i, int j);
+	EType& type(int i, int j);
+	int& weight(int i, int j);
 	void insert(const Te& d, int i, int j, int weight); //[0, e)
 	Te remove(int i, int j);
 	bool exist(int i, int j);
-	EType type(int i, int j);
-	Te& edge(int i, int j);
-	int weight(int i, int j);
-	//extend
+	/**
+	 * extend
+	 */
 	void print(std::ostream& os);
-	//algorithm
+	/**
+	 * algorithm
+	 */
 	void BFS(int v, int clock); 
 
 friend std::ostream& operator<<(std::ostream& os, AdjaMatrix<Tv,Te>& matrix) {
@@ -446,10 +465,12 @@ bool amo::AdjaMatrix<Tv, Te>::exist(int i, int j) {
 }
 
 template<typename Tv, typename Te>
-EType amo::AdjaMatrix<Tv, Te>::type(int i, int j) {
+EType& amo::AdjaMatrix<Tv, Te>::type(int i, int j) {
 	if (!exist(i, j)){
 		cout << RED << "no edge exists and return UNDETERMINED" << WHITE << std::endl;
-		return UNDETERMINED;
+		Edge<Te>* edge = E[i][j];
+		edge->type = UNDETERMINED;
+		return edge->type;
 	}
 	Edge<Te>* edge = E[i][j];
 	return edge->type;
@@ -467,7 +488,7 @@ Te& amo::AdjaMatrix<Tv, Te>::edge(int i, int j) {
 }
 
 template<typename Tv, typename Te>
-int amo::AdjaMatrix<Tv, Te>::weight(int i, int j) {
+int& amo::AdjaMatrix<Tv, Te>::weight(int i, int j) {
 	if (!exist(i, j)){
 		cout << RED << "no edge exists and return NULL" << WHITE << std::endl;
 		return ERROR_CODE;
@@ -478,25 +499,46 @@ int amo::AdjaMatrix<Tv, Te>::weight(int i, int j) {
 
 template<typename Tv, typename Te>
 void amo::AdjaMatrix<Tv, Te>::BFS(int v, int clock) {
+#if 1 //info
 	string str;
 	char c[2]; //for a char and a null-terminated character
-	for (int u=firstNbr(v); u>=0; u=nextNbr(v, u)) {
-		str.clear();
-#if 0		
-		sprintf(c, "%d", v);
-		str.append(c, 1);
-		str.append(" - ");
-		sprintf(c, "%d", u);
-		str.append(c, 1);
-#else		
-		c[0] = vertex(v);
-		str.append(c, 1);
-		str.append(" - ");
-		c[0] = vertex(u);
-		str.append(c, 1);
 #endif
-		cout << YELLOW << str << WHITE << endl;
-		
+	int distance[this->n];
+	std::queue<int> queue;
+	queue.push(v);
+	distance[v] = 0;
+	while (!queue.empty()) {
+		int i = queue.front();
+		queue.pop();
+#if 0 //from tail		
+		for (int u=firstNbr(i); u>=0; u=nextNbr(i, u)) {
+#else //from head			
+		for (int u=firstNbr(i); u<this->n; u=nextNbr(i, u)) {
+#endif			
+#if 1 //info	
+			str.clear();	
+			c[0] = vertex(i);
+			str.append(c, 1);
+			str.append(" - ");
+			c[0] = vertex(u);
+			str.append(c, 1);
+			cout << YELLOW << str << WHITE << endl;
+#endif		
+			if (status(u) == UNDISCOVERED) {
+				queue.push(u);
+				status(u) = DISCOVERED;
+				type(i, u) = TREE;
+				parent(u) = i;
+				distance[u] = distance[i]+1;
+			} else {
+				type(i, u) = CROSS;
+			}
+		}
+		status(i) = VISITED;
+	}
+	for (int i=0; i<this->n; i++) {
+		//cout << YELLOW << "distance[" << i << "]:" << distance[i] << endl;
+		cout << YELLOW << "distance[" << vertex(i) << "]:" << distance[i] << endl;
 	}
 }
 

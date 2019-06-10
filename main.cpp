@@ -2534,6 +2534,7 @@ int main(int argc, char *argv[])
 
 #if 1
 	std::cout << GREEN << "****************** Graph tree ******************\n" << WHITE << std::endl;
+	
 	//amo::Graph<int, int> graph;
 	amo::AdjaMatrix<char, string> matrix;
 	matrix.insert('S'); //0
