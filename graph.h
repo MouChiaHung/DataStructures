@@ -77,7 +77,17 @@ friend std::ostream& operator<<(std::ostream& os, const Vertex& vertex) {
 	os << WHITE << "[data]     :" << vertex.data << endl;
 	os << WHITE << "[inDegree] :" << vertex.inDegree << endl;
 	os << WHITE << "[outDegree]:" << vertex.outDegree << endl;
-	os << WHITE << "[status]   :" << (int)vertex.status << endl;
+	switch (vertex.status) {
+		case UNDISCOVERED:
+			os << WHITE << "[status]   :" << "UNDISCOVERED" << endl;
+			break;
+		case DISCOVERED:
+			os << WHITE << "[status]   :" << "DISCOVERED" << endl;
+			break;
+		case VISITED:
+			os << WHITE << "[status]   :" << "VISITED" << endl;
+			break;	
+	}
 	os << WHITE << "[dTime]    :" << vertex.dTime << endl;
 	os << WHITE << "[fTime]    :" << vertex.fTime << endl;
 	os << WHITE << "[parent]   :" << vertex.parent << endl;
@@ -108,7 +118,24 @@ friend std::ostream& operator<<(std::ostream& os, const Edge& edge) {
 	os << WHITE << "[this]  :" << &edge << endl;
 	os << WHITE << "[data]  :" << edge.data << endl;
 	os << WHITE << "[weight]:" << edge.weight << endl;
-	os << WHITE << "[type]  :" << edge.type << endl;
+	switch (edge.type) {
+		case UNDETERMINED:
+			os << WHITE << "[type]  :" << "UNDETERMINED" << endl;
+			break;
+		case TREE:
+			os << WHITE << "[type]  :" << "TREE" << endl;
+			break;
+		case CROSS:
+			os << WHITE << "[type]  :" << "CROSS" << endl;
+			break;	
+		case FORWARD:
+			os << WHITE << "[type]  :" << "FORWARD" << endl;
+			break;	
+		case BACKWARD:
+			os << WHITE << "[type]  :" << "BACKWARD" << endl;
+			break;		
+	}
+	
 	return os;
 }		
 };
@@ -221,8 +248,7 @@ public:
 		while (--j >= 0) {
 			if (exist(i, j)) break;
 		}
-		if (j >= 0) std::cout << "i:" << i << ", j:" << j << WHITE << std::endl;
-		//else std::cout << RED << "i:" << i << ", next nbr:" << j << WHITE << std::endl;
+		if (j >= 0) cout << i << " -> " << j << WHITE << endl;
 		return j;
 	}
 #else //from head
@@ -231,8 +257,7 @@ public:
 		while (++j < this->n) {
 			if (exist(i, j)) break;
 		}
-		if (j < this->n) std::cout << "i:" << i << ", j:" << j << WHITE << std::endl;
-		//else std::cout << RED << "i:" << i << ", next nbr:" << j << WHITE << std::endl;
+		if (j < this->n) cout << i << " -> " << j << WHITE << endl;
 		return j;
 	}
 #endif	
@@ -260,7 +285,9 @@ public:
 	/**
 	 * algorithm
 	 */
-	void BFS(int v, int clock); 
+	void BFS(int v);
+	void DFS(int v);
+	void DFS(int v, int& time, int*& distance, int*& predecessor, int*& discover, int*& finish);
 
 friend std::ostream& operator<<(std::ostream& os, AdjaMatrix<Tv,Te>& matrix) {
 	matrix.print(os);
@@ -498,15 +525,17 @@ int& amo::AdjaMatrix<Tv, Te>::weight(int i, int j) {
 }
 
 template<typename Tv, typename Te>
-void amo::AdjaMatrix<Tv, Te>::BFS(int v, int clock) {
+void amo::AdjaMatrix<Tv, Te>::BFS(int v) {
 #if 1 //info
 	string str;
 	char c[2]; //for a char and a null-terminated character
 #endif
 	int distance[this->n];
+	int predecessor[this->n];
 	std::queue<int> queue;
 	queue.push(v);
 	distance[v] = 0;
+	predecessor[v] = -1;
 	while (!queue.empty()) {
 		int i = queue.front();
 		queue.pop();
@@ -530,6 +559,7 @@ void amo::AdjaMatrix<Tv, Te>::BFS(int v, int clock) {
 				type(i, u) = TREE;
 				parent(u) = i;
 				distance[u] = distance[i]+1;
+				predecessor[u] = i;
 			} else {
 				type(i, u) = CROSS;
 			}
@@ -537,14 +567,76 @@ void amo::AdjaMatrix<Tv, Te>::BFS(int v, int clock) {
 		status(i) = VISITED;
 	}
 	for (int i=0; i<this->n; i++) {
-		//cout << YELLOW << "distance[" << i << "]:" << distance[i] << endl;
-		cout << YELLOW << "distance[" << vertex(i) << "]:" << distance[i] << endl;
+		cout << YELLOW << "distance[" << vertex(i) << "]:" << distance[i] << WHITE << endl;
+	}
+	for (int i=0; i<this->n; i++) {
+		int p = predecessor[i];
+		if (p >= 0) cout << YELLOW << "predecessor[" << vertex(i) << "]:" << vertex(p) << WHITE << endl;
+		else cout << YELLOW << "predecessor[" << vertex(i) << "]:NULL(root)" << WHITE << endl;
 	}
 }
 
+template<typename Tv, typename Te>
+void amo::AdjaMatrix<Tv, Te>::DFS(int v) {
+	int root = v;
+	int time = 0;
+	int* distance = new int[this->n];
+	int* predecessor = new int[this->n] {-1,-1,-1,-1,-1,-1,-1,-1};
+	int* discover = new int[this->n]; //all of dTime of V
+	int* finish = new int[this->n]; //all of fTime of V
+	do {
+		if (status(v) == UNDISCOVERED) {
+			cout << YELLOW << "going to DFS of sub-graph of v:" << v << WHITE << endl;
+			DFS(v, time, distance, predecessor, discover, finish);
+		}
+	} while (root!=(v=(++v%this->n)));
+	for (int i=0; i<this->n; i++) {
+		int p = predecessor[i];
+		if (p >= 0) cout << YELLOW << "predecessor[" << vertex(i) << "]:" << vertex(p) << WHITE << endl;
+		else cout << YELLOW << "predecessor[" << vertex(i) << "]:NULL" << WHITE << endl;
+	}
+	for (int i=0; i<this->n; i++) {
+		cout << YELLOW << "discover[" << vertex(i) << "]:" << discover[i] << WHITE << endl;
+	}
+	for (int i=0; i<this->n; i++) {
+		cout << YELLOW << "finish[" << vertex(i) << "]:" << finish[i] << WHITE << endl;
+	}
+}
 
-
-
+template<typename Tv, typename Te>
+void amo::AdjaMatrix<Tv, Te>::DFS(int v, int& time, int*& distance, int*& predecessor, int*& discover, int*& finish) {
+	status(v) = DISCOVERED;
+	dTime(v) = ++time;
+	discover[v] = dTime(v);
+	for (int u=firstNbr(v); u<this->n; u=nextNbr(v, u)) {
+		if (status(u) == UNDISCOVERED) {
+			cout << vertex(v) << " discover " << vertex(u) << endl;
+			type(v, u) = TREE;
+			parent(u) = v;
+			predecessor[u] = v;
+			DFS(u, time, distance, predecessor, discover, finish);
+		}
+		else if (status(u) == DISCOVERED) {
+			cout << vertex(v) << " backward " << vertex(u) << endl;
+			type(v, u) = BACKWARD;
+		}
+		else if (status(u) == VISITED) {
+			if (dTime(v) > dTime(u)) {
+				cout << vertex(v) << " cross " << vertex(u) << endl;
+				type(v, u) = CROSS;
+			}
+			else if (dTime(v) < dTime(u)) {
+				cout << vertex(v) << " forward " << vertex(u) << endl;
+				type(v, u) = FORWARD;
+			}
+			else cout << RED << "Exception of dTime of v:" << v << WHITE << endl;
+		}
+		else cout << RED << "Exception of status of v:" << v << WHITE << endl;
+	}
+	status(v) = VISITED;
+	fTime(v) = ++time;
+	finish[v] = fTime(v);
+}
 
 
 

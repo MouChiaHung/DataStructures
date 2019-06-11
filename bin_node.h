@@ -422,17 +422,16 @@ void amo::BinNode<T>::traversePost() {
 template<typename T>
 void amo::BinNode<T>::tracePost(BinNode<T>* node, std::stack<BinNode<T>*> &stack) {
 	while (node) {
+		if (node->isLeaf()) {
+			node = NULL;
+			continue;
+		}
 		if (node->hasRightChild()) {
-			//std::cout << YELLOW << "going to push rchild to stack:" << *node->rchild << WHITE;
 			stack.push(node->rchild);
 		}
 		if (node->hasLeftChild()) {
+			stack.push(node->lchild);
 			node = node->lchild;
-			//std::cout << YELLOW << "going to push lchild to stack:" << *node << WHITE;
-			stack.push(node);
-		}
-		else{
-			node = NULL;
 		}
 	}
 }
@@ -455,7 +454,7 @@ void amo::BinNode<T>::traversePostLoop() {
 		else std::cout << CYAN << "vertex" << WHITE << std::endl;
 		functor(*popped);
 	}	
-	if (isRoot()) std::cout << CYAN << "[BinNode::traversePostLoop()]: --- TREE BOTTOM ------" << WHITE << std::endl;
+	if (isRoot()) std::cout << CYAN << "[BinNode::traversePostLoop()]: --- TREE BOTTOM ------" << WHITE << std::endl;	
 }
 
 template<typename T>

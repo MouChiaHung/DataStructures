@@ -2467,10 +2467,10 @@ int main(int argc, char *argv[])
 	return 0;
 #endif
 
-#if 1
+#if 0
 	std::cout << GREEN << "****************** tree node ******************\n" << WHITE << std::endl;
  
-#if 0
+#if 1
 	amo::BinNode<int> root(0);
 	amo::BinNode<int>* lchild1 = root.insertLeftChild(1);
 	amo::BinNode<int>* rchild2 = root.insertRightChild(2);
@@ -2492,7 +2492,7 @@ int main(int argc, char *argv[])
 	root.traversePreLoop();
 	std::cout << GREEN << "going to root.traversePreLoop2()" << WHITE << std::endl;
 	root.traversePreLoop2();
-#elif 1
+#elif 0
 	std::cout << GREEN << "going to root.traverseIn()" << WHITE << std::endl;
 	root.traverseIn();
 	std::cout << GREEN << "going to root.traverseInLoop()" << WHITE << std::endl;
@@ -2534,7 +2534,8 @@ int main(int argc, char *argv[])
 
 #if 1
 	std::cout << GREEN << "****************** Graph tree ******************\n" << WHITE << std::endl;
-	
+
+#if 0
 	//amo::Graph<int, int> graph;
 	amo::AdjaMatrix<char, string> matrix;
 	matrix.insert('S'); //0
@@ -2556,13 +2557,9 @@ int main(int argc, char *argv[])
 	matrix.insert("EG", 5, 7, 10);
 	matrix.insert("GB", 7, 2, 10);
 	matrix.insert("GF", 7, 6, 10);
-	std::cout << GREEN << "--- AdjaMatrix information start ---" << WHITE << endl;
-	std::cout << matrix << WHITE << endl;
-	std::cout << GREEN << "--- AdjaMatrix information end ---" << WHITE << endl;
 	
 	//std::cout << GREEN << "going to matrix.remove(0)" << WHITE << endl;
 	//matrix.remove(0);
-	
 	//std::cout << GREEN << "going to matrix.remove(1, 0)" << WHITE << endl;
 	//matrix.remove(1, 0);
 	
@@ -2571,7 +2568,42 @@ int main(int argc, char *argv[])
 	std::cout << GREEN << "--- AdjaMatrix information end ---" << WHITE << endl;
 	
 	std::cout << GREEN << "going to BFS" << WHITE << endl;
-	matrix.BFS(0, 0);
+	matrix.BFS(0);
+#endif	
+
+#if 1
+	amo::AdjaMatrix<char, string> matrix;
+	matrix.insert('A'); //0
+	matrix.insert('B'); //1
+	matrix.insert('C'); //2
+	matrix.insert('D'); //3
+	matrix.insert('E'); //4
+	matrix.insert('F'); //5
+	matrix.insert('G'); //6
+	matrix.insert('H'); //7
+	matrix.insert("A-B", 0, 1, 10);
+	matrix.insert("A-C", 0, 2, 10);
+	matrix.insert("B-D", 1, 3, 10);
+	matrix.insert("C-B", 2, 1, 10);
+	matrix.insert("C-F", 2, 5, 10);
+	matrix.insert("D-E", 3, 4, 10);
+	matrix.insert("D-F", 3, 5, 10);
+	matrix.insert("F-B", 5, 1, 10);
+	matrix.insert("G-E", 6, 4, 10);	
+	matrix.insert("G-H", 6, 7, 10);
+	matrix.insert("H-G", 7, 6, 10);
+	
+	std::cout << GREEN << "--- AdjaMatrix information start ---" << WHITE << endl;
+	std::cout << matrix << WHITE << endl;
+	std::cout << GREEN << "--- AdjaMatrix information end ---" << WHITE << endl;
+	
+	std::cout << GREEN << "going to DFS" << WHITE << endl;
+	matrix.DFS(0);
+	
+	std::cout << GREEN << "--- AdjaMatrix information start ---" << WHITE << endl;
+	std::cout << matrix << WHITE << endl;
+	std::cout << GREEN << "--- AdjaMatrix information end ---" << WHITE << endl;
+#endif	
 	
 	std::cout << GREEN << "\n****************** main return ******************" << WHITE << std::endl;
 	return 0;
