@@ -254,7 +254,7 @@ void amo::HuffmanTree<T>::grow(std::list<Model*>& list) { //ascendantly sorted l
 					subs.erase(it_subs);
 					break;
 				}
-				if (lchild != NULL) break; //tricky but important
+				if (lchild != NULL) break; //tricky but important, synthetic nodes might have same fields
 			}
 			for (it_subs=subs.begin(); it_subs!=subs.end(); it_subs++) { //set rchild if any sub-tree corresponds with this r model iterated currently 
 				if (*r == (*it_subs)->data) {
@@ -264,7 +264,7 @@ void amo::HuffmanTree<T>::grow(std::list<Model*>& list) { //ascendantly sorted l
 					subs.erase(it_subs);
 					break;
 				}
-				if (rchild != NULL) break; //tricky but important
+				if (rchild != NULL) break; //tricky but important, synthetic nodes might have same fields
 			}
 			if (lchild == NULL) { //set lchild with a new node if no any sub-tree corresponds with this l model iterated currently, which means meeting a row leaf 
 				lchild = new BinNode<T>(*l);
@@ -367,7 +367,7 @@ void amo::HuffmanTree<T>::decode(const char* inputFilePath, const char* outputFi
 		//cout << endl;
 		sscanf(buf, "%c%s", &c, code);
 		if (c < 32) {
-			cout << GREEN << "got null-character:" << (int)c << WHITE << endl;
+			cout << GREEN << "got instruction character:" << (int)c << WHITE << endl;
 			fis_table.getline(buf, sizeof(buf)/sizeof(buf[0]));
 			sscanf(buf, "%s", code);
 			c = 10;

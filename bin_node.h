@@ -447,7 +447,7 @@ void amo::BinNode<T>::traversePostLoop() {
 	while (true) {
 		if (stack.empty()) break;
 		node = stack.top();
-		if (node!=popped->parent) tracePost(node, stack); //traversing if popping the left and going to the right, not from a child towards a parent 
+		if (node!=popped->parent) tracePost(node, stack); //traces if toward the right, not back the parent 
 		popped = stack.top();
 		stack.pop();
 		if (popped->isLeaf()) std::cout << CYAN << "leaf" << WHITE << std::endl;
