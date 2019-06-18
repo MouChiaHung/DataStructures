@@ -252,12 +252,12 @@ public:
 		return j;
 	}
 #else //from head
-	int firstNbr(int i) { return nextNbr(i, 0); }
+	int firstNbr(int i) { return nextNbr(i, -1); }
 	int nextNbr(int i, int j) { //next of (j, n)
 		while (++j < this->n) {
 			if (exist(i, j)) break;
 		}
-		if (j < this->n) cout << i << " -> " << j << WHITE << endl;
+		//if (j < this->n) cout << i << " -> " << j << WHITE << endl;
 		return j;
 	}
 #endif	
@@ -286,8 +286,12 @@ public:
 	 * algorithm
 	 */
 	void BFS(int v);
+	void BFS(int v, int*& distance, int*& predecessor);
 	void DFS(int v);
 	void DFS(int v, int& time, int*& distance, int*& predecessor, int*& discover, int*& finish);
+	void collapse(int*& predecessor);
+	void CCDFS(int v);
+	void CCDFS(int v, int& time, int*& distance, int*& predecessor, int*& discover, int*& finish);
 
 friend std::ostream& operator<<(std::ostream& os, AdjaMatrix<Tv,Te>& matrix) {
 	matrix.print(os);
@@ -526,12 +530,31 @@ int& amo::AdjaMatrix<Tv, Te>::weight(int i, int j) {
 
 template<typename Tv, typename Te>
 void amo::AdjaMatrix<Tv, Te>::BFS(int v) {
+	int root = v;
+	int* distance = new int[this->n];
+	int* predecessor = new int[this->n] {-1,-1,-1,-1,-1,-1,-1,-1};
+	do {
+		if (status(v) == UNDISCOVERED) {
+			cout << GREEN << "going to BFS of sub-graph of v:" << v << WHITE << endl;
+			BFS(v, distance, predecessor);
+		}
+	} while (root!=(v=(++v%this->n)));
+	for (int i=0; i<this->n; i++) {
+		cout << WHITE << "distance[" << vertex(i) << "]:" << distance[i] << WHITE << endl;
+	}
+	for (int i=0; i<this->n; i++) {
+		int p = predecessor[i];
+		if (p >= 0) cout << YELLOW << "predecessor[" << vertex(i) << "]:" << vertex(p) << WHITE << endl;
+		else cout << YELLOW << "predecessor[" << vertex(i) << "]:" << predecessor[i] << WHITE << endl;
+	}
+}
+
+template<typename Tv, typename Te>
+void amo::AdjaMatrix<Tv, Te>::BFS(int v, int*& distance, int*& predecessor) {
 #if 1 //info
 	string str;
 	char c[2]; //for a char and a null-terminated character
 #endif
-	int distance[this->n];
-	int predecessor[this->n];
 	std::queue<int> queue;
 	queue.push(v);
 	distance[v] = 0;
@@ -551,7 +574,7 @@ void amo::AdjaMatrix<Tv, Te>::BFS(int v) {
 			str.append(" - ");
 			c[0] = vertex(u);
 			str.append(c, 1);
-			cout << YELLOW << str << WHITE << endl;
+			cout << WHITE << str << WHITE << endl;
 #endif		
 			if (status(u) == UNDISCOVERED) {
 				queue.push(u);
@@ -566,14 +589,6 @@ void amo::AdjaMatrix<Tv, Te>::BFS(int v) {
 		}
 		status(i) = VISITED;
 	}
-	for (int i=0; i<this->n; i++) {
-		cout << YELLOW << "distance[" << vertex(i) << "]:" << distance[i] << WHITE << endl;
-	}
-	for (int i=0; i<this->n; i++) {
-		int p = predecessor[i];
-		if (p >= 0) cout << YELLOW << "predecessor[" << vertex(i) << "]:" << vertex(p) << WHITE << endl;
-		else cout << YELLOW << "predecessor[" << vertex(i) << "]:NULL(root)" << WHITE << endl;
-	}
 }
 
 template<typename Tv, typename Te>
@@ -586,25 +601,105 @@ void amo::AdjaMatrix<Tv, Te>::DFS(int v) {
 	int* finish = new int[this->n]; //all of fTime of V
 	do {
 		if (status(v) == UNDISCOVERED) {
-			cout << YELLOW << "going to DFS of sub-graph of v:" << v << WHITE << endl;
+			cout << GREEN << "going to DFS of sub-graph of v:" << v << WHITE << endl;
 			DFS(v, time, distance, predecessor, discover, finish);
 		}
 	} while (root!=(v=(++v%this->n)));
 	for (int i=0; i<this->n; i++) {
 		int p = predecessor[i];
 		if (p >= 0) cout << YELLOW << "predecessor[" << vertex(i) << "]:" << vertex(p) << WHITE << endl;
-		else cout << YELLOW << "predecessor[" << vertex(i) << "]:NULL" << WHITE << endl;
+		else cout << YELLOW << "predecessor[" << vertex(i) << "]:" << predecessor[i] << WHITE << endl;
 	}
 	for (int i=0; i<this->n; i++) {
-		cout << YELLOW << "discover[" << vertex(i) << "]:" << discover[i] << WHITE << endl;
+		cout << WHITE << "discover[" << vertex(i) << "]:" << discover[i] << WHITE << endl;
 	}
 	for (int i=0; i<this->n; i++) {
-		cout << YELLOW << "finish[" << vertex(i) << "]:" << finish[i] << WHITE << endl;
+		cout << WHITE << "finish[" << vertex(i) << "]:" << finish[i] << WHITE << endl;
 	}
 }
 
 template<typename Tv, typename Te>
 void amo::AdjaMatrix<Tv, Te>::DFS(int v, int& time, int*& distance, int*& predecessor, int*& discover, int*& finish) {
+	status(v) = DISCOVERED;
+	dTime(v) = ++time;
+	discover[v] = dTime(v);
+	for (int u=firstNbr(v); u<this->n; u=nextNbr(v, u)) {
+		if (status(u) == UNDISCOVERED) {
+			cout << vertex(v) << " discover " << vertex(u) << endl;
+			type(v, u) = TREE;
+			parent(u) = v;
+			predecessor[u] = v;
+			DFS(u, time, distance, predecessor, discover, finish);
+		}
+		else if (status(u) == DISCOVERED) {
+			cout << vertex(v) << " backward " << vertex(u) << endl;
+			type(v, u) = BACKWARD;
+		}
+		else if (status(u) == VISITED) {
+			if (dTime(v) > dTime(u)) {
+				cout << vertex(v) << " cross " << vertex(u) << endl;
+				type(v, u) = CROSS;
+			}
+			else if (dTime(v) < dTime(u)) {
+				cout << vertex(v) << " forward " << vertex(u) << endl;
+				type(v, u) = FORWARD;
+			}
+			else cout << RED << "Exception of dTime of v:" << v << WHITE << endl;
+		}
+		else cout << RED << "Exception of status of v:" << v << WHITE << endl;
+	}
+	status(v) = VISITED;
+	fTime(v) = ++time;
+	finish[v] = fTime(v);
+}
+
+template<typename Tv, typename Te>
+void amo::AdjaMatrix<Tv, Te>::collapse(int*& predecessor) {
+	int i = -1;
+	while (++i<this->n) {
+		if (predecessor[i] < 0) {
+			cout << CYAN << "root:" << i << WHITE << endl;
+			continue;
+		}
+		while (predecessor[predecessor[i]]>=0) {
+			predecessor[i] = predecessor[predecessor[i]];
+			cout << CYAN << "changed predecessor[" << i << "]:" << vertex(predecessor[i]) << WHITE << endl;
+		} 
+	} 
+}
+
+template<typename Tv, typename Te>
+void amo::AdjaMatrix<Tv, Te>::CCDFS(int v) {
+	int root = v;
+	int time = 0;
+	int* distance = new int[this->n];
+	int* predecessor = new int[this->n] {-1,-1,-1,-1,-1,-1,-1,-1};
+	int* discover = new int[this->n]; //all of dTime of V
+	int* finish = new int[this->n]; //all of fTime of V
+	do {
+		if (status(v) == UNDISCOVERED) {
+			cout << GREEN << "going to DFS of sub-graph of v:" << v << WHITE << endl;
+			DFS(v, time, distance, predecessor, discover, finish);
+		}
+	} while (root!=(v=(++v%this->n)));
+	
+	collapse(predecessor);
+	
+	for (int i=0; i<this->n; i++) {
+		int p = predecessor[i];
+		if (p >= 0) cout << YELLOW << "predecessor[" << vertex(i) << "]:" << vertex(p) << WHITE << endl;
+		else cout << YELLOW << "predecessor[" << vertex(i) << "]:" << predecessor[i] << WHITE << endl;
+	}
+	for (int i=0; i<this->n; i++) {
+		cout << WHITE << "discover[" << vertex(i) << "]:" << discover[i] << WHITE << endl;
+	}
+	for (int i=0; i<this->n; i++) {
+		cout << WHITE << "finish[" << vertex(i) << "]:" << finish[i] << WHITE << endl;
+	}
+}
+
+template<typename Tv, typename Te>
+void amo::AdjaMatrix<Tv, Te>::CCDFS(int v, int& time, int*& distance, int*& predecessor, int*& discover, int*& finish) {
 	status(v) = DISCOVERED;
 	dTime(v) = ++time;
 	discover[v] = dTime(v);
