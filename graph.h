@@ -248,8 +248,11 @@ public:
 		while (--j >= 0) {
 			if (exist(i, j)) break;
 		}
-		if (j >= 0) cout << i << " -> " << j << WHITE << endl;
-		return j;
+		if (j >= 0) { 
+			cout << i << " -> " << j << WHITE << endl;
+			return j;
+		}
+		else return -1;
 	}
 #else //from head
 	int firstNbr(int i) { return nextNbr(i, -1); }
@@ -257,8 +260,11 @@ public:
 		while (++j < this->n) {
 			if (exist(i, j)) break;
 		}
-		//if (j < this->n) cout << i << " -> " << j << WHITE << endl;
-		return j;
+		if (j < this->n) {
+			cout << i << " -> " << j << WHITE << endl;
+			return j;
+		}
+		else return -1;
 	}
 #endif	
 	VStatus& status(int i) { return V[i]->status; }
@@ -291,7 +297,9 @@ public:
 	void DFS(int v, int& time, int*& distance, int*& predecessor, int*& discover, int*& finish);
 	void collapse(int*& predecessor);
 	void CCDFS(int v);
-	void CCDFS(int v, int& time, int*& distance, int*& predecessor, int*& discover, int*& finish);
+	void quickSort(int*& predecessor, int front, int end);
+	void quickSortAndRank(int*& rank, int*& sort, int front, int end);
+	void SCCDFS(int v);
 
 friend std::ostream& operator<<(std::ostream& os, AdjaMatrix<Tv,Te>& matrix) {
 	matrix.print(os);
@@ -321,9 +329,10 @@ void amo::AdjaMatrix<Tv, Te>::print(std::ostream& os) {
 	os << GREEN << "--- EDGE TOP ------" << WHITE << std::endl;
 	for (itE=E.begin(); itE!=E.end(); itE++) {
 		for (it_adjs=itE->begin(); it_adjs!=itE->end(); it_adjs++) {
+			if (*it_adjs == NULL) continue;
 			os << CYAN << "E[" << distance(E.begin(), itE) << "][" << distance(itE->begin(), it_adjs) << "]" << WHITE << endl;
 			os << **it_adjs;
-			if (*it_adjs != NULL) e_check++;
+			e_check++;
 		}
 	}
 	if (this->n == n_check) os << GREEN << "right n:" << this->n << WHITE << endl;
@@ -535,7 +544,7 @@ void amo::AdjaMatrix<Tv, Te>::BFS(int v) {
 	int* predecessor = new int[this->n] {-1,-1,-1,-1,-1,-1,-1,-1};
 	do {
 		if (status(v) == UNDISCOVERED) {
-			cout << GREEN << "going to BFS of sub-graph of v:" << v << WHITE << endl;
+			cout << GREEN << "going to BFS the subgraph of v:" << v << WHITE << endl;
 			BFS(v, distance, predecessor);
 		}
 	} while (root!=(v=(++v%this->n)));
@@ -560,14 +569,11 @@ void amo::AdjaMatrix<Tv, Te>::BFS(int v, int*& distance, int*& predecessor) {
 	distance[v] = 0;
 	predecessor[v] = -1;
 	while (!queue.empty()) {
+		int u = -1;
 		int i = queue.front();
-		queue.pop();
-#if 0 //from tail		
-		for (int u=firstNbr(i); u>=0; u=nextNbr(i, u)) {
-#else //from head			
-		for (int u=firstNbr(i); u<this->n; u=nextNbr(i, u)) {
-#endif			
-#if 1 //info	
+		queue.pop();		
+		while ((u=nextNbr(i, u))>=0) {		
+#if 0 //info	
 			str.clear();	
 			c[0] = vertex(i);
 			str.append(c, 1);
@@ -601,7 +607,7 @@ void amo::AdjaMatrix<Tv, Te>::DFS(int v) {
 	int* finish = new int[this->n]; //all of fTime of V
 	do {
 		if (status(v) == UNDISCOVERED) {
-			cout << GREEN << "going to DFS of sub-graph of v:" << v << WHITE << endl;
+			cout << GREEN << "going to DFS the subgraph of v:" << v << WHITE << endl;
 			DFS(v, time, distance, predecessor, discover, finish);
 		}
 	} while (root!=(v=(++v%this->n)));
@@ -623,7 +629,8 @@ void amo::AdjaMatrix<Tv, Te>::DFS(int v, int& time, int*& distance, int*& predec
 	status(v) = DISCOVERED;
 	dTime(v) = ++time;
 	discover[v] = dTime(v);
-	for (int u=firstNbr(v); u<this->n; u=nextNbr(v, u)) {
+	int u = -1;
+	while ((u=nextNbr(v, u))>=0) {
 		if (status(u) == UNDISCOVERED) {
 			cout << vertex(v) << " discover " << vertex(u) << endl;
 			type(v, u) = TREE;
@@ -678,11 +685,12 @@ void amo::AdjaMatrix<Tv, Te>::CCDFS(int v) {
 	int* finish = new int[this->n]; //all of fTime of V
 	do {
 		if (status(v) == UNDISCOVERED) {
-			cout << GREEN << "going to DFS of sub-graph of v:" << v << WHITE << endl;
+			cout << GREEN << "going to DFS the subgraph of v:" << v << WHITE << endl;
 			DFS(v, time, distance, predecessor, discover, finish);
 		}
 	} while (root!=(v=(++v%this->n)));
 	
+	cout << GREEN << "going to collapse" << WHITE << endl;
 	collapse(predecessor);
 	
 	for (int i=0; i<this->n; i++) {
@@ -699,39 +707,104 @@ void amo::AdjaMatrix<Tv, Te>::CCDFS(int v) {
 }
 
 template<typename Tv, typename Te>
-void amo::AdjaMatrix<Tv, Te>::CCDFS(int v, int& time, int*& distance, int*& predecessor, int*& discover, int*& finish) {
-	status(v) = DISCOVERED;
-	dTime(v) = ++time;
-	discover[v] = dTime(v);
-	for (int u=firstNbr(v); u<this->n; u=nextNbr(v, u)) {
-		if (status(u) == UNDISCOVERED) {
-			cout << vertex(v) << " discover " << vertex(u) << endl;
-			type(v, u) = TREE;
-			parent(u) = v;
-			predecessor[u] = v;
-			DFS(u, time, distance, predecessor, discover, finish);
+void amo::AdjaMatrix<Tv, Te>::quickSort(int*& sort, int front, int end) { //[front, end]
+	if (front >= end) return;
+	//partition start
+	int pivot = end;
+	int l = front-1;
+	for (int i=front; i<end; i++) { 
+		if (sort[i] > sort[pivot]) {
+			l++; //one more left
+			std::swap(sort[i], sort[l]);
 		}
-		else if (status(u) == DISCOVERED) {
-			cout << vertex(v) << " backward " << vertex(u) << endl;
-			type(v, u) = BACKWARD;
-		}
-		else if (status(u) == VISITED) {
-			if (dTime(v) > dTime(u)) {
-				cout << vertex(v) << " cross " << vertex(u) << endl;
-				type(v, u) = CROSS;
-			}
-			else if (dTime(v) < dTime(u)) {
-				cout << vertex(v) << " forward " << vertex(u) << endl;
-				type(v, u) = FORWARD;
-			}
-			else cout << RED << "Exception of dTime of v:" << v << WHITE << endl;
-		}
-		else cout << RED << "Exception of status of v:" << v << WHITE << endl;
 	}
-	status(v) = VISITED;
-	fTime(v) = ++time;
-	finish[v] = fTime(v);
+	l++; //positions pivot
+	std::swap(sort[l], sort[pivot]);
+	pivot = l;
+	//partition end
+	quickSort(sort, front, pivot-1);
+	quickSort(sort, pivot+1, end);
 }
+
+/**
+ * rank holds indexes corresponding to the sort in the same order
+ */
+template<typename Tv, typename Te>
+void amo::AdjaMatrix<Tv, Te>::quickSortAndRank(int*& rank, int*& sort, int front, int end) { //[front, end]
+	if (front >= end) return;
+	//partition start
+	int pivot = end;
+	int l = front-1;
+	for (int i=front; i<end; i++) { 
+		if (sort[i] > sort[pivot]) {
+			l++; //one more left
+			std::swap(sort[i], sort[l]);
+			std::swap(rank[i], rank[l]);
+		}
+	}
+	l++; //positions pivot
+	std::swap(sort[l], sort[pivot]);
+	std::swap(rank[l], rank[pivot]);
+	pivot = l;
+	//partition end
+	quickSortAndRank(rank, sort, front, pivot-1);
+	quickSortAndRank(rank, sort, pivot+1, end);
+}
+
+template<typename Tv, typename Te>
+void amo::AdjaMatrix<Tv, Te>::SCCDFS(int v) {
+	int root = v;
+	int time = 0;
+	int* distance = new int[this->n];
+	int* predecessor = new int[this->n] {-1,-1,-1,-1,-1,-1,-1,-1};
+	int* discover = new int[this->n]; //all of dTime of V
+	int* finish = new int[this->n]; //all of fTime of V
+	int* finish_sort = new int[this->n]; //descent
+	int* finish_rank = new int[this->n]; 
+	do {
+		if (status(v) == UNDISCOVERED) {
+			cout << GREEN << "going to DFS the subgraph of v:" << v << WHITE << endl;
+			DFS(v, time, distance, predecessor, discover, finish);
+		}
+	} while (root!=(v=(++v%this->n)));
+			
+	for (int i=0; i<this->n; i++) {
+		int p = predecessor[i];
+		if (p >= 0) cout << YELLOW << "predecessor[" << vertex(i) << "]:" << vertex(p) << WHITE << endl;
+		else cout << YELLOW << "predecessor[" << vertex(i) << "]:" << predecessor[i] << WHITE << endl;
+	}
+	for (int i=0; i<this->n; i++) {
+		cout << WHITE << "discover[" << vertex(i) << "]:" << discover[i] << WHITE << endl;
+	}
+	for (int i=0; i<this->n; i++) {
+		cout << WHITE << "finish[" << vertex(i) << "]:" << finish[i] << WHITE << endl;
+	}
+	
+	for (int i=0; i<this->n; i++) {
+		finish_sort[i] = finish[i];
+		finish_rank[i] = i;
+	}
+#if 0 //O(n^2)
+	cout << GREEN << "going to quick sort" << WHITE << endl;
+	quickSort(finish_sort, 0, (this->n)-1);
+	for (int rank=0; rank<this->n; rank++) {
+		for (int i=0; i<this->n; i++) {
+			if (finish[i] == finish_sort[rank]) {
+				finish_rank[rank] = i;
+			}
+		}
+	}
+#else //O(nLogn)
+	cout << GREEN << "going to quick sort and rank" << WHITE << endl;
+	quickSortAndRank(finish_rank, finish_sort, 0, (this->n)-1);
+#endif
+	for (int i=0; i<this->n; i++) {
+		cout << WHITE << "finish_rank[" << i << "]:" << finish_rank[i] << WHITE << endl;
+	}
+	
+	
+}
+
 
 
 

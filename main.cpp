@@ -2599,10 +2599,6 @@ int main(int argc, char *argv[])
 	
 	std::cout << GREEN << "going to DFS" << WHITE << endl;
 	matrix.DFS(0);
-	
-	std::cout << GREEN << "--- AdjaMatrix information start ---" << WHITE << endl;
-	std::cout << matrix << WHITE << endl;
-	std::cout << GREEN << "--- AdjaMatrix information end ---" << WHITE << endl;
 #endif	
 
 #if 0
@@ -2669,7 +2665,7 @@ int main(int argc, char *argv[])
 	matrix.DFS(0);
 #endif	
 
-#if 1
+#if 0
 	amo::AdjaMatrix<char, string> matrix;
 	matrix.insert('0'); //0
 	matrix.insert('1'); //1
@@ -2699,7 +2695,42 @@ int main(int argc, char *argv[])
 	
 	std::cout << GREEN << "going to CCDFS" << WHITE << endl;
 	matrix.CCDFS(0);
-#endif	
+#endif
+
+#if 1
+	amo::AdjaMatrix<char, string> matrix;
+	matrix.insert('0'); //0
+	matrix.insert('1'); //1
+	matrix.insert('2'); //2
+	matrix.insert('3'); //3
+	matrix.insert('4'); //4
+	matrix.insert('5'); //5
+	matrix.insert('6'); //6
+	matrix.insert('7'); //7
+	matrix.insert('8'); //8
+	matrix.insert("0-1", 0, 1, 0);
+	matrix.insert("1-2", 1, 2, 0);
+	matrix.insert("1-4", 1, 4, 0);
+	matrix.insert("2-0", 2, 0, 0);
+	matrix.insert("2-3", 2, 3, 0);
+	matrix.insert("2-5", 2, 5, 0);
+	matrix.insert("3-2", 3, 2, 0);
+	matrix.insert("4-5", 4, 5, 0);
+	matrix.insert("4-6", 4, 6, 0);
+	matrix.insert("5-4", 5, 4, 0);
+	matrix.insert("5-6", 5, 6, 0);
+	matrix.insert("5-7", 5, 7, 0);
+	matrix.insert("6-7", 6, 7, 0);
+	matrix.insert("7-8", 7, 8, 0);
+	matrix.insert("8-6", 8, 6, 0);
+	
+	std::cout << GREEN << "--- AdjaMatrix information start ---" << WHITE << endl;
+	std::cout << matrix << WHITE << endl;
+	std::cout << GREEN << "--- AdjaMatrix information end ---" << WHITE << endl;
+	
+	std::cout << GREEN << "going to SCCDFS" << WHITE << endl;
+	matrix.SCCDFS(0);
+#endif
 	
 	std::cout << GREEN << "\n****************** main return ******************" << WHITE << std::endl;
 	return 0;
