@@ -46,14 +46,9 @@ public:
 	int fTime;
 	int parent;
 	int priority;
-	Vertex(const Tv& d = (Tv) 0) : data(d), inDegree(0), outDegree(0), status(UNDISCOVERED), dTime(-1), fTime(-1), parent(-1), priority(INT_MAX) {
-		std::cout << "[Vertex::Vertex()]: this:" << this << ", Tv type:" << typeid(Tv).name() << WHITE << std::endl;
-	}
-	Vertex(const Vertex& v) : data(v.data), inDegree(v.inDegree), outDegree(v.outDegree), status(v.status), dTime(v.dTime), fTime(v.fTime), parent(v.parent), priority(v.priority) {
-		std::cout << "[Vertex::Vertex(Vertex&)]: this:" << this << ", Tv type:" << typeid(Tv).name() << WHITE << std::endl;
-	}
+	Vertex(const Tv& d = (Tv) 0) : data(d), inDegree(0), outDegree(0), status(UNDISCOVERED), dTime(-1), fTime(-1), parent(-1), priority(INT_MAX) {}
+	Vertex(const Vertex& v) : data(v.data), inDegree(v.inDegree), outDegree(v.outDegree), status(v.status), dTime(v.dTime), fTime(v.fTime), parent(v.parent), priority(v.priority) {}
 	Vertex& operator=(const Vertex& vertex) {
-		std::cout << "[Vertex::operator=()]: data:" << vertex.data << WHITE << std::endl;
 		data = vertex.data;
 		inDegree = vertex.inDegree;
 		outDegree = vertex.outDegree;
@@ -64,9 +59,7 @@ public:
 		priority = vertex.priority;
 		return *this;
 	}
-	~Vertex() {
-		std::cout << "[Vertex::~Vertex()]: this:" << this << WHITE << std::endl;
-	}
+	~Vertex() {}
 	
 friend std::ostream& operator<<(std::ostream& os, const Vertex& vertex) {
 	if (&vertex == NULL) {
@@ -104,12 +97,8 @@ public:
 	EType type;
 	Te data;
 	int weight;
-	Edge(const Te& d = (Te) 0, int w = 0) : data(d), weight(w), type(UNDETERMINED) {
-		std::cout << "[Vertex::Vertex()]: this:" << this << ", Te type:" << typeid(Te).name() << WHITE << std::endl;
-	}
-	~Edge() {
-		std::cout << "[Edge::~Edge()]: this:" << this << WHITE << std::endl;
-	}
+	Edge(const Te& d = (Te) 0, int w = 0) : data(d), weight(w), type(UNDETERMINED) {}
+	~Edge() {}
 friend std::ostream& operator<<(std::ostream& os, const Edge& edge) {
 	if (&edge == NULL) {
 		os << BLUE << "null" << endl;
@@ -153,10 +142,10 @@ public:
 	int n;
 	int e;
 	Graph(): n(0), e(0) {
-		std::cout << "[Graph::Graph()]: this:" << this << ", Tv type:" << typeid(Tv).name() << ", Te type:" << typeid(Te).name() << WHITE << std::endl;
+		//std::cout << "[Graph::Graph()]: this:" << this << ", Tv type:" << typeid(Tv).name() << ", Te type:" << typeid(Te).name() << WHITE << std::endl;
 	}
 	~Graph() {
-		std::cout << "[Graph::~Graph()]: this:" << this << WHITE << std::endl;
+		//std::cout << "[Graph::~Graph()]: this:" << this << WHITE << std::endl;
 	}
 	void reset() {
 		for (int i=0; i<n; i++) {
@@ -231,18 +220,14 @@ public:
 	//using amo::Graph<Tv, Te>::insert;
 	std::vector<Vertex<Tv>*> V;
 	std::vector<std::vector<Edge<Te>*>> E;
-	AdjaMatrix(): Graph<Tv, Te>() {
-		std::cout << "[AdjaMatrix::AdjaMatrix()]: this:" << this << ", Tv type:" << typeid(Tv).name() << ", Te type:" << typeid(Te).name() << WHITE << std::endl;
-	}
-	~AdjaMatrix() {
-		std::cout << "[AdjaMatrix::~AdjaMatrix()]: this:" << this << WHITE << std::endl;
-	}
+	AdjaMatrix(): Graph<Tv, Te>() {}
+	~AdjaMatrix() {}
 	/**
 	 * overload for V
 	 */
 	int inDegree(int i) { return V[i]->inDegree; }
 	int outDegree(int i) { return V[i]->outDegree; }
-#if 0 //from tail	
+#if 0 //from tail
 	int firstNbr(int i) { return nextNbr(i, this->n-1); }
 	int nextNbr(int i, int j) { //next of [0, j)
 		while (--j >= 0) {
@@ -297,6 +282,7 @@ public:
 	void DFS(int v, int& time, int*& distance, int*& predecessor, int*& discover, int*& finish);
 	void collapse(int*& predecessor);
 	void CCDFS(int v);
+	AdjaMatrix transpose();
 	void quickSort(int*& predecessor, int front, int end);
 	void quickSortAndRank(int*& rank, int*& sort, int front, int end);
 	void SCCDFS(int v);
@@ -314,10 +300,10 @@ void amo::AdjaMatrix<Tv, Te>::print(std::ostream& os) {
 	typename std::vector<Edge<Te>*>::iterator it_adjs; //points to E[i]
 	int n_check = 0;
 	int e_check = 0;
-	os << CYAN << "[AdjaMatrix::print()]: size of V:" << V.size() << WHITE << std::endl;
-	os << CYAN << "[AdjaMatrix::print()]: size of E:" << E.size() << WHITE << std::endl;
+	os << CYAN << "size of V:" << V.size() << WHITE << std::endl;
+	os << CYAN << "size of E:" << E.size() << WHITE << std::endl;
 	for (itE=E.begin(); itE!=E.end(); itE++) {
-		os << CYAN << "[AdjaMatrix::print()]: size of E["<< distance(E.begin(), itE) << "]:" << itE->size() << WHITE << std::endl;
+		os << CYAN << "size of E["<< distance(E.begin(), itE) << "]:" << itE->size() << WHITE << std::endl;
 	}
 	os << GREEN << "--- VERTEX TOP ------" << WHITE << std::endl;
 	for (itV=V.begin(); itV!=V.end(); itV++) {
@@ -377,7 +363,6 @@ void amo::AdjaMatrix<Tv, Te>::print(std::ostream& os) {
  */
 template<typename Tv, typename Te>
 int amo::AdjaMatrix<Tv, Te>::insert(const Tv& data) {
-	std::cout << YELLOW << "[AdjaMatrix::insert()]: data:" << data << WHITE << std::endl;
 	Vertex<Tv>* vertex = new Vertex<Tv>(data);
 	typename std::vector<Vertex<Tv>*>::iterator itV;
 	typename std::vector<std::vector<Edge<Te>*>>::iterator itE;
@@ -389,17 +374,14 @@ int amo::AdjaMatrix<Tv, Te>::insert(const Tv& data) {
 		adjs->push_back((Edge<Te>*)0); 
 	}
 	itE = this->E.insert(E.end(), *adjs);	
-	std::cout << YELLOW << "[AdjaMatrix::insert()]: inserted an vector at E[" << distance(E.begin(), itE) << "]" << WHITE << std::endl;
+	std::cout << YELLOW << "inserted an vector at E[" << distance(E.begin(), itE) << "]" << WHITE << std::endl;
 	for (itE=E.begin(); itE!=E.end(); itE++) {
-		it_adjs = itE->insert(itE->end(), (Edge<Te>*)0);
-		std::cout << YELLOW << "[AdjaMatrix::insert()]: inserted an dummy at E[" <<  distance(this->E.begin(), itE)
-				  << "][" << distance(itE->begin(), it_adjs) << "]" 
-					<< " and size of E[" << distance(E.begin(), itE) << "]:" << itE->size() << WHITE << std::endl;		  
+		it_adjs = itE->insert(itE->end(), (Edge<Te>*)0);		
 	}
 	
 	itV = this->V.insert(V.end(), vertex);
 	(this->n)++;
-	std::cout << YELLOW << "[AdjaMatrix::insert()]: n:" << this->n << WHITE << std::endl;
+	//std::cout << YELLOW << "n:" << this->n << WHITE << std::endl;
 	return distance(V.begin(), itV);
 }
 
@@ -707,6 +689,28 @@ void amo::AdjaMatrix<Tv, Te>::CCDFS(int v) {
 }
 
 template<typename Tv, typename Te>
+AdjaMatrix<Tv, Te> amo::AdjaMatrix<Tv, Te>::transpose(){	
+	typename std::vector<Vertex<Tv>*>::iterator itV;
+	typename std::vector<std::vector<Edge<Te>*>>::iterator itE;
+	typename std::vector<Edge<Te>*>::iterator ite;
+	typename amo::AdjaMatrix<Tv, Te> T;
+	
+	for (itV=V.begin(); itV!=V.end(); itV++) {
+		T.insert((*itV)->data);
+	}
+	int v = -1;
+	int u = -1;
+	for (itV=V.begin(); itV!=V.end(); itV++) {
+		v = std::distance(V.begin(), itV);
+		u = -1;
+		while ((u=nextNbr(v, u))>=0) {
+			T.insert("", u, v, 0);
+		}
+	}
+	return T;
+}
+
+template<typename Tv, typename Te>
 void amo::AdjaMatrix<Tv, Te>::quickSort(int*& sort, int front, int end) { //[front, end]
 	if (front >= end) return;
 	//partition start
@@ -761,6 +765,9 @@ void amo::AdjaMatrix<Tv, Te>::SCCDFS(int v) {
 	int* finish = new int[this->n]; //all of fTime of V
 	int* finish_sort = new int[this->n]; //descent
 	int* finish_rank = new int[this->n]; 
+	
+	//first DFS
+	cout << GREEN << "going to 1st DFS" << WHITE << endl;
 	do {
 		if (status(v) == UNDISCOVERED) {
 			cout << GREEN << "going to DFS the subgraph of v:" << v << WHITE << endl;
@@ -768,6 +775,7 @@ void amo::AdjaMatrix<Tv, Te>::SCCDFS(int v) {
 		}
 	} while (root!=(v=(++v%this->n)));
 			
+	//print 
 	for (int i=0; i<this->n; i++) {
 		int p = predecessor[i];
 		if (p >= 0) cout << YELLOW << "predecessor[" << vertex(i) << "]:" << vertex(p) << WHITE << endl;
@@ -778,8 +786,9 @@ void amo::AdjaMatrix<Tv, Te>::SCCDFS(int v) {
 	}
 	for (int i=0; i<this->n; i++) {
 		cout << WHITE << "finish[" << vertex(i) << "]:" << finish[i] << WHITE << endl;
-	}
+	}	
 	
+	//ranks the finish after the first DFS
 	for (int i=0; i<this->n; i++) {
 		finish_sort[i] = finish[i];
 		finish_rank[i] = i;
@@ -802,7 +811,46 @@ void amo::AdjaMatrix<Tv, Te>::SCCDFS(int v) {
 		cout << WHITE << "finish_rank[" << i << "]:" << finish_rank[i] << WHITE << endl;
 	}
 	
+	//transpose
+	cout << GREEN << "going to transpose" << WHITE << endl;
+	typename amo::AdjaMatrix<Tv, Te> T = this->transpose();
 	
+	//second DFS vertexes of the transpose in the order latest toward earliest of finish 
+	int timeT = 0;
+	int* distanceT = new int[T.n];
+	int* predecessorT = new int[T.n] {-1,-1,-1,-1,-1,-1,-1,-1};
+	int* discoverT = new int[T.n] {0,0,0,0,0,0,0,0}; //all of dTime of V
+	int* finishT = new int[T.n] {0,0,0,0,0,0,0,0}; //all of fTime of V
+	for (int i=0; i<T.n; i++) {
+		v = finish_rank[i];
+		cout << GREEN << "... v:" << v << WHITE << endl;
+		if (T.status(v) == UNDISCOVERED) {
+			cout << GREEN << "going to 2nd DFS from vertex:" << vertex(v) << WHITE << endl;
+			T.DFS(v, timeT, distanceT, predecessorT, discoverT, finishT);
+		}
+	}
+	
+	//print
+	for (int i=0; i<this->n; i++) {
+		int p = predecessorT[i];
+		if (p >= 0) cout << YELLOW << "predecessorT[" << vertex(i) << "]:" << vertex(p) << WHITE << endl;
+		else cout << YELLOW << "predecessorT[" << vertex(i) << "]:" << predecessorT[i] << WHITE << endl;
+	}
+	for (int i=0; i<this->n; i++) {
+		cout << WHITE << "discoverT[" << vertex(i) << "]:" << discoverT[i] << WHITE << endl;
+	}
+	for (int i=0; i<this->n; i++) {
+		cout << WHITE << "finishT[" << vertex(i) << "]:" << finishT[i] << WHITE << endl;
+	}	
+	
+	//collapse
+	cout << GREEN << "going to collapse" << WHITE << endl;
+	T.collapse(predecessorT);
+	for (int i=0; i<this->n; i++) {
+		int p = predecessorT[i];
+		if (p >= 0) cout << YELLOW << "predecessorT[" << vertex(i) << "]:" << vertex(p) << WHITE << endl;
+		else cout << YELLOW << "predecessorT[" << vertex(i) << "]:" << predecessorT[i] << WHITE << endl;
+	}
 }
 
 

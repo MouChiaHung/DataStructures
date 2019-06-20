@@ -2728,6 +2728,13 @@ int main(int argc, char *argv[])
 	std::cout << matrix << WHITE << endl;
 	std::cout << GREEN << "--- AdjaMatrix information end ---" << WHITE << endl;
 	
+#if 0	
+	amo::AdjaMatrix<char, string> matrixT = matrix.transpose();
+	std::cout << MAGENTA << "--- Transpose information start ---" << WHITE << endl;
+	std::cout << matrixT << WHITE << endl;
+	std::cout << MAGENTA << "--- Transpose information end ---" << WHITE << endl;
+#endif
+	
 	std::cout << GREEN << "going to SCCDFS" << WHITE << endl;
 	matrix.SCCDFS(0);
 #endif
