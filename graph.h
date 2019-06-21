@@ -851,6 +851,50 @@ void amo::AdjaMatrix<Tv, Te>::SCCDFS(int v) {
 		if (p >= 0) cout << YELLOW << "predecessorT[" << vertex(i) << "]:" << vertex(p) << WHITE << endl;
 		else cout << YELLOW << "predecessorT[" << vertex(i) << "]:" << predecessorT[i] << WHITE << endl;
 	}
+	
+	//print SCC
+	
+	cout << *this << endl;
+	
+	std::string scc[this->n][3];
+	char c[2];
+	for (int i=0; i<this->n; i++) {
+		int p = predecessorT[i];
+		if (p == -1) { 
+			c[0] = vertex(i);
+			scc[i][0].append(GREEN);
+			scc[i][0].append("Strong connected component#");
+			scc[i][0].append(c, 1);
+			scc[i][0].append("\n");
+			scc[i][0].append(CYAN);
+			scc[i][0].append("-------\n");
+			scc[i][0].append("[");
+			scc[i][0].append(c, 1);
+			scc[i][0].append("]");
+		}
+	}
+	
+	for (int i=0; i<this->n; i++) {
+		int p = predecessorT[i];
+		if (p >= 0) {
+			c[0] = vertex(i);
+			scc[p][1].append(CYAN); 
+			scc[p][1].append(" | "); 
+			scc[p][2].append("[");
+			scc[p][2].append(c, 1);
+			scc[p][2].append("]");
+		}
+	}
+	
+	int i = -1;
+	while (++i < this->n) {
+		if (!scc[i][0].empty()) {
+			cout << scc[i][0] << endl;
+			cout << scc[i][1] << endl;
+			cout << scc[i][2] << endl;
+			cout << "-------" << endl;
+		}
+	}
 }
 
 
