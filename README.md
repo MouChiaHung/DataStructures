@@ -10,6 +10,9 @@ Demostration:
 - Huffaman coding
 ![image](https://github.com/MouChiaHung/DataStructures/blob/master/Huffman.jpg)
 
+- DFS for strong connected components coding
+![image](https://github.com/MouChiaHung/DataStructures/blob/master/SCC.PNG)
+
 Practices includes:
  - C++ skills 
  - STL
