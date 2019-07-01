@@ -329,7 +329,8 @@ void amo::BinNode<T>::traverseInLoop2() {
 			stack.push(node);
 			node = node->lchild;
 		}
-		else if (!stack.empty()){ //while-loop task2
+		else { //while-loop task2
+			if (stack.empty()) break;
 			node = stack.top();
 			stack.pop();
 			if (node->isLeaf()) std::cout << GREEN << "leaf" << WHITE << std::endl;
@@ -337,7 +338,6 @@ void amo::BinNode<T>::traverseInLoop2() {
 			functor(*node);
 			node = node->rchild;
 		}
-		else break;
 	}
 	std::cout << GREEN << "\n[BinNode::traverseInLoop2()]: --- TREE BOTTOM ------" << WHITE << std::endl;
 }
@@ -431,8 +431,8 @@ void amo::BinNode<T>::tracePost(BinNode<T>* node, std::stack<BinNode<T>*> &stack
 		}
 		if (node->hasLeftChild()) {
 			stack.push(node->lchild);
-			node = node->lchild;
 		}
+		node = node->lchild;
 	}
 }
 

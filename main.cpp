@@ -2508,8 +2508,10 @@ int main(int argc, char *argv[])
 #elif 0
 	std::cout << GREEN << "going to root.traverseLevel()" << WHITE << std::endl;
 	root.traverseLevel();
-#else	
+#else
 #endif
+	std::cout << GREEN << "\n****************** main return ******************" << WHITE << std::endl;
+	return 0;
 #endif	
 
 #if 0

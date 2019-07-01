@@ -853,7 +853,6 @@ void amo::AdjaMatrix<Tv, Te>::SCCDFS(int v) {
 	}
 	
 	//print SCC
-	
 	cout << *this << endl;
 	
 	std::string scc[this->n][3];
