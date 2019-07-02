@@ -147,20 +147,6 @@ public:
 	~Graph() {
 		//std::cout << "[Graph::~Graph()]: this:" << this << WHITE << std::endl;
 	}
-	void reset() {
-		for (int i=0; i<n; i++) {
-			status(i) = UNDISCOVERED;
-			dTime(i) = -1;
-			fTime(i) = -1;
-			parent(i) = -1;
-			priority(i) = INT_MAX;
-			for (int j=0; j<n; j++) {
-				if (exist(i, j)) {
-					type(i, j) = UNDETERMINED;
-				}
-			}
-		}
-	}
 #if 0 //to be an abstract class
 	//vertex
 	virtual int insert(const Tv& data) = 0;
@@ -183,6 +169,7 @@ public:
 	virtual Te& edge(int i, int j) = 0;
 	virtual int& weight(int i, int j) = 0;
 #else 	
+	void reset();
 	//vertex
 	int insert(const Tv& d);
 	Tv remove(int i);
@@ -222,6 +209,20 @@ public:
 	std::vector<std::vector<Edge<Te>*>> E;
 	AdjaMatrix(): Graph<Tv, Te>() {}
 	~AdjaMatrix() {}
+	void reset() {
+		for (int i=0; i<this->n; i++) {
+			status(i) = UNDISCOVERED;
+			dTime(i) = -1;
+			fTime(i) = -1;
+			parent(i) = -1;
+			priority(i) = INT_MAX;
+			for (int j=0; j<this->n; j++) {
+				if (exist(i, j)) {
+					type(i, j) = UNDETERMINED;
+				}
+			}
+		}
+	}
 	/**
 	 * overload for V
 	 */
@@ -286,6 +287,7 @@ public:
 	void quickSort(int*& predecessor, int front, int end);
 	void quickSortAndRank(int*& rank, int*& sort, int front, int end);
 	void SCCDFS(int v);
+	void TopoSort(int v);
 
 friend std::ostream& operator<<(std::ostream& os, AdjaMatrix<Tv,Te>& matrix) {
 	matrix.print(os);
@@ -374,13 +376,12 @@ int amo::AdjaMatrix<Tv, Te>::insert(const Tv& data) {
 		adjs->push_back((Edge<Te>*)0); 
 	}
 	itE = this->E.insert(E.end(), *adjs);	
-	std::cout << YELLOW << "inserted an vector at E[" << distance(E.begin(), itE) << "]" << WHITE << std::endl;
 	for (itE=E.begin(); itE!=E.end(); itE++) {
 		it_adjs = itE->insert(itE->end(), (Edge<Te>*)0);		
 	}
-	
 	itV = this->V.insert(V.end(), vertex);
 	(this->n)++;
+	std::cout << YELLOW << "inserted a vector at V[" << distance(V.begin(), itV) << "]" << WHITE << std::endl;
 	//std::cout << YELLOW << "n:" << this->n << WHITE << std::endl;
 	return distance(V.begin(), itV);
 }
@@ -423,7 +424,7 @@ void amo::AdjaMatrix<Tv, Te>::insert(const Te& d, int i, int j, int weight) { //
 	this->e++;
 	V[i]->outDegree++;
 	V[j]->inDegree++;
-	cout << CYAN << "inserted edge:" << this->E[i][j] << WHITE << std::endl;
+	cout << CYAN << "inserted an edge at E[" << i << "][" << j << "]" << WHITE << std::endl;
 }
 
 template<typename Tv, typename Te>
@@ -896,7 +897,50 @@ void amo::AdjaMatrix<Tv, Te>::SCCDFS(int v) {
 	}
 }
 
-
+template<typename Tv, typename Te>
+void amo::AdjaMatrix<Tv, Te>::TopoSort(int v) {
+	int root = v;
+	int time = 0;
+	int* distance = new int[this->n];
+	int* predecessor = new int[this->n] {-1,-1,-1,-1,-1,-1,-1,-1};
+	int* discover = new int[this->n]; //all of dTime of V
+	int* finish = new int[this->n]; //all of fTime of V
+	do {
+		if (status(v) == UNDISCOVERED) {
+			cout << GREEN << "going to DFS the subgraph of v:" << v << WHITE << endl;
+			DFS(v, time, distance, predecessor, discover, finish);
+		}
+	} while (root!=(v=(++v%this->n)));
+	
+	typename std::vector<std::vector<Edge<Te>*>>::iterator itE;
+	typename std::vector<Edge<Te>*>::iterator it_adjs;
+	for (itE=this->E.begin(); itE!=this->E.end(); itE++) {
+		for (it_adjs=itE->begin(); it_adjs!=itE->end(); it_adjs++) {
+			//cout << **it_adjs << endl;
+			if (*it_adjs == NULL) continue; 
+			if (((*it_adjs)->type) == BACKWARD) {
+				cout << RED << "NOT DAG" << WHITE << endl;
+				return;
+			}
+		}
+	}
+	
+	int* finish_sort = new int[this->n];
+	int* finish_rank = new int[this->n];
+	for (int i=0; i<this->n; i++) {
+		finish_sort[i] = finish[i];
+		finish_rank[i] = i;
+	}
+	quickSortAndRank(finish_rank, finish_sort, 0, (this->n)-1);
+	
+	//print
+	cout << GREEN << "Topological sort:";
+	for (int i=0; i<this->n; i++) {
+		cout << GREEN << vertex(finish_rank[i]);
+		if (i != (this->n)-1) cout << GREEN << " -> ";
+	}
+	cout << WHITE << endl;
+}
 
 
 

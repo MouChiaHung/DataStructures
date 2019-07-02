@@ -2699,7 +2699,7 @@ int main(int argc, char *argv[])
 	matrix.CCDFS(0);
 #endif
 
-#if 1
+#if 0
 	amo::AdjaMatrix<char, string> matrix;
 	matrix.insert('0'); //0
 	matrix.insert('1'); //1
@@ -2741,11 +2741,50 @@ int main(int argc, char *argv[])
 	matrix.SCCDFS(0);
 #endif
 	
-	std::cout << GREEN << "\n****************** main return ******************" << WHITE << std::endl;
-	return 0;
+#if 1
+	amo::AdjaMatrix<char, string> matrix;
+	matrix.insert('0'); //0
+	matrix.insert('1'); //1
+	matrix.insert('2'); //2
+	matrix.insert('3'); //3
+	matrix.insert('4'); //4
+	matrix.insert('5'); //5
+	matrix.insert('6'); //6
+	matrix.insert('7'); //7
+	matrix.insert('8'); //8
+	matrix.insert('9'); //9
+	matrix.insert('a'); //10
+	matrix.insert('b'); //11
+	matrix.insert('c'); //12
+	matrix.insert('d'); //13
+	matrix.insert('e'); //14
+	matrix.insert("0-2", 0, 2, 0);
+	matrix.insert("1-2", 1, 2, 0);
+	matrix.insert("2-6", 2, 6, 0);
+	matrix.insert("2-7", 2, 7, 0);
+	matrix.insert("3-4", 3, 4, 0);
+	matrix.insert("4-5", 4, 5, 0);
+	matrix.insert("5-6", 5, 6, 0);
+	matrix.insert("5-14", 5, 14, 0);
+	matrix.insert("6-8", 6, 8, 0);
+	matrix.insert("6-9", 6, 9, 0);
+	matrix.insert("6-11", 6, 11, 0);
+	matrix.insert("6-12", 6, 12, 0);
+	matrix.insert("7-8", 7, 8, 0);
+	matrix.insert("9-10", 9, 10, 0);
+	matrix.insert("12-13", 12, 13, 0);
+#if 1//DAG of not	
+	matrix.insert("13-3", 13, 3, 0);
+#endif	
+	std::cout << GREEN << "going to topological sort from 0" << WHITE << endl;
+	matrix.TopoSort(0);
+	
+	std::cout << GREEN << "going to topological sort from 4" << WHITE << endl;
+	matrix.reset();
+	matrix.TopoSort(4);
 #endif
 
- 
+#endif
 	std::cout << GREEN << "\n****************** main return ******************" << WHITE << std::endl;
 	return 0;
 }
