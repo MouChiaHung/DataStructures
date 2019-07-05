@@ -2741,7 +2741,7 @@ int main(int argc, char *argv[])
 	matrix.SCCDFS(0);
 #endif
 	
-#if 1
+#if 0
 	amo::AdjaMatrix<char, string> matrix;
 	matrix.insert('0'); //0
 	matrix.insert('1'); //1
@@ -2773,7 +2773,7 @@ int main(int argc, char *argv[])
 	matrix.insert("7-8", 7, 8, 0);
 	matrix.insert("9-10", 9, 10, 0);
 	matrix.insert("12-13", 12, 13, 0);
-#if 1//DAG of not	
+#if 0//DAG of not	
 	matrix.insert("13-3", 13, 3, 0);
 #endif	
 	std::cout << GREEN << "going to topological sort from 0" << WHITE << endl;
@@ -2782,6 +2782,59 @@ int main(int argc, char *argv[])
 	std::cout << GREEN << "going to topological sort from 4" << WHITE << endl;
 	matrix.reset();
 	matrix.TopoSort(4);
+#endif
+
+#if 1
+	amo::AdjaMatrix<char, string> matrix;
+	matrix.insert('A'); //0
+	matrix.insert('B'); //1
+	matrix.insert('C'); //2
+	matrix.insert('D'); //3
+	matrix.insert('E'); //4
+	matrix.insert('F'); //5
+	matrix.insert('G'); //6
+	matrix.insert('H'); //7
+	matrix.insert('I'); //8
+	matrix.insert('J'); //9
+	
+	matrix.insert("A-B", 0, 1, 0);
+	matrix.insert("B-A", 1, 0, 0);
+	
+	matrix.insert("A-I", 0, 8, 0);
+	matrix.insert("I-A", 8, 0, 0);
+	
+	matrix.insert("B-C", 1, 2, 0);
+	matrix.insert("C-B", 2, 1, 0);
+	
+	matrix.insert("C-D", 2, 3, 0);
+	matrix.insert("D-C", 3, 2, 0);
+	
+	matrix.insert("C-H", 2, 7, 0);
+	matrix.insert("H-C", 7, 2, 0);
+	
+	matrix.insert("D-E", 3, 4, 0);
+	matrix.insert("E-D", 4, 3, 0);
+	
+	matrix.insert("E-G", 4, 6, 0);
+	matrix.insert("G-E", 6, 4, 0);
+	
+	matrix.insert("G-D", 6, 3, 0);
+	matrix.insert("D-G", 3, 6, 0);
+	
+	matrix.insert("G-F", 6, 5, 0);
+	matrix.insert("F-G", 5, 6, 0);
+	
+	matrix.insert("H-A", 7, 0, 0);
+	matrix.insert("A-H", 0, 7, 0);
+	
+	matrix.insert("I-J", 8, 9, 0);
+	matrix.insert("J-I", 9, 8, 0);
+	
+	matrix.insert("J-A", 9, 0, 0);
+	matrix.insert("A-J", 0, 9, 0);
+	
+	std::cout << GREEN << "going to BCC for articulation vertices" << WHITE << endl;
+	matrix.BCC(0);
 #endif
 
 #endif

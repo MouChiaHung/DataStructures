@@ -9,6 +9,7 @@
 #include <map>
 #include <typeinfo> 
 #include <climits>
+#include <algorithm> //std::min
 
 namespace amo {
 
@@ -247,7 +248,7 @@ public:
 			if (exist(i, j)) break;
 		}
 		if (j < this->n) {
-			cout << i << " -> " << j << WHITE << endl;
+			//cout << i << " -> " << j << WHITE << endl;
 			return j;
 		}
 		else return -1;
@@ -288,6 +289,8 @@ public:
 	void quickSortAndRank(int*& rank, int*& sort, int front, int end);
 	void SCCDFS(int v);
 	void TopoSort(int v);
+	void BCC(int v);
+	void BCC(int v, int*& discover, int*& finish, int*& predecessor, int*& hca, std::stack<int>& stack, int& clock);
 
 friend std::ostream& operator<<(std::ostream& os, AdjaMatrix<Tv,Te>& matrix) {
 	matrix.print(os);
@@ -524,13 +527,18 @@ template<typename Tv, typename Te>
 void amo::AdjaMatrix<Tv, Te>::BFS(int v) {
 	int root = v;
 	int* distance = new int[this->n];
-	int* predecessor = new int[this->n] {-1,-1,-1,-1,-1,-1,-1,-1};
+	int* predecessor = new int[this->n];
+	for (int i=0; i<this->n; i++) {
+		predecessor[i] = -1;
+	}
 	do {
 		if (status(v) == UNDISCOVERED) {
 			cout << GREEN << "going to BFS the subgraph of v:" << v << WHITE << endl;
 			BFS(v, distance, predecessor);
 		}
 	} while (root!=(v=(++v%this->n)));
+	
+	//print
 	for (int i=0; i<this->n; i++) {
 		cout << WHITE << "distance[" << vertex(i) << "]:" << distance[i] << WHITE << endl;
 	}
@@ -572,8 +580,10 @@ void amo::AdjaMatrix<Tv, Te>::BFS(int v, int*& distance, int*& predecessor) {
 				parent(u) = i;
 				distance[u] = distance[i]+1;
 				predecessor[u] = i;
+				cout << YELLOW << vertex(i) << " tree " << vertex(u) << WHITE << endl;
 			} else {
 				type(i, u) = CROSS;
+				cout << vertex(i) << " cross " << vertex(u) << endl;
 			}
 		}
 		status(i) = VISITED;
@@ -585,9 +595,12 @@ void amo::AdjaMatrix<Tv, Te>::DFS(int v) {
 	int root = v;
 	int time = 0;
 	int* distance = new int[this->n];
-	int* predecessor = new int[this->n] {-1,-1,-1,-1,-1,-1,-1,-1};
+	int* predecessor = new int[this->n];
 	int* discover = new int[this->n]; //all of dTime of V
 	int* finish = new int[this->n]; //all of fTime of V
+	for (int i=0; i<this->n; i++) {
+		predecessor[i] = -1;
+	}
 	do {
 		if (status(v) == UNDISCOVERED) {
 			cout << GREEN << "going to DFS the subgraph of v:" << v << WHITE << endl;
@@ -615,7 +628,7 @@ void amo::AdjaMatrix<Tv, Te>::DFS(int v, int& time, int*& distance, int*& predec
 	int u = -1;
 	while ((u=nextNbr(v, u))>=0) {
 		if (status(u) == UNDISCOVERED) {
-			cout << vertex(v) << " discover " << vertex(u) << endl;
+			cout << vertex(v) << " tree " << vertex(u) << endl;
 			type(v, u) = TREE;
 			parent(u) = v;
 			predecessor[u] = v;
@@ -636,7 +649,7 @@ void amo::AdjaMatrix<Tv, Te>::DFS(int v, int& time, int*& distance, int*& predec
 			}
 			else cout << RED << "Exception of dTime of v:" << v << WHITE << endl;
 		}
-		else cout << RED << "Exception of status of v:" << v << WHITE << endl;
+		else cout << RED << "Exception of status of u:" << u << WHITE << endl;
 	}
 	status(v) = VISITED;
 	fTime(v) = ++time;
@@ -663,9 +676,12 @@ void amo::AdjaMatrix<Tv, Te>::CCDFS(int v) {
 	int root = v;
 	int time = 0;
 	int* distance = new int[this->n];
-	int* predecessor = new int[this->n] {-1,-1,-1,-1,-1,-1,-1,-1};
+	int* predecessor = new int[this->n];
 	int* discover = new int[this->n]; //all of dTime of V
 	int* finish = new int[this->n]; //all of fTime of V
+	for (int i=0; i<this->n; i++) {
+		predecessor[i] = -1;
+	}
 	do {
 		if (status(v) == UNDISCOVERED) {
 			cout << GREEN << "going to DFS the subgraph of v:" << v << WHITE << endl;
@@ -761,12 +777,15 @@ void amo::AdjaMatrix<Tv, Te>::SCCDFS(int v) {
 	int root = v;
 	int time = 0;
 	int* distance = new int[this->n];
-	int* predecessor = new int[this->n] {-1,-1,-1,-1,-1,-1,-1,-1};
+	int* predecessor = new int[this->n];
 	int* discover = new int[this->n]; //all of dTime of V
 	int* finish = new int[this->n]; //all of fTime of V
 	int* finish_sort = new int[this->n]; //descent
 	int* finish_rank = new int[this->n]; 
 	
+	for (int i=0; i<this->n; i++) {
+		predecessor[i] = -1;
+	}
 	//first DFS
 	cout << GREEN << "going to 1st DFS" << WHITE << endl;
 	do {
@@ -819,9 +838,15 @@ void amo::AdjaMatrix<Tv, Te>::SCCDFS(int v) {
 	//second DFS vertexes of the transpose in the order latest toward earliest of finish 
 	int timeT = 0;
 	int* distanceT = new int[T.n];
-	int* predecessorT = new int[T.n] {-1,-1,-1,-1,-1,-1,-1,-1};
-	int* discoverT = new int[T.n] {0,0,0,0,0,0,0,0}; //all of dTime of V
-	int* finishT = new int[T.n] {0,0,0,0,0,0,0,0}; //all of fTime of V
+	int* predecessorT = new int[T.n];
+	int* discoverT = new int[T.n]; //all of dTime of V
+	int* finishT = new int[T.n]; //all of fTime of V
+	for (int i=0; i<T.n; i++) {
+		predecessorT[i] = -1;
+		discoverT[i] = 0;
+		finishT[i] = 0;
+	}
+	
 	for (int i=0; i<T.n; i++) {
 		v = finish_rank[i];
 		cout << GREEN << "... v:" << v << WHITE << endl;
@@ -902,9 +927,14 @@ void amo::AdjaMatrix<Tv, Te>::TopoSort(int v) {
 	int root = v;
 	int time = 0;
 	int* distance = new int[this->n];
-	int* predecessor = new int[this->n] {-1,-1,-1,-1,-1,-1,-1,-1};
+	int* predecessor = new int[this->n];
 	int* discover = new int[this->n]; //all of dTime of V
 	int* finish = new int[this->n]; //all of fTime of V
+	
+	for (int i=0; i<this->n; i++) {
+		predecessor[i] = -1;
+	}
+	
 	do {
 		if (status(v) == UNDISCOVERED) {
 			cout << GREEN << "going to DFS the subgraph of v:" << v << WHITE << endl;
@@ -941,6 +971,134 @@ void amo::AdjaMatrix<Tv, Te>::TopoSort(int v) {
 	}
 	cout << WHITE << endl;
 }
+
+template<typename Tv, typename Te>
+void AdjaMatrix<Tv, Te>::BCC(int v) {
+	int lim = std::numeric_limits<int>::max();
+	int *predecessor = new int[this->n];
+	int *discover = new int[this->n]; 
+	int *finish = new int[this->n];
+	int *hca = new int[this->n];
+	std::stack<int> stack;
+	int clock = 0;
+	int s = v;
+	for (int i=0; i<this->n; i++) {
+		predecessor[i] = -1;
+		hca[i] = lim;
+	}
+	do {
+		if (status(v) == UNDISCOVERED) {
+			cout << GREEN << "going to BCC from v:" << v << WHITE << endl;
+			BCC(v, discover, finish, predecessor, hca, stack, clock);
+			int sub_tree_of_v = 0;
+			for (int i=0; i<this->n; i++) {
+				if (hca[i] == v) {
+					sub_tree_of_v++;
+					if (sub_tree_of_v >= 2) {
+						cout << YELLOW << vertex(v) << " is an articulation vertex" << WHITE << endl;
+						stack.push(v);
+						break;
+					}
+				}
+			}
+		} 
+	} while (s!=(v=(++v%(this->n))));
+	
+	//print
+	for (int i=0; i<this->n; i++) {
+		int p = predecessor[i];
+		if (p >= 0) cout << WHITE << "predecessor[" << vertex(i) << "]:" << vertex(p) << WHITE << endl;
+		else cout << WHITE << "predecessor[" << vertex(i) << "]:" << predecessor[i] << WHITE << endl;
+	}
+	for (int i=0; i<this->n; i++) {
+		cout << WHITE << "discover[" << vertex(i) << "]:" << discover[i] << WHITE << endl;
+	}
+	for (int i=0; i<this->n; i++) {
+		cout << WHITE << "finish[" << vertex(i) << "]:" << finish[i] << WHITE << endl;
+	}
+	for (int i=0; i<this->n; i++) {
+		if (hca[i]>=0 && hca[i]<this->n) 
+			cout << YELLOW << "hca[" << vertex(i) << "]:" << vertex(hca[i]) << WHITE << endl;
+		else cout << YELLOW << "hca[" << vertex(i) << "]:" << hca[i] << WHITE << endl;
+	}
+	while (!stack.empty()) {
+		cout << GREEN << "articulation vertex:" << vertex(stack.top()) << WHITE << endl;
+		stack.pop();
+	}
+}
+
+template<typename Tv, typename Te>
+void AdjaMatrix<Tv, Te>::BCC(int v, int*& discover, int*& finish, int*& predecessor, int*& hca, std::stack<int>& stack, int& clock) {
+	status(v) = DISCOVERED;
+	discover[v] = ++clock;
+	int u = -1;
+	int top;
+	while ((u=nextNbr(v, u))>=0) {
+		if (status(u) == UNDISCOVERED) {
+			cout << vertex(v) << " tree " << vertex(u) << endl;
+			type(v, u) = TREE;
+			predecessor[u] = v;
+			parent(u) = v;
+			BCC(u, discover, finish, predecessor, hca, stack, clock);
+			
+			if (hca[u] <= hca[v]) {
+				cout << YELLOW << vertex(v) << " belongs a loop with " << vertex(u) << WHITE << endl;
+				if (hca[u] < hca[v] && hca[u] != v) {
+					cout << CYAN << "set hca of " << vertex(v) << " to be " << vertex(hca[u]) << WHITE << endl; 
+					hca[v] = hca[u];
+				}	
+				else if (hca[u] == hca[v]) {
+					cout  << CYAN << "keep hca of " << vertex(v) << " as " << vertex(hca[v]) << WHITE << endl;
+					hca[v] = hca[v];
+				}	
+			}
+			else {
+				cout << YELLOW << vertex(v) << " is an articulation vertex" << WHITE << endl;
+				stack.push(v);
+			}
+		}
+		else if (status(u) == DISCOVERED) {
+			cout << vertex(v) << " backward " << vertex(u) << endl;
+			type(v, u) = BACKWARD;
+			if (hca[v] < u) {
+				//cout << MAGENTA << "keep hca of " << vertex(v) << " as " << vertex(hca[v]) << WHITE << endl;
+				hca[v] = hca[v];
+			}	
+			else {
+				cout  << MAGENTA << "set hca of " << vertex(v) << " to be " << vertex(u) << WHITE << endl; 
+				hca[v] = u;
+			}
+			//hca[v] = std::min(hca[v], u);
+			
+		}
+		else if (status(u) == VISITED) {
+			if (dTime(u) > dTime(v)) {
+				cout << vertex(v) << " forward " << vertex(u) << endl;
+				type(v, u) = FORWARD;
+			}
+			else {
+				cout << vertex(v) << " cross " << vertex(u) << endl;
+				type(v, u) = CROSS;
+			}
+		}
+		else cout << RED << "Exception of status of u:" << u << WHITE << endl;
+	}
+	status(v) = VISITED;
+	finish[v] = ++clock;
+}
+
+
+//std::numeric_limits<int>::max()
+
+
+
+
+
+
+
+
+
+
 
 
 
