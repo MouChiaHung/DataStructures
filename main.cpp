@@ -2784,7 +2784,7 @@ int main(int argc, char *argv[])
 	matrix.TopoSort(4);
 #endif
 
-#if 1
+#if 0
 	amo::AdjaMatrix<char, string> matrix;
 	matrix.insert('A'); //0
 	matrix.insert('B'); //1
@@ -2836,6 +2836,70 @@ int main(int argc, char *argv[])
 	std::cout << GREEN << "going to BCC for articulation vertices" << WHITE << endl;
 	matrix.BCC(0);
 #endif
+
+#if 0
+	amo::AdjaMatrix<char, string> matrix;
+	matrix.insert('0'); //0
+	matrix.insert('1'); //1
+	matrix.insert('2'); //2
+	matrix.insert('3'); //3
+	matrix.insert('4'); //4
+	matrix.insert('5'); //5
+	matrix.insert('6'); //6
+	matrix.insert('7'); //7
+	matrix.insert('8'); //8
+	matrix.insert("0-1", 0, 1, 10);
+	matrix.insert("1-0", 1, 0, 10);
+	matrix.insert("1-4", 1, 4, 10);
+	matrix.insert("4-1", 4, 1, 10);
+	matrix.insert("4-5", 4, 5, 10);
+	matrix.insert("5-4", 5, 4, 10);
+	matrix.insert("5-7", 5, 7, 10);
+	matrix.insert("7-5", 7, 5, 10);
+	matrix.insert("3-6", 3, 6, 10);
+	matrix.insert("6-3", 6, 3, 10);
+	matrix.insert("6-8", 6, 8, 10);
+	matrix.insert("8-6", 8, 6, 10);
+	
+	std::cout << GREEN << "going to DFS" << WHITE << endl;
+	matrix.DFS(0);
+
+	std::cout << GREEN << "going to PFS for DFS" << WHITE << endl;
+	matrix.reset();
+	matrix.PFS_DFS(0);
+#endif	
+
+#if 1
+	amo::AdjaMatrix<char, string> matrix;
+	matrix.insert('0'); //0
+	matrix.insert('1'); //1
+	matrix.insert('2'); //2
+	matrix.insert('3'); //3
+	matrix.insert('4'); //4
+	matrix.insert('5'); //5
+	matrix.insert('6'); //6
+	matrix.insert('7'); //7
+	matrix.insert('8'); //8
+	matrix.insert("0-1", 0, 1, 10);
+	matrix.insert("1-0", 1, 0, 10);
+	matrix.insert("1-4", 1, 4, 10);
+	matrix.insert("4-1", 4, 1, 10);
+	matrix.insert("4-5", 4, 5, 10);
+	matrix.insert("5-4", 5, 4, 10);
+	matrix.insert("5-7", 5, 7, 10);
+	matrix.insert("7-5", 7, 5, 10);
+	matrix.insert("3-6", 3, 6, 10);
+	matrix.insert("6-3", 6, 3, 10);
+	matrix.insert("6-8", 6, 8, 10);
+	matrix.insert("8-6", 8, 6, 10);
+	
+	std::cout << GREEN << "going to BFS" << WHITE << endl;
+	matrix.BFS(0);
+	
+	std::cout << GREEN << "going to PFS for DFS" << WHITE << endl;
+	matrix.reset();
+	matrix.PFS_BFS(0);
+#endif	
 
 #endif
 	std::cout << GREEN << "\n****************** main return ******************" << WHITE << std::endl;

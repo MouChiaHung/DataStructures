@@ -291,6 +291,10 @@ public:
 	void TopoSort(int v);
 	void BCC(int v);
 	void BCC(int v, int*& discover, int*& finish, int*& predecessor, int*& hca, std::stack<int>& stack, int& clock);
+	template<typename Interface> void PFS(int s, Interface priority_updater, int& clock, int*& predecessor, int*& discover, int*& finish);
+	template<typename Interface> void PFS(int s, Interface priority_updater, int*& predecessor, int*& distance);
+	void PFS_DFS(int v);
+	void PFS_BFS(int v);
 
 friend std::ostream& operator<<(std::ostream& os, AdjaMatrix<Tv,Te>& matrix) {
 	matrix.print(os);
@@ -493,7 +497,7 @@ bool amo::AdjaMatrix<Tv, Te>::exist(int i, int j) {
 template<typename Tv, typename Te>
 EType& amo::AdjaMatrix<Tv, Te>::type(int i, int j) {
 	if (!exist(i, j)){
-		cout << RED << "no edge exists and return UNDETERMINED" << WHITE << std::endl;
+		cout << RED << "no edge exists and return UNDETERMINED (" << i << "," << j << ")" << WHITE << std::endl;
 		Edge<Te>* edge = E[i][j];
 		edge->type = UNDETERMINED;
 		return edge->type;
@@ -530,6 +534,7 @@ void amo::AdjaMatrix<Tv, Te>::BFS(int v) {
 	int* predecessor = new int[this->n];
 	for (int i=0; i<this->n; i++) {
 		predecessor[i] = -1;
+		distance[i] = -1;
 	}
 	do {
 		if (status(v) == UNDISCOVERED) {
@@ -1088,18 +1093,226 @@ void AdjaMatrix<Tv, Te>::BCC(int v, int*& discover, int*& finish, int*& predeces
 }
 
 
-//std::numeric_limits<int>::max()
+template<typename Tv, typename Te> template<typename Interface>
+void AdjaMatrix<Tv, Te>::PFS(int s, Interface priority_updater, int& clock, int*& predecessor, int*& discover, int*& finish) {
+	status(s) = DISCOVERED;
+	priority(s) = 0;
+	dTime(s) = ++clock;
+	discover[s] = dTime(s);
+	int v = s;
+	int u = -1;
+	int sentry = v;
+	typename std::vector<Vertex<Tv>*>::iterator it;
+	while (true) {
+		sentry = v;
+		u = -1;
+		while ((u=nextNbr(v, u))>=0) {
+			if (status(u) == UNDISCOVERED) {
+				priority_updater(this, v, u); //sets the priority of u with v
+				parent(u) = v;
+			}
+			else if (status(u) == DISCOVERED) {
+				cout << vertex(v) << " backward " << vertex(u) << endl;
+				type(v, u) = BACKWARD;
+			} 
+			else if (status(u) == VISITED) {
+				if (dTime(v) > dTime(u)) {
+					cout << vertex(v) << " cross " << vertex(u) << endl;
+					type(v, u) = CROSS;
+				}
+				else {
+					cout << vertex(v) << " forward " << vertex(u) << endl;
+					type(v, u) = FORWARD;
+				}
+			}
+			else cout << RED << "Exception of status of u:" << u << WHITE << endl;
+		}
+		int priority_lowest = std::numeric_limits<int>::max(); //largest and lowest 
+		int index;
+		
+		//print
+		//for (int i=0; i<this->n; i++) cout << "priority(" << vertex(i) << "):" << priority(i) << endl;
+		
+		for (it=this->V.begin(); it!=this->V.end(); it++) {
+			index = std::distance(this->V.begin(), it);
+			if (priority(index) < priority_lowest && status(index) == UNDISCOVERED) {
+				priority_lowest = priority(index);
+				v = index;
+			}
+		}
+		
+		if (v == sentry) {
+			cout << CYAN << "met the leaf:" << vertex(v) << WHITE << endl;
+			status(v) = VISITED;
+			fTime(v) = ++clock;
+			finish[v] = fTime(v);
+			int p = parent(v);
+			while (true) {
+				if (p == -1) break;
+				fTime(p) = ++clock;
+				finish[p] = fTime(p);
+				if (parent(p) == -1) break;
+				else p = parent(p);
+			}
+			break;
+		}
 
+		cout << vertex(parent(v)) << " tree " << vertex(v) << endl;
+		predecessor[v] = parent(v);
+		type(parent(v), v) = TREE;
+		status(v) = DISCOVERED;
+		dTime(v) = ++clock;
+		discover[v] = dTime(v);
+	}
+}
 
+template<typename Tv, typename Te> template<typename Interface>
+void AdjaMatrix<Tv, Te>::PFS(int s, Interface priority_updater, int*& predecessor, int*& distance) {
+	status(s) = DISCOVERED;
+	priority(s) = 0;
+	int v = s;
+	int u = -1;
+	int sentry = v;
+	distance[v] = 0;
+	typename std::vector<Vertex<Tv>*>::iterator it;
+	while (true) {
+		sentry = v;
+		u = -1;
+		while ((u=nextNbr(v, u))>=0) {
+			if (status(u) == UNDISCOVERED) {
+				priority_updater(this, v, u); //sets the priority of u with v
+				parent(u) = v;
+			}
+			else if (status(u) == DISCOVERED) {
+				cout << vertex(v) << " backward " << vertex(u) << endl;
+				type(v, u) = BACKWARD;
+			} 
+			else if (status(u) == VISITED) {
+				if (dTime(v) > dTime(u)) {
+					cout << vertex(v) << " cross " << vertex(u) << endl;
+					type(v, u) = CROSS;
+				}
+				else {
+					cout << vertex(v) << " forward " << vertex(u) << endl;
+					type(v, u) = FORWARD;
+				}
+			}
+			else cout << RED << "Exception of status of u:" << u << WHITE << endl;
+		}
+		int priority_lowest = std::numeric_limits<int>::max(); //largest and lowest 
+		int index;
+		
+		//print
+		//for (int i=0; i<this->n; i++) cout << "priority(" << vertex(i) << "):" << priority(i) << endl;
+		
+		for (it=this->V.begin(); it!=this->V.end(); it++) {
+			index = std::distance(this->V.begin(), it);
+			if (priority(index) < priority_lowest && status(index) == UNDISCOVERED) {
+				priority_lowest = priority(index);
+				v = index;
+			}
+		}
+		
+		if (v == sentry) {
+			cout << CYAN << "met the leaf:" << vertex(v) << WHITE << endl;
+			status(v) = VISITED;
+			int p = parent(v);
+			while (true) {
+				if (p == -1) break;
+				if (parent(p) == -1) break;
+				else p = parent(p);
+			}
+			break;
+		}
 
+		cout << vertex(parent(v)) << " tree " << vertex(v) << endl;
+		predecessor[v] = parent(v);
+		type(parent(v), v) = TREE;
+		status(v) = DISCOVERED;
+		distance[v] = distance[parent(v)]+1;
+	}
+}
 
+template<typename Tv, typename Te>
+struct PriorityUpdaterDfs {
+	virtual void operator()(AdjaMatrix<Tv, Te>* matrix, int v, int u) {
+		if (matrix->priority(u) >= matrix->priority(v)) {
+			matrix->priority(u) = matrix->priority(v) - 1;
+		}
+	}
+};
 
+template<typename Tv, typename Te>
+void AdjaMatrix<Tv, Te>::PFS_DFS(int v) {
+	int lim = std::numeric_limits<int>::max();
+	int *predecessor = new int[this->n];
+	int *discover = new int[this->n]; 
+	int *finish = new int[this->n];
+	int clock = 0;
+	int s = v;
+	for (int i=0; i<this->n; i++) {
+		predecessor[i] = -1;
+	}
 
+	do {
+		if (status(v) == UNDISCOVERED) {
+			cout << GREEN << "going to PFS (for DFS) the subgraph of v:" << v << WHITE << endl;
+			PFS(v, PriorityUpdaterDfs<Tv, Te>(), clock, predecessor, discover, finish);
+		}	
+	} while (s!=(v=++v%(this->n)));
+	
+	//print
+	for (int i=0; i<this->n; i++) {
+		int p = predecessor[i];
+		if (p >= 0) cout << YELLOW << "predecessor[" << vertex(i) << "]:" << vertex(p) << WHITE << endl;
+		else cout << YELLOW << "predecessor[" << vertex(i) << "]:" << predecessor[i] << WHITE << endl;
+	}
+	for (int i=0; i<this->n; i++) {
+		cout << WHITE << "discover[" << vertex(i) << "]:" << discover[i] << WHITE << endl;
+	}
+	for (int i=0; i<this->n; i++) {
+		cout << WHITE << "finish[" << vertex(i) << "]:" << finish[i] << WHITE << endl;
+	}
+}
 
+template<typename Tv, typename Te>
+struct PriorityUpdaterBfs {
+	virtual void operator()(AdjaMatrix<Tv, Te>* matrix, int v, int u) {
+		if (matrix->priority(u) >= matrix->priority(v)) {
+			matrix->priority(u) = matrix->priority(v) + 1;
+		}
+	}
+};
 
+template<typename Tv, typename Te>
+void AdjaMatrix<Tv, Te>::PFS_BFS(int v) {
+	int lim = std::numeric_limits<int>::max();
+	int *predecessor = new int[this->n];
+	int *distance = new int[this->n]; 
+	int s = v;
+	for (int i=0; i<this->n; i++) {
+		predecessor[i] = -1;
+		distance[i] = -1;
+	}
 
+	do {
+		if (status(v) == UNDISCOVERED) {
+			cout << GREEN << "going to PFS (for BFS) the subgraph of v:" << v << WHITE << endl;
+			PFS(v, PriorityUpdaterBfs<Tv, Te>(), predecessor, distance);
+		}	
+	} while (s!=(v=++v%(this->n)));
+	
+	//print
+	for (int i=0; i<this->n; i++) {
+		int p = predecessor[i];
+		if (p >= 0) cout << YELLOW << "predecessor[" << vertex(i) << "]:" << vertex(p) << WHITE << endl;
+		else cout << YELLOW << "predecessor[" << vertex(i) << "]:" << predecessor[i] << WHITE << endl;
+	}
+	for (int i=0; i<this->n; i++) {
+		cout << WHITE << "distance[" << vertex(i) << "]:" << distance[i] << WHITE << endl;
+	}
 
-
+}
 
 
 };
