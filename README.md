@@ -19,4 +19,6 @@ Practices includes:
  - vector
  - list
  - stack
+ - tree
+ - graph
  - algorithm
