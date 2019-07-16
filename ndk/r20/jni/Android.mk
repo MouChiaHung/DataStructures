@@ -31,6 +31,6 @@ LOCAL_CPP_EXTENSION := .cxx .cpp .cc
 #LOCAL_LDLIBS +=-landroid -llog -lz
 
 LOCAL_CPPFLAGS := -fexceptions -frtti
-LOCAL_CPPFLAGS += -std=c++11 -D__cplusplus=201103L
+LOCAL_CPPFLAGS += -std=c++11 -D__cplusplus=201103L -DANDROID_STL=c++_shared
 
 include $(BUILD_EXECUTABLE)  
