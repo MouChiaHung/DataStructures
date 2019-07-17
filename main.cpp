@@ -2398,7 +2398,7 @@ int main(int argc, char *argv[])
 	
 	cout << GREEN << "going to convert" << WHITE << endl;
 	amo::Stack<char> s;
-	(amo::Char::getInstance()).convert(s, 4321, 10);
+	(amo::Char::getInstance()).convert(s, 4321, 0);
 	s.traverse();
 	
 
@@ -2548,17 +2548,17 @@ int main(int argc, char *argv[])
 	matrix.insert('E'); //5
 	matrix.insert('F'); //6
 	matrix.insert('G'); //7
-	matrix.insert("SA", 0, 1, 10);
-	matrix.insert("SC", 0, 3, 10);
-	matrix.insert("SD", 0, 4, 10);
-	matrix.insert("AC", 1, 3, 10);
-	matrix.insert("AE", 1, 5, 10);
-	matrix.insert("CB", 3, 2, 10);
-	matrix.insert("DB", 4, 2, 10);
-	matrix.insert("EF", 5, 6, 10);
-	matrix.insert("EG", 5, 7, 10);
-	matrix.insert("GB", 7, 2, 10);
-	matrix.insert("GF", 7, 6, 10);
+	matrix.insert("SA", 0, 1, 0);
+	matrix.insert("SC", 0, 3, 0);
+	matrix.insert("SD", 0, 4, 0);
+	matrix.insert("AC", 1, 3, 0);
+	matrix.insert("AE", 1, 5, 0);
+	matrix.insert("CB", 3, 2, 0);
+	matrix.insert("DB", 4, 2, 0);
+	matrix.insert("EF", 5, 6, 0);
+	matrix.insert("EG", 5, 7, 0);
+	matrix.insert("GB", 7, 2, 0);
+	matrix.insert("GF", 7, 6, 0);
 	
 	//std::cout << GREEN << "going to matrix.remove(0)" << WHITE << endl;
 	//matrix.remove(0);
@@ -2583,17 +2583,17 @@ int main(int argc, char *argv[])
 	matrix.insert('F'); //5
 	matrix.insert('G'); //6
 	matrix.insert('H'); //7
-	matrix.insert("A-B", 0, 1, 10);
-	matrix.insert("A-C", 0, 2, 10);
-	matrix.insert("B-D", 1, 3, 10);
-	matrix.insert("C-B", 2, 1, 10);
-	matrix.insert("C-F", 2, 5, 10);
-	matrix.insert("D-E", 3, 4, 10);
-	matrix.insert("D-F", 3, 5, 10);
-	matrix.insert("F-B", 5, 1, 10);
-	matrix.insert("G-E", 6, 4, 10);	
-	matrix.insert("G-H", 6, 7, 10);
-	matrix.insert("H-G", 7, 6, 10);
+	matrix.insert("A-B", 0, 1, 0);
+	matrix.insert("A-C", 0, 2, 0);
+	matrix.insert("B-D", 1, 3, 0);
+	matrix.insert("C-B", 2, 1, 0);
+	matrix.insert("C-F", 2, 5, 0);
+	matrix.insert("D-E", 3, 4, 0);
+	matrix.insert("D-F", 3, 5, 0);
+	matrix.insert("F-B", 5, 1, 0);
+	matrix.insert("G-E", 6, 4, 0);	
+	matrix.insert("G-H", 6, 7, 0);
+	matrix.insert("H-G", 7, 6, 0);
 	
 	std::cout << GREEN << "--- AdjaMatrix information start ---" << WHITE << endl;
 	std::cout << matrix << WHITE << endl;
@@ -2614,18 +2614,18 @@ int main(int argc, char *argv[])
 	matrix.insert('6'); //6
 	matrix.insert('7'); //7
 	matrix.insert('8'); //8
-	matrix.insert("0-1", 0, 1, 10);
-	matrix.insert("1-0", 1, 0, 10);
-	matrix.insert("1-4", 1, 4, 10);
-	matrix.insert("4-1", 4, 1, 10);
-	matrix.insert("4-5", 4, 5, 10);
-	matrix.insert("5-4", 5, 4, 10);
-	matrix.insert("5-7", 5, 7, 10);
-	matrix.insert("7-5", 7, 5, 10);
-	matrix.insert("3-6", 3, 6, 10);
-	matrix.insert("6-3", 6, 3, 10);
-	matrix.insert("6-8", 6, 8, 10);
-	matrix.insert("8-6", 8, 6, 10);
+	matrix.insert("0-1", 0, 1, 0);
+	matrix.insert("1-0", 1, 0, 0);
+	matrix.insert("1-4", 1, 4, 0);
+	matrix.insert("4-1", 4, 1, 0);
+	matrix.insert("4-5", 4, 5, 0);
+	matrix.insert("5-4", 5, 4, 0);
+	matrix.insert("5-7", 5, 7, 0);
+	matrix.insert("7-5", 7, 5, 0);
+	matrix.insert("3-6", 3, 6, 0);
+	matrix.insert("6-3", 6, 3, 0);
+	matrix.insert("6-8", 6, 8, 0);
+	matrix.insert("8-6", 8, 6, 0);
 	
 	std::cout << GREEN << "--- AdjaMatrix information start ---" << WHITE << endl;
 	std::cout << matrix << WHITE << endl;
@@ -2646,18 +2646,18 @@ int main(int argc, char *argv[])
 	matrix.insert('6'); //6
 	matrix.insert('7'); //7
 	matrix.insert('8'); //8
-	matrix.insert("0-1", 0, 1, 10);
-	matrix.insert("1-0", 1, 0, 10);
-	matrix.insert("1-4", 1, 4, 10);
-	matrix.insert("4-1", 4, 1, 10);
-	matrix.insert("4-5", 4, 5, 10);
-	matrix.insert("5-4", 5, 4, 10);
-	matrix.insert("5-7", 5, 7, 10);
-	matrix.insert("7-5", 7, 5, 10);
-	matrix.insert("3-6", 3, 6, 10);
-	matrix.insert("6-3", 6, 3, 10);
-	matrix.insert("6-8", 6, 8, 10);
-	matrix.insert("8-6", 8, 6, 10);
+	matrix.insert("0-1", 0, 1, 0);
+	matrix.insert("1-0", 1, 0, 0);
+	matrix.insert("1-4", 1, 4, 0);
+	matrix.insert("4-1", 4, 1, 0);
+	matrix.insert("4-5", 4, 5, 0);
+	matrix.insert("5-4", 5, 4, 0);
+	matrix.insert("5-7", 5, 7, 0);
+	matrix.insert("7-5", 7, 5, 0);
+	matrix.insert("3-6", 3, 6, 0);
+	matrix.insert("6-3", 6, 3, 0);
+	matrix.insert("6-8", 6, 8, 0);
+	matrix.insert("8-6", 8, 6, 0);
 	
 	std::cout << GREEN << "--- AdjaMatrix information start ---" << WHITE << endl;
 	std::cout << matrix << WHITE << endl;
@@ -2678,18 +2678,18 @@ int main(int argc, char *argv[])
 	matrix.insert('6'); //6
 	matrix.insert('7'); //7
 	matrix.insert('8'); //8
-	matrix.insert("0-1", 0, 1, 10);
-	matrix.insert("1-0", 1, 0, 10);
-	matrix.insert("1-4", 1, 4, 10);
-	matrix.insert("4-1", 4, 1, 10);
-	matrix.insert("4-5", 4, 5, 10);
-	matrix.insert("5-4", 5, 4, 10);
-	matrix.insert("5-7", 5, 7, 10);
-	matrix.insert("7-5", 7, 5, 10);
-	matrix.insert("3-6", 3, 6, 10);
-	matrix.insert("6-3", 6, 3, 10);
-	matrix.insert("6-8", 6, 8, 10);
-	matrix.insert("8-6", 8, 6, 10);
+	matrix.insert("0-1", 0, 1, 0);
+	matrix.insert("1-0", 1, 0, 0);
+	matrix.insert("1-4", 1, 4, 0);
+	matrix.insert("4-1", 4, 1, 0);
+	matrix.insert("4-5", 4, 5, 0);
+	matrix.insert("5-4", 5, 4, 0);
+	matrix.insert("5-7", 5, 7, 0);
+	matrix.insert("7-5", 7, 5, 0);
+	matrix.insert("3-6", 3, 6, 0);
+	matrix.insert("6-3", 6, 3, 0);
+	matrix.insert("6-8", 6, 8, 0);
+	matrix.insert("8-6", 8, 6, 0);
 	
 	std::cout << GREEN << "--- AdjaMatrix information start ---" << WHITE << endl;
 	std::cout << matrix << WHITE << endl;
@@ -2848,18 +2848,18 @@ int main(int argc, char *argv[])
 	matrix.insert('6'); //6
 	matrix.insert('7'); //7
 	matrix.insert('8'); //8
-	matrix.insert("0-1", 0, 1, 10);
-	matrix.insert("1-0", 1, 0, 10);
-	matrix.insert("1-4", 1, 4, 10);
-	matrix.insert("4-1", 4, 1, 10);
-	matrix.insert("4-5", 4, 5, 10);
-	matrix.insert("5-4", 5, 4, 10);
-	matrix.insert("5-7", 5, 7, 10);
-	matrix.insert("7-5", 7, 5, 10);
-	matrix.insert("3-6", 3, 6, 10);
-	matrix.insert("6-3", 6, 3, 10);
-	matrix.insert("6-8", 6, 8, 10);
-	matrix.insert("8-6", 8, 6, 10);
+	matrix.insert("0-1", 0, 1, 0);
+	matrix.insert("1-0", 1, 0, 0);
+	matrix.insert("1-4", 1, 4, 0);
+	matrix.insert("4-1", 4, 1, 0);
+	matrix.insert("4-5", 4, 5, 0);
+	matrix.insert("5-4", 5, 4, 0);
+	matrix.insert("5-7", 5, 7, 0);
+	matrix.insert("7-5", 7, 5, 0);
+	matrix.insert("3-6", 3, 6, 0);
+	matrix.insert("6-3", 6, 3, 0);
+	matrix.insert("6-8", 6, 8, 0);
+	matrix.insert("8-6", 8, 6, 0);
 	
 	std::cout << GREEN << "going to DFS" << WHITE << endl;
 	matrix.DFS(0);
@@ -2869,7 +2869,7 @@ int main(int argc, char *argv[])
 	matrix.PFS_DFS(0);
 #endif	
 
-#if 1
+#if 0
 	amo::AdjaMatrix<char, string> matrix;
 	matrix.insert('0'); //0
 	matrix.insert('1'); //1
@@ -2880,18 +2880,18 @@ int main(int argc, char *argv[])
 	matrix.insert('6'); //6
 	matrix.insert('7'); //7
 	matrix.insert('8'); //8
-	matrix.insert("0-1", 0, 1, 10);
-	matrix.insert("1-0", 1, 0, 10);
-	matrix.insert("1-4", 1, 4, 10);
-	matrix.insert("4-1", 4, 1, 10);
-	matrix.insert("4-5", 4, 5, 10);
-	matrix.insert("5-4", 5, 4, 10);
-	matrix.insert("5-7", 5, 7, 10);
-	matrix.insert("7-5", 7, 5, 10);
-	matrix.insert("3-6", 3, 6, 10);
-	matrix.insert("6-3", 6, 3, 10);
-	matrix.insert("6-8", 6, 8, 10);
-	matrix.insert("8-6", 8, 6, 10);
+	matrix.insert("0-1", 0, 1, 0);
+	matrix.insert("1-0", 1, 0, 0);
+	matrix.insert("1-4", 1, 4, 0);
+	matrix.insert("4-1", 4, 1, 0);
+	matrix.insert("4-5", 4, 5, 0);
+	matrix.insert("5-4", 5, 4, 0);
+	matrix.insert("5-7", 5, 7, 0);
+	matrix.insert("7-5", 7, 5, 0);
+	matrix.insert("3-6", 3, 6, 0);
+	matrix.insert("6-3", 6, 3, 0);
+	matrix.insert("6-8", 6, 8, 0);
+	matrix.insert("8-6", 8, 6, 0);
 	
 	std::cout << GREEN << "going to BFS" << WHITE << endl;
 	matrix.BFS(0);
@@ -2899,6 +2899,43 @@ int main(int argc, char *argv[])
 	std::cout << GREEN << "going to PFS for DFS" << WHITE << endl;
 	matrix.reset();
 	matrix.PFS_BFS(0);
+#endif	
+
+#if 1
+	amo::AdjaMatrix<char, string> matrix;
+	matrix.insert('A'); //0
+	matrix.insert('B'); //1
+	matrix.insert('C'); //2
+	matrix.insert('D'); //3
+	matrix.insert('E'); //4
+	matrix.insert('F'); //5
+	matrix.insert('G'); //6
+	matrix.insert('H'); //7
+	matrix.insert("A-B", 0, 1, 4);
+	matrix.insert("A-D", 0, 3, 6);
+	matrix.insert("B-A", 1, 0, 4);
+	matrix.insert("B-C", 1, 2, 12);
+	matrix.insert("C-D", 2, 3, 9);
+	matrix.insert("C-E", 2, 4, 1);
+	matrix.insert("C-F", 2, 5, 2);
+	matrix.insert("D-A", 3, 0, 6);
+	matrix.insert("D-C", 3, 2, 9);
+	matrix.insert("D-E", 3, 4, 13);
+	matrix.insert("D-G", 3, 6, 2);
+	matrix.insert("E-C", 4, 2, 1);
+	matrix.insert("E-D", 4, 3, 13);
+	matrix.insert("E-F", 4, 5, 5);
+	matrix.insert("E-G", 4, 6, 11);
+	matrix.insert("E-H", 4, 7, 8);
+	matrix.insert("F-C", 5, 2, 2);
+	matrix.insert("F-E", 5, 4, 5);
+	matrix.insert("F-H", 5, 7, 7);
+	matrix.insert("G-D", 6, 3, 2);
+	matrix.insert("G-E", 6, 4, 11);
+	matrix.insert("G-H", 6, 7, 14);
+	
+	std::cout << GREEN << "going to prim for MST" << WHITE << endl;
+	matrix.PFS_Prim(0);
 #endif	
 
 #endif
