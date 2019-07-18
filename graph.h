@@ -1110,8 +1110,9 @@ void AdjaMatrix<Tv, Te>::PFS(int s, Interface priority_updater, int& clock, int*
 		u = -1;
 		while ((u=nextNbr(v, u))>=0) {
 			if (status(u) == UNDISCOVERED) {
-				priority_updater(this, v, u); //sets the priority of u with v
-				parent(u) = v;
+				//v just met an undiscovered u, if priority(u) >= priority(v) 
+				//which means priority(u) is the default INT_MAX, minus the priority of u for DFS
+				priority_updater(this, v, u);
 			}
 			else if (status(u) == DISCOVERED) {
 				cout << vertex(v) << " backward " << vertex(u) << endl;
@@ -1135,6 +1136,7 @@ void AdjaMatrix<Tv, Te>::PFS(int s, Interface priority_updater, int& clock, int*
 		//print
 		//for (int i=0; i<this->n; i++) cout << "priority(" << vertex(i) << "):" << priority(i) << endl;
 		
+		//picks up the next vertex having the lowest priority value (highest priority)
 		for (it=this->V.begin(); it!=this->V.end(); it++) {
 			index = std::distance(this->V.begin(), it);
 			if (priority(index) < priority_lowest && status(index) == UNDISCOVERED) {
@@ -1182,8 +1184,9 @@ void AdjaMatrix<Tv, Te>::PFS(int s, Interface priority_updater, int*& predecesso
 		u = -1;
 		while ((u=nextNbr(v, u))>=0) {
 			if (status(u) == UNDISCOVERED) {
-				priority_updater(this, v, u); //sets the priority of u based on specific pattern with v
-				parent(u) = v;
+				//v just met an undiscovered u, if priority(u) >= priority(v) 
+				//which means priority(u) is the default INT_MAX, plus the priority of u for BFS
+				priority_updater(this, v, u);
 			}
 			else if (status(u) == DISCOVERED) {
 				cout << vertex(v) << " backward " << vertex(u) << endl;
@@ -1207,6 +1210,7 @@ void AdjaMatrix<Tv, Te>::PFS(int s, Interface priority_updater, int*& predecesso
 		//print
 		//for (int i=0; i<this->n; i++) cout << "priority(" << vertex(i) << "):" << priority(i) << endl;
 		
+		//picks up the next vertex having the lowest priority value (highest priority)
 		for (it=this->V.begin(); it!=this->V.end(); it++) {
 			index = std::distance(this->V.begin(), it);
 			if (priority(index) < priority_lowest && status(index) == UNDISCOVERED) {
@@ -1248,9 +1252,9 @@ void AdjaMatrix<Tv, Te>::PFS(int s, Interface priority_updater, std::vector<int>
 		u = -1;
 		while ((u=nextNbr(v, u))>=0) {
 			if (status(u) == UNDISCOVERED) {
-				priority_updater(this, v, u); //sets the priority of u with v
-				cout << vertex(v) << " discovered " << vertex(u) << endl;
-				parent(u) = v;
+				//v just met an undiscovered u, if priority(u) >= weight(v, u) 
+				//which means weight(v, u) is the shorter than the previous trace towards u, update the priority of u as Greedy
+				priority_updater(this, v, u);
 			}
 			else if (status(u) == DISCOVERED) {
 				cout << vertex(v) << " backward " << vertex(u) << endl;
@@ -1274,6 +1278,7 @@ void AdjaMatrix<Tv, Te>::PFS(int s, Interface priority_updater, std::vector<int>
 		//print
 		//for (int i=0; i<this->n; i++) cout << "priority(" << vertex(i) << "):" << priority(i) << endl;
 		
+		//picks up the next vertex having the lowest priority value (highest priority)
 		for (it=this->V.begin(); it!=this->V.end(); it++) {
 			index = std::distance(this->V.begin(), it);
 			if (priority(index) < priority_lowest && status(index) == UNDISCOVERED) {
@@ -1312,6 +1317,7 @@ struct PriorityUpdaterDfs {
 	virtual void operator()(AdjaMatrix<Tv, Te>* matrix, int v, int u) {
 		if (matrix->priority(u) >= matrix->priority(v)) {
 			matrix->priority(u) = matrix->priority(v) - 1;
+			matrix->parent(u) = v;
 		}
 	}
 };
@@ -1354,6 +1360,7 @@ struct PriorityUpdaterBfs {
 	virtual void operator()(AdjaMatrix<Tv, Te>* matrix, int v, int u) {
 		if (matrix->priority(u) >= matrix->priority(v)) {
 			matrix->priority(u) = matrix->priority(v) + 1;
+			matrix->parent(u) = v;
 		}
 	}
 };
@@ -1378,14 +1385,13 @@ void AdjaMatrix<Tv, Te>::PFS_BFS(int v) {
 	
 	//print
 	for (int i=0; i<this->n; i++) {
+		cout << WHITE << "distance[" << vertex(i) << "]:" << distance[i] << WHITE << endl;
+	}
+	for (int i=0; i<this->n; i++) {
 		int p = predecessor[i];
 		if (p >= 0) cout << YELLOW << "predecessor[" << vertex(i) << "]:" << vertex(p) << WHITE << endl;
 		else cout << YELLOW << "predecessor[" << vertex(i) << "]:" << predecessor[i] << WHITE << endl;
 	}
-	for (int i=0; i<this->n; i++) {
-		cout << WHITE << "distance[" << vertex(i) << "]:" << distance[i] << WHITE << endl;
-	}
-
 }
 
 template<typename Tv, typename Te>
@@ -1393,6 +1399,7 @@ struct PriorityUpdaterPrim {
 	void operator()(amo::AdjaMatrix<Tv, Te>* matrix, int v, int u) {
 		if (matrix->priority(u) > matrix->weight(v, u)) {
 			matrix->priority(u) = matrix->weight(v, u);
+			matrix->parent(u) = v;
 		}
 	}
 };

@@ -149,23 +149,6 @@ BinNode<T>& amo::BinNode<T>::operator=(const BinNode<T>& node) {
 	color = node->color;
 }
 
-#if 0
-template<typename T>
-void amo::BinNode<T>::traverse() {
-	FUNCTOR_TRAVERSER functor;
-	if (isRoot()) std::cout << GREEN << "[BinNode::traverse()]: --- TREE BOTTOM ------" << WHITE << std::endl;
-	if (isLeaf()) {
-		std::cout << GREEN << "leaf" << WHITE << std::endl;
-		functor(*this);
-	} else {
-		if (hasLeftChild()) lchild->traverse();
-		if (hasRightChild()) rchild->traverse();
-		std::cout << GREEN << "vertex" << WHITE << std::endl;
-		functor(*this);
-	}
-	if (isRoot()) std::cout << GREEN << "[BinNode::traverse()]: --- TREE TOP ------" << WHITE << std::endl;
-}
-#else
 template<typename T>
 void amo::BinNode<T>::traverse() {
 	FUNCTOR_TRAVERSER functor;
@@ -183,7 +166,6 @@ void amo::BinNode<T>::traverse() {
 		return;
 	}
 }
-#endif
 
 template<typename T>
 void amo::BinNode<T>::traverse(FUNCTOR_TRAVERSER& functor) {
@@ -362,29 +344,6 @@ void amo::BinNode<T>::traverseInLoop3() {
 	BinNode<T>* node = this;
 	bool backtrack = false;
 	std::cout << CYAN << "\n[BinNode::traverseInLoop3()]: --- TREE TOP ------" << WHITE << std::endl;
-#if 0
-	while (true) {
-		if (!backtrack && node->hasLeftChild()) { //firstly dig into the deepest left child
-			std::cout << CYAN << "digs into the left child" << WHITE << std::endl;
-			node = node->lchild;
-		}
-		else { //backtrack onto a vertex or arrive a leaf 
-			if (node->isLeaf()) std::cout << GREEN << "leaf" << WHITE << std::endl;
-			else std::cout << GREEN << "vertex" << WHITE << std::endl;
-			functor(*node);
-			if (node->hasRightChild()) { //a vertex
-				//node = node->rchild; //the pattern traversing a sub tree equals the pattern traversing root tree
-				node = node->succ();
-				backtrack = false;
-			}
-			else { //a leaf
-				node = node->succ(); //backtrack
-				if (node == NULL) break; 
-				backtrack = true;
-			}
-		}
-	}	
-#else //new
 	while(node->hasLeftChild()) { //leftmost
 		std::cout << CYAN << "digs into the left child" << WHITE << std::endl;
 		node = node->lchild;
@@ -396,7 +355,6 @@ void amo::BinNode<T>::traverseInLoop3() {
 		node = node->succ();
 		if (node == NULL) break;
 	}
-#endif	
 	std::cout << CYAN << "\n[BinNode::traverseInLoop3()]: --- TREE BOTTOM ------" << WHITE << std::endl;
 } 
 
