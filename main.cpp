@@ -2901,7 +2901,7 @@ int main(int argc, char *argv[])
 	matrix.PFS_BFS(0);
 #endif	
 
-#if 1
+#if 0
 	amo::AdjaMatrix<char, string> matrix;
 	matrix.insert('A'); //0
 	matrix.insert('B'); //1
@@ -2936,6 +2936,37 @@ int main(int argc, char *argv[])
 	
 	std::cout << GREEN << "going to prim for MST" << WHITE << endl;
 	matrix.PFS_Prim(0);
+#endif
+
+#if 1
+	amo::AdjaMatrix<char, string> matrix;
+	matrix.insert('S'); //0
+	matrix.insert('A'); //1
+	matrix.insert('B'); //2
+	matrix.insert('C'); //3
+	matrix.insert('D'); //4
+	matrix.insert('E'); //5
+	matrix.insert('F'); //6
+	matrix.insert('G'); //7
+	matrix.insert("S-A", 0, 1, 9);
+	matrix.insert("S-C", 0, 3, 14);
+	matrix.insert("S-F", 0, 6, 15);
+	matrix.insert("A-B", 1, 2, 25);
+	matrix.insert("B-D", 2, 4, 2);
+	matrix.insert("C-B", 3, 2, 18);
+	matrix.insert("C-D", 3, 4, 30);
+	matrix.insert("C-F", 3, 6, 5);
+	matrix.insert("D-E", 4, 5, 11);
+	matrix.insert("D-G", 4, 7, 16);
+	matrix.insert("E-B", 5, 2, 6);
+	matrix.insert("E-G", 5, 7, 6);
+	matrix.insert("F-D", 6, 4, 20);
+	matrix.insert("F-G", 6, 7, 40);
+	
+	std::cout << GREEN << "going to Dijkstra for the shortest path" << WHITE << endl;
+	int s = 0;
+	matrix.priority(s) = 0;
+	matrix.Dijkstra(s);
 #endif	
 
 #endif

@@ -297,6 +297,7 @@ public:
 	void PFS_DFS(int v);
 	void PFS_BFS(int v);
 	void PFS_Prim(int v);
+	void Dijkstra(int v);
 
 friend std::ostream& operator<<(std::ostream& os, AdjaMatrix<Tv,Te>& matrix) {
 	matrix.print(os);
@@ -1112,6 +1113,7 @@ void AdjaMatrix<Tv, Te>::PFS(int s, Interface priority_updater, int& clock, int*
 			if (status(u) == UNDISCOVERED) {
 				//v just met an undiscovered u, if priority(u) >= priority(v) 
 				//which means priority(u) is the default INT_MAX, minus the priority of u for DFS
+				cout << CYAN << vertex(v) << " met undiscovered " << vertex(u) << WHITE << endl;
 				priority_updater(this, v, u);
 			}
 			else if (status(u) == DISCOVERED) {
@@ -1136,7 +1138,7 @@ void AdjaMatrix<Tv, Te>::PFS(int s, Interface priority_updater, int& clock, int*
 		//print
 		//for (int i=0; i<this->n; i++) cout << "priority(" << vertex(i) << "):" << priority(i) << endl;
 		
-		//picks up the next vertex having the lowest priority value (highest priority)
+		//picks up the next vertex having the lowest priority value (highest priority) and undiscovered
 		for (it=this->V.begin(); it!=this->V.end(); it++) {
 			index = std::distance(this->V.begin(), it);
 			if (priority(index) < priority_lowest && status(index) == UNDISCOVERED) {
@@ -1210,7 +1212,7 @@ void AdjaMatrix<Tv, Te>::PFS(int s, Interface priority_updater, int*& predecesso
 		//print
 		//for (int i=0; i<this->n; i++) cout << "priority(" << vertex(i) << "):" << priority(i) << endl;
 		
-		//picks up the next vertex having the lowest priority value (highest priority)
+		//picks up the next vertex having the lowest priority value (highest priority) and undiscovered
 		for (it=this->V.begin(); it!=this->V.end(); it++) {
 			index = std::distance(this->V.begin(), it);
 			if (priority(index) < priority_lowest && status(index) == UNDISCOVERED) {
@@ -1253,7 +1255,9 @@ void AdjaMatrix<Tv, Te>::PFS(int s, Interface priority_updater, std::vector<int>
 		while ((u=nextNbr(v, u))>=0) {
 			if (status(u) == UNDISCOVERED) {
 				//v just met an undiscovered u, if priority(u) >= weight(v, u) 
-				//which means weight(v, u) is the shorter than the previous trace towards u, update the priority of u as Greedy
+				//which means weight(v, u) is the shorter than the previous trace towards u, 
+				//updates the priority of u the way as Greedy algorithm
+				cout << CYAN << vertex(v) << " met undiscovered " << vertex(u) << WHITE << endl;
 				priority_updater(this, v, u);
 			}
 			else if (status(u) == DISCOVERED) {
@@ -1278,7 +1282,7 @@ void AdjaMatrix<Tv, Te>::PFS(int s, Interface priority_updater, std::vector<int>
 		//print
 		//for (int i=0; i<this->n; i++) cout << "priority(" << vertex(i) << "):" << priority(i) << endl;
 		
-		//picks up the next vertex having the lowest priority value (highest priority)
+		//picks up the next vertex having the lowest priority value (highest priority) and undiscovered (no circle)
 		for (it=this->V.begin(); it!=this->V.end(); it++) {
 			index = std::distance(this->V.begin(), it);
 			if (priority(index) < priority_lowest && status(index) == UNDISCOVERED) {
@@ -1316,6 +1320,7 @@ template<typename Tv, typename Te>
 struct PriorityUpdaterDfs {
 	virtual void operator()(AdjaMatrix<Tv, Te>* matrix, int v, int u) {
 		if (matrix->priority(u) >= matrix->priority(v)) {
+			cout << CYAN << "going to update priority(" << matrix->vertex(u) << ") = " << (matrix->priority(v) - 1) << WHITE << endl;
 			matrix->priority(u) = matrix->priority(v) - 1;
 			matrix->parent(u) = v;
 		}
@@ -1434,8 +1439,47 @@ void AdjaMatrix<Tv, Te>::PFS_Prim(int v) {
 	}
 }
 
+template<typename Tv, typename Te>
+struct PriorityUpdaterDijkstra {
+	void operator()(amo::AdjaMatrix<Tv, Te>* matrix, int v, int u) {
+		if (matrix->priority(u) > (matrix->priority(v) + matrix->weight(v, u))) {
+			cout << CYAN << "going to update priority(" << matrix->vertex(u) << ") = " << (matrix->priority(v)+matrix->weight(v, u)) << WHITE << endl;
+			matrix->priority(u) = matrix->priority(v) + matrix->weight(v, u);
+			matrix->parent(u) = v;
+		}
+	}
+};
 
-
+template<typename Tv, typename Te>
+void AdjaMatrix<Tv, Te>::Dijkstra(int v) {
+	int s =  v;
+	
+	std::vector<int> position;
+	std::vector<Edge<Te>*> path;
+	do {
+		if (status(v) == UNDISCOVERED) {
+			cout << GREEN << "going to PFS (for Dijkstra) the subgraph of v:" << v << WHITE << endl;	
+			PFS(v, PriorityUpdaterDijkstra<Tv, Te>(), position, path);
+		}
+	} while (s!=(v=(++v%(this->n))));
+	
+	//print
+	cout << "POSITIONS:" << endl;
+	for (std::vector<int>::iterator it=position.begin(); it!=position.end(); it++) {
+		cout << YELLOW << vertex(*it) << " ";
+	}
+	cout << WHITE << endl;
+	
+	cout << "PATHS:" << endl;
+	for (typename std::vector<Edge<Te>*>::iterator it=path.begin(); it!=path.end(); it++) {
+		cout << YELLOW << (*it)->data << " ";
+	}
+	cout << WHITE << endl;
+	
+	for (int i=0; i<this->n; i++) {
+		cout << WHITE << "priority of " << vertex(i) << ":" << priority(i) << WHITE << endl;
+	}
+}
 
 
 
