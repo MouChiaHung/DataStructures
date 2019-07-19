@@ -36,13 +36,13 @@ protected:
 	BinNode<T>* _root;
 public:
 	BinTree() : _size(0), _root(NULL) {
-		std::cout << "[BinTree::BinTree()]: this:" << this << ", type:" << typeid(T).name() << WHITE << std::endl;
+		std::cout << "[BinTree()]: this:" << this << ", type:" << typeid(T).name() << WHITE << std::endl;
 	}
 	BinTree(BinNode<T>* node) : _size(node->height), _root(node) {
-		std::cout << "[BinTree::BinTree(BinNode<T>*)]: this:" << this << ", root:" << _root->data << ", size:" << _size << WHITE << std::endl;
+		std::cout << "[BinTree(BinNode<T>*)]: this:" << this << ", root:" << _root->data << ", size:" << _size << WHITE << std::endl;
 	}
 	~BinTree() {
-		std::cout << "[BinTree::~BinTree()]: size:" << _size << WHITE << std::endl;
+		std::cout << "[~BinTree()]: size:" << _size << WHITE << std::endl;
 		if (0<size() && _root!=NULL) remove(_root);
 	}
 	
@@ -88,7 +88,6 @@ template<typename T>
 int amo::BinTree<T>::updateHeight(BinNode<T>* node) {
 	if (node->isLeaf()) {
 		node->height = 0;
-		std::cout << "[BinTree::updateHeight()]: leaf:" << node->data << WHITE << std::endl;
 		return node->height;
 	}
 	else {
@@ -98,10 +97,9 @@ int amo::BinTree<T>::updateHeight(BinNode<T>* node) {
 		else if (lchild && rchild == NULL) node->height = 1 + lchild->height;
 		else if (rchild && lchild == NULL) node->height = 1 + rchild->height;
 		else {
-			std::cout << RED << "[BinTree::updateHeight()]: error vertex" << WHITE << std::endl;
+			std::cout << RED << "error vertex" << WHITE << std::endl;
 			node->height = 0;
 		}
-		std::cout << "[BinTree::updateHeight()]: vertex:" << node->data << WHITE << std::endl;
 		return node->height;
 	}
 }
@@ -119,19 +117,14 @@ void amo::BinTree<T>::updateHeightAll() {
 	std::queue<BinNode<T>*> queue;
 	BinNode<T>* node = _root;
 	queue.push(node);
-	std::cout << GREEN << "[BinTree::updateHeightAll()]: --- TREE TOP ------" << WHITE << std::endl;
 	while (true) {
 		if (queue.empty()) break;
 		node = queue.front();
 		queue.pop();
-		
 		if (node->isLeaf()) updateHeightAbove(node);
-		
-		
 		if (node->hasLeftChild()) queue.push(node->lchild);
 		if (node->hasRightChild()) queue.push(node->rchild);
 	}
-	std::cout << GREEN << "\n[BinTree::updateHeightAll()]: --- TREE BOTTOM ------" << WHITE << std::endl;
 }
 
 template<typename T>
@@ -142,11 +135,9 @@ BinNode<T>* amo::BinTree<T>::insertRoot(T const& t) {
 	return r;
 }
 
-
 template<typename T>
 BinNode<T>* amo::BinTree<T>::insertLeftChild(BinNode<T>* node, const T& t) {
 	BinNode<T>* insert = node->insertLeftChild(t);
-	std::cout << "[BinTree::insertLeftChild()]: inserted node:" << insert->data << WHITE << std::endl;
 	updateHeightAbove(node);
 	_size++;
 	return insert;
@@ -155,7 +146,6 @@ BinNode<T>* amo::BinTree<T>::insertLeftChild(BinNode<T>* node, const T& t) {
 template<typename T>
 BinNode<T>* amo::BinTree<T>::insertRightChild(BinNode<T>* node, const T& t) {
 	BinNode<T>* insert = node->insertRightChild(t);
-	std::cout << "[BinTree::insertRightChild()]: inserted node:" << insert->data << WHITE << std::endl;
 	updateHeightAbove(node);
 	_size++;
 	return insert;
@@ -168,7 +158,7 @@ BinNode<T>* amo::BinTree<T>::attachLeftChild(BinNode<T>* node, BinTree<T>* &tree
 	tree->parent = node;
 	size += tree->size();
 	updateHeightAbove(node);
-NO_ROOT:	
+NO_ROOT_AL:	
 	tree->_root = NULL;
 	tree->_size = 0;
 	//release(tree);
@@ -193,18 +183,15 @@ NO_ROOT_AR:
 template<typename T>
 int amo::BinTree<T>::removeTree(BinNode<T>* node) {
 	int removed = 0;
-	
 	if (node == NULL) return 0;
 	if (node->isLeaf()) {
-		//std::cout << "[BinTree::removeTree()]: going to delete leaf:" << node->data << WHITE << std::endl;
 		delete node;
 		removed++;
 		return removed;
 	}
-	else {
+	else { //removes in the post-order
 		if (node->hasLeftChild()) removed += removeTree(node->lchild);
 		if (node->hasRightChild()) removed += removeTree(node->rchild);
-		//std::cout << "[BinTree::removeTree()]: going to delete vertex:" << node->data << WHITE << std::endl;
 		delete node;
 		removed++;
 		return removed;
@@ -213,14 +200,10 @@ int amo::BinTree<T>::removeTree(BinNode<T>* node) {
 
 template<typename T>
 int amo::BinTree<T>::remove(BinNode<T>* node) {
-	if (!node->isRoot()) {
-		if (node->isLeftChild()) 
-			std::cout << "[BinTree::remove()]: node(" << node->data << ") parent left link at:" << &(node->parent->lchild) << ", link at:" << &(node->parentLink()) << WHITE << endl;
-		else if (node->isRightChild()) 
-			std::cout << "[BinTree::remove()]: node(" << node->data << ") parent right link at:" << &(node->parent->rchild) << ", link at:" << &(node->parentLink()) << WHITE << endl;
+	if (!node->isRoot()) { 
 		node->parentLink() = NULL;
 		updateHeightAbove(node->parent);
-	}	
+	}
 	int removed_count = removeTree(node);
 	_size -= removed_count;
 	return removed_count;

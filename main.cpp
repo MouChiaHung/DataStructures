@@ -42,8 +42,11 @@
 #include <bin_tree.h>
 #include <bin_node.h>
 #include <huffman_tree.h>
+#include <bst.h>
 
 #include <graph.h>
+#include <entry.h>
+
 
 using namespace std;
 using namespace amo;
@@ -2485,7 +2488,7 @@ int main(int argc, char *argv[])
 	amo::BinNode<int>* lchild11 = rchild8->insertLeftChild(11);
 	amo::BinNode<int>* rchild12 = rchild8->insertRightChild(12);
 	
-#if 0
+#if 1
 	std::cout << GREEN << "going to root.traversePre()" << WHITE << std::endl;
 	root.traversePre();
 	std::cout << GREEN << "going to root.traversePreLoop()" << WHITE << std::endl;
@@ -2501,7 +2504,7 @@ int main(int argc, char *argv[])
 	root.traverseInLoop2();
 	std::cout << GREEN << "going to root.traverseInLoop3()" << WHITE << std::endl;
 	root.traverseInLoop3();
-#elif 1
+#elif 0
 	std::cout << GREEN << "going to root.traversePost()" << WHITE << std::endl;
 	root.traversePost();
 	root.traversePostLoop();
@@ -2534,7 +2537,7 @@ int main(int argc, char *argv[])
 	return 0;
 #endif  
 
-#if 1
+#if 0
 	std::cout << GREEN << "****************** Graph tree ******************\n" << WHITE << std::endl;
 
 #if 0
@@ -2938,7 +2941,7 @@ int main(int argc, char *argv[])
 	matrix.PFS_Prim(0);
 #endif
 
-#if 1
+#if 0
 	amo::AdjaMatrix<char, string> matrix;
 	matrix.insert('S'); //0
 	matrix.insert('A'); //1
@@ -2965,11 +2968,22 @@ int main(int argc, char *argv[])
 	
 	std::cout << GREEN << "going to Dijkstra for the shortest path" << WHITE << endl;
 	int s = 0;
+	
 	matrix.priority(s) = 0;
 	matrix.Dijkstra(s);
-#endif	
-
 #endif
+#endif
+
+#if 1
+	std::cout << GREEN << "****************** binary search tree ******************\n" << WHITE << std::endl;
+	BinNode<int>* root = new BinNode<int>(10);
+	amo::BST<int> bst(root);
+	bst.search(9);
+	bst.search(11);
+	bst.search(10);
+	bst.traverse();		
+#endif
+
 	std::cout << GREEN << "\n****************** main return ******************" << WHITE << std::endl;
 	return 0;
 }
