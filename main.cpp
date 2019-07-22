@@ -2976,12 +2976,22 @@ int main(int argc, char *argv[])
 
 #if 1
 	std::cout << GREEN << "****************** binary search tree ******************\n" << WHITE << std::endl;
-	BinNode<int>* root = new BinNode<int>(10);
-	amo::BST<int> bst(root);
-	bst.search(9);
-	bst.search(11);
-	bst.search(10);
-	bst.traverse();		
+	amo::BST<int> bst;
+	bst.insert(36);
+	bst.insert(27);
+	bst.insert(6);
+	bst.insert(58);
+	bst.insert(53);
+	bst.insert(69);
+	bst.insert(40);
+	bst.insert(46);
+	bst.insert(64);
+
+	bst.remove(58);
+
+	
+	cout << bst << endl;
+	bst.traverseLevel();	
 #endif
 
 	std::cout << GREEN << "\n****************** main return ******************" << WHITE << std::endl;

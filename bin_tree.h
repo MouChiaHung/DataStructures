@@ -35,14 +35,9 @@ protected:
 	int _size; //0 if root is null
 	BinNode<T>* _root;
 public:
-	BinTree() : _size(0), _root(NULL) {
-		std::cout << "[BinTree()]: this:" << this << ", type:" << typeid(T).name() << WHITE << std::endl;
-	}
-	BinTree(BinNode<T>* node) : _size(node->height), _root(node) {
-		std::cout << "[BinTree(BinNode<T>*)]: this:" << this << ", root:" << _root->data << ", size:" << _size << WHITE << std::endl;
-	}
+	BinTree() : _size(0), _root(NULL) {}
+	BinTree(BinNode<T>* node) : _size(node->height), _root(node) {}
 	~BinTree() {
-		std::cout << "[~BinTree()]: size:" << _size << WHITE << std::endl;
 		if (0<size() && _root!=NULL) remove(_root);
 	}
 	
@@ -76,9 +71,6 @@ public:
 	void updateHeightAll();
 	
 friend std::ostream& operator<<(std::ostream& os, const BinTree<T>& tree) {
-	os  << WHITE << "[this]:" << &tree << endl;
-	os  << WHITE << "[root]:" << tree.root << endl;
-	os  << WHITE << "[size]:" << tree.size << endl;
 	return os;
 }
 
@@ -97,8 +89,8 @@ int amo::BinTree<T>::updateHeight(BinNode<T>* node) {
 		else if (lchild && rchild == NULL) node->height = 1 + lchild->height;
 		else if (rchild && lchild == NULL) node->height = 1 + rchild->height;
 		else {
-			std::cout << RED << "error vertex" << WHITE << std::endl;
-			node->height = 0;
+			std::cout << RED << "Exception of " << __func__ << WHITE << std::endl;
+			node->height = -1;
 		}
 		return node->height;
 	}
@@ -185,13 +177,20 @@ int amo::BinTree<T>::removeTree(BinNode<T>* node) {
 	int removed = 0;
 	if (node == NULL) return 0;
 	if (node->isLeaf()) {
+		cout << "delete leaf:" << *node;
 		delete node;
 		removed++;
 		return removed;
 	}
 	else { //removes in the post-order
-		if (node->hasLeftChild()) removed += removeTree(node->lchild);
-		if (node->hasRightChild()) removed += removeTree(node->rchild);
+		if (node->hasLeftChild()) { 
+		
+			removed += removeTree(node->lchild);
+		}
+		if (node->hasRightChild()) { 
+			removed += removeTree(node->rchild);
+		}
+		cout << "delete vertex:" << *node;
 		delete node;
 		removed++;
 		return removed;
