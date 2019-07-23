@@ -2987,11 +2987,19 @@ int main(int argc, char *argv[])
 	bst.insert(46);
 	bst.insert(64);
 
+	bst.remove(36);
+	bst.remove(27);
+	bst.remove(6);
 	bst.remove(58);
+	bst.remove(53);
+	bst.remove(69);
+	bst.remove(40);
+	bst.remove(46);
+	//bst.remove(64);
 
-	
+
 	cout << bst << endl;
-	bst.traverseLevel();	
+	bst.traverseIn();	
 #endif
 
 	std::cout << GREEN << "\n****************** main return ******************" << WHITE << std::endl;

@@ -35,15 +35,17 @@ public:
 	BinNode<T>* insert(T const& e);
 	bool remove(T const& e);
 	BinNode<T>* removeAt(BinNode<T>* node, BinNode<T>*& hot);
+	BinNode<T>* succ(BinNode<T>* node);
 
 friend std::ostream& operator<<(std::ostream& os, const BST<T>& bst) {
-	os << CYAN;
-	os << "[this]:" << &bst << endl;
+	os << YELLOW << "------ BST MEMBER ------" << endl;
+	//os << "[this]:" << &bst << endl;
 	if (bst.root() == NULL) os << "[root]:" << "NULL" << endl;
 	else os << "[root]:" << *bst.root();
 	os << "[size]:" << bst.size() << endl;	
-	os << "[height]:" << bst.root()->height << endl;
-	os << WHITE;
+	if (bst.root() == NULL) os << "[height]:" << "NULL" << endl;
+	else os << "[height]:" << bst.root()->height << endl;
+	os << "------ BST MEMBER ------" << WHITE;
 	return os;
 }
 };
@@ -51,10 +53,10 @@ friend std::ostream& operator<<(std::ostream& os, const BST<T>& bst) {
 template<typename T>
 BinNode<T>* BST<T>::searchIn(BinNode<T>* v, T const& e, BinNode<T>*& hot) {
 	if ((v == NULL) || (e == v->data)) { 
-		if (v == NULL) std::cout << YELLOW << "no:" << e << ", [hot]:" << *(this->_hot) << WHITE;
+		if (v == NULL) std::cout << WHITE << "not searched:" << e << " and hot:" << *hot << WHITE;
 		else {
-			if ((this->_hot)!=NULL) std::cout << CYAN << "searched:" << e << ", [hot]:" << *(this->_hot) << WHITE;
-			else std::cout << CYAN << "searched:" << e << " (root), [hot]:NULL" << WHITE << std::endl;
+			if (hot != NULL) std::cout << GREEN << "searched:" << e << " and hot:" << *hot << WHITE;
+			else std::cout << GREEN << "searched root:" << e << " and hot:NULL" << WHITE << std::endl;
 		}
 		return v;
 	}
@@ -74,41 +76,52 @@ BinNode<T>* BST<T>::insert(T const& e) {
 	//first one to be the root
 	if (this->empty()) {
 		this->insertRoot(e);
-		std::cout << "inserted root:" << *this->root();
+		std::cout << CYAN << "inserted root:" << *this->root() << WHITE;
 		return this->root();
 	}
 	//already in as node
 	if ((sentry = search(e)) != NULL) {
-		std::cout << "equivalent element:" << *sentry;
+		std::cout << CYAN << "equivalent element:" << *sentry << WHITE;;
 		return sentry;
 	}
 	//inserts a new node
 	if (e < this->_hot->data) {
 		this->insertLeftChild(this->_hot, e);
-		std::cout << "inserted lchild:" << *this->_hot->lchild;
+		std::cout << CYAN << "inserted lchild:" << *this->_hot->lchild << WHITE;
 		return this->_hot->lchild;
 	}
 	else if (e > this->_hot->data){
 		this->insertRightChild(this->_hot, e);
-		std::cout << "inserted rchild:" << *this->_hot->rchild;
+		std::cout << CYAN << "inserted rchild:" << *this->_hot->rchild << WHITE;
 		return this->_hot->rchild;
 	}
 	else {
-		std::cout << RED << "Exception of " << __func__ << WHITE << std::endl;
+		std::cout << RED << __func__ << ":Exception case unknown inserting" << WHITE << std::endl;
 		return NULL;
 	}
+}
+
+template<typename T>
+BinNode<T>* BST<T>::succ(BinNode<T>* node) {
+	if (!node->hasRightChild()) return NULL;
+	node = node->rchild;
+	while (node->hasLeftChild())
+		node = node->lchild;
+	return node;
 }
 
 template<typename T>
 bool BST<T>::remove(T const& e) {
 	BinNode<T>* sentry = NULL;
 	if ((sentry = search(e)) == NULL) {
-		std::cout << "no:" << e << std::endl;
+		std::cout << CYAN << "no equivalent:" << e << WHITE << std::endl;
 		return false;
 	}
 	BinNode<int>* replace = removeAt(sentry, this->_hot);
-	if (replace != NULL) cout << "removed element:" << e << " and replaced with element:" << *replace;
-	else cout << "removed element:" << e << " and replaced with element NULL" << std::endl;
+	if (replace != NULL) 
+		cout << CYAN << "removed:" << e << " and replaced:" << *replace << WHITE;
+	else 
+		cout << CYAN << "removed:" << e << " and replaced:NULL" << WHITE << std::endl;
 	this->_size--;
 	this->updateHeightAbove(this->_hot);
 	return true;
@@ -117,13 +130,13 @@ bool BST<T>::remove(T const& e) {
 template<typename T>
 BinNode<T>* BST<T>::removeAt(BinNode<T>* node, BinNode<T>*& hot) {
 	if (node == NULL) {
-		std::cout << RED << "Exception case 1 of " << __func__ << WHITE << std::endl;
+		std::cout << RED << __func__ << ":Exception case removing null" << WHITE << std::endl;
 		hot = NULL;
 		return NULL;
 	}
 	BinNode<T>* replace = NULL;
 	
-	//replace or swap and replace
+	//replaces for single sub->tree or swaps and replaces for dual sub->tree
 	if (node->hasLeftChild() && !node->hasRightChild()) { //node has single left sub->tree
 		replace = node->lchild;
 	}
@@ -132,55 +145,59 @@ BinNode<T>* BST<T>::removeAt(BinNode<T>* node, BinNode<T>*& hot) {
 		
 	}
 	else if (node->hasLeftChild() && node->hasRightChild()) { //node has dual sub->tree
-		BinNode<T>* succ = node->succ(); //succ is the most left of the right sub->tree of node
-		std::swap(node->data, succ->data);
-		hot = succ->parent;
-		node = succ;
-		replace = node->rchild;//most left doesn't have lchild
-		std::cout << "node:" << *node;
-		std::cout << "hot:" << *hot;
-		if (replace != NULL) std::cout << "replace:" << *replace;
-		else std::cout << "replace:" << "NULL" << std::endl;
-	}
-	else {
-		std::cout << RED << "Exception case 2 of " << __func__ << WHITE << std::endl;
-		hot = NULL;
-		return NULL;
-	}
-	
-	//update tree and delete node
-	if (replace == NULL) {
-		if (hot->lchild == node) { //node is lchild
-		hot->lchild = replace;
-		}
-		else if (hot->rchild == node){ //node is rchild
-			hot->rchild = replace;
-		}
-		else {
-			std::cout << RED << "Exception case 3 of " << __func__ << WHITE << std::endl;
+		//BinNode<T>* succ = node->succ(); //succ is the most left of the right sub->tree of node
+		BinNode<T>* succ = this->succ(node); //succ is the most left of the right sub->tree of node
+		if (succ == NULL) {
+			std::cout << RED << __func__ << ":Exception case null succ" << WHITE << std::endl;
 			hot = NULL;
 			return NULL;
 		}
-		delete node;
-		return replace;
+		std::cout << YELLOW << "swap " << node->data << " and " << succ->data << WHITE << std::endl;
+		std::swap(node->data, succ->data);
+		hot = succ->parent; //I chose hot pointing to the parent of succ instead of parent of the node
+		node = succ;
+		replace = node->rchild;//most left doesn't have lchild and rchild might be null too
 	}
-	
-	if (hot->lchild == node) { //node is lchild
-		hot->lchild = replace;
-		replace->parent = hot;
-	}
-	else if (hot->rchild == node){ //node is rchild
-		hot->rchild = replace;
-		replace->parent = hot;
+	else if (!node->hasLeftChild() && !node->hasRightChild())  {
+		replace = NULL;
 	}
 	else {
-		std::cout << RED << "Exception case 4 of " << __func__ << WHITE << std::endl;
+		std::cout << RED << __func__ << ":Exception case unknown sub-tree type" << WHITE << std::endl;
 		hot = NULL;
 		return NULL;
 	}
+	
+	//reconnects tree and deletes node
+	if (hot != NULL) { //case of deleting node
+		if (hot->lchild == node)
+			hot->lchild = replace;
+		else if (hot->rchild == node)
+			hot->rchild = replace;
+		else {
+			std::cout << RED << __func__ << ":Exception case neither left nor right" << WHITE << std::endl;
+			hot = NULL;
+			return NULL;
+		}
+	}
+	else { //case of deleting root
+		if (this->_root->isLeaf()) { 
+			std::cout << YELLOW << "delete the last:" << node->data << WHITE << std::endl;
+			this->_root = NULL;
+		}
+		else {
+			std::cout << YELLOW << "delete root:" << node->data << " and replace:" << replace->data << WHITE << std::endl;
+			this->_root = replace;
+		}
+	}
+	if (replace != NULL) replace->parent = hot;
 	delete node;
 	return replace;
 }
+
+
+
+
+
 
 
 

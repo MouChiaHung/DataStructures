@@ -222,27 +222,32 @@ BinTree<T>* amo::BinTree<T>::secede(BinNode<T>* node) {
 
 template<typename T>
 void amo::BinTree<T>::traverse() {
-	_root->traverse();
+	if (!empty()) _root->traverse();
+	else std::cout << GREEN << "no element to traverse" << WHITE << std::endl;
 }
 
 template<typename T>
 void amo::BinTree<T>::traversePre() {
-	_root->traversePre();
+	if (!empty()) _root->traversePre();
+	else std::cout << GREEN << "no element to traverse" << WHITE << std::endl;
 }
 
 template<typename T>
 void amo::BinTree<T>::traverseIn() {
-	_root->traverseIn();
+	if (!empty()) _root->traverseIn();
+	else std::cout << GREEN << "no element to traverse" << WHITE << std::endl;
 }
 
 template<typename T>
 void amo::BinTree<T>::traversePost() {
-	_root->traversePost();
+	if (!empty()) _root->traversePost();
+	else std::cout << GREEN << "no element to traverse" << WHITE << std::endl;
 }
 
 template<typename T>
 void amo::BinTree<T>::traverseLevel() {
-	_root->traverseLevel();
+	if (!empty()) _root->traverseLevel();
+	else std::cout << GREEN << "no element to traverse" << WHITE << std::endl;
 }
 };
 #endif
