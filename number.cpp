@@ -41,19 +41,19 @@ Number* Number::instance = 0;
 /* implements                                                           */
 /* -------------------------------------------------------------------- */
 amo::Number::Number() {
-	std::cout << "[Number::Number()]:" << this << std::endl;
+	std::cout << "[Number()]:" << this << std::endl;
 }
 
 amo::Number::~Number() {
-	std::cout << "[Number::~Number()]:" << this << std::endl;
+	std::cout << "[~Number()]:" << this << std::endl;
 }
 
 Number& amo::Number::getInstance() {
 	if (instance == nullptr) {
-		std::cout << "[Number::getInstance()]:going to 'instance = new Number()':" << &instance << std::endl;
+		std::cout << "[getInstance()]:going to 'instance = new Number()':" << &instance << std::endl;
 		instance = new Number();
 	} 
-	std::cout << "[Number::getInstance()]:returns:" << instance << std::endl;
+	std::cout << "[getInstance()]:returns:" << instance << std::endl;
 	return *instance;
 } 	
 
@@ -61,7 +61,7 @@ int amo::Number::getBinCount(int num) {
 	int count = 0;
 	while (num > 0) {
 		if ((num&0x1)>0) count++;
-		std::cout << "[Number::getBinCount(int)]: in while-loop, count:" << count << " and parameter:" << std::bitset<sizeof(int)*8>(num) << " (" << num << ")" << std::endl;
+		std::cout << "[getBinCount(int)]: in while-loop, count:" << count << " and parameter:" << std::bitset<sizeof(int)*8>(num) << " (" << num << ")" << std::endl;
 		num >>= 1;
 	}
 	return count;
@@ -71,11 +71,11 @@ int amo::Number::getBinCount(int num) {
 long long amo::Number::power2(int n) {
 	if (n < 0) return 0;
 	long long pow = 1;
-	std::cout << "[Number::power2(int)]: pow:" << pow << std::endl;
+	std::cout << "[power2(int)]: pow:" << pow << std::endl;
 	//while (0 < (--n)) {
 	while (0 < n--) {
 		pow <<= 1;
-		std::cout << "[Number::power2(int)]: in while-loop, n:" << n << " and pow:" << pow << std::endl;
+		std::cout << "[power2(int)]: in while-loop, n:" << n << " and pow:" << pow << std::endl;
 	}
 	return pow;
 }
@@ -85,11 +85,11 @@ inline long long sqr(long long n) {return n * n;}
 long long amo::Number::power2(int n) {
 	if (n < 0) return 0;
 	if (n == 0) {
-		std::cout << "[Number::power2(int)]: n == 0 and returns 1" << std::endl;
+		std::cout << "[power2(int)]: n == 0 and returns 1" << std::endl;
 		return 1;
 	}
-	if (n & 1) std::cout << "[Number::power2(int)]: n:" << n << " and going to sqr(power2(" << n/2 << ")) << 1" << std::endl; //odd
-	else	   std::cout << "[Number::power2(int)]: n:" << n << " and going to sqr(power2(" << n/2 << "))" << std::endl; //even
+	if (n & 1) std::cout << "[power2(int)]: n:" << n << " and going to sqr(power2(" << n/2 << ")) << 1" << std::endl; //odd
+	else	   std::cout << "[power2(int)]: n:" << n << " and going to sqr(power2(" << n/2 << "))" << std::endl; //even
 	return (n & 1) ? sqr(power2(n/2)) << 1 : sqr(power2(n/2));
 }
 #endif
@@ -97,28 +97,28 @@ long long amo::Number::power2(int n) {
 long long amo::Number::power(int base, int n) {
 	if (n < 0) return 0;
 	long long pow = 1;
-	std::cout << "[Number::power2(int)]: pow:" << pow << std::endl;
+	std::cout << "[power2(int)]: pow:" << pow << std::endl;
 	while (0 < n--) {
 		pow = pow*base;
-		std::cout << "[Number::power2(int)]: in while-loop, n:" << n << " and pow:" << pow << std::endl;
+		std::cout << "[power2(int)]: in while-loop, n:" << n << " and pow:" << pow << std::endl;
 	}
 	return pow;
 }
 
 int amo::Number::akermann(int m, int n) {
 	if (m < 0 || n <0) {
-		std::cout << "[Number::akermann(int, int)]: !!! m < 0 || n < 0 returns:" << -1 << std::endl;
+		std::cout << "[akermann(int, int)]: !!! m < 0 || n < 0 returns:" << -1 << std::endl;
 		return -1;
 	}
 	if (m == 0) {
-		std::cout << "[Number::akermann(int, int)]: m == 0 returns:" << n+1 << std::endl;
+		std::cout << "[akermann(int, int)]: m == 0 returns:" << n+1 << std::endl;
 		return n+1;
 	}
 	if (n == 0) {
-		std::cout << "[Number::akermann(int, int)]: m > 0 && n == 0 going to akermann(" << m-1 << ", " << 1 << "))" << std::endl;
+		std::cout << "[akermann(int, int)]: m > 0 && n == 0 going to akermann(" << m-1 << ", " << 1 << "))" << std::endl;
 		return akermann(m-1, 1);
 	} else {
-		std::cout << "[Number::akermann(int, int)]: m > 0 && n > 0 going to akermann(" << m-1 << ", akermann(" << m << ", " << n-1 << "))" << std::endl;
+		std::cout << "[akermann(int, int)]: m > 0 && n > 0 going to akermann(" << m-1 << ", akermann(" << m << ", " << n-1 << "))" << std::endl;
 		return akermann(m-1, akermann(m, n-1));
 	}	
 }
@@ -126,21 +126,21 @@ int amo::Number::akermann(int m, int n) {
 int amo::Number::hailstone(int n) {
 	int run = 1;
 	if (n < 1) {
-		std::cout << "[Number::hailstone(int)]: !!! n < 1 returns:" << -1 << std::endl;
+		std::cout << "[hailstone(int)]: !!! n < 1 returns:" << -1 << std::endl;
 		return 1;
 	}
 	if (n == 1) {
-		std::cout << "[Number::hailstone(int)]: n == 1 && run = 0 returns:" << 0 << std::endl;
+		std::cout << "[hailstone(int)]: n == 1 && run = 0 returns:" << 0 << std::endl;
 		return 0;
 	}
 	if (n%2 == 0) {
-		std::cout << "[Number::hailstone(int)]: even and going to hailstone(n/2:" << n/2 << ")" << std::endl;
+		std::cout << "[hailstone(int)]: even and going to hailstone(n/2:" << n/2 << ")" << std::endl;
 		run += hailstone(n/2);
 	} else {
-		std::cout << "[Number::hailstone(int)]: odd and going to hailstone((3*n+1):" << 3*n+1 << ")" << std::endl;
+		std::cout << "[hailstone(int)]: odd and going to hailstone((3*n+1):" << 3*n+1 << ")" << std::endl;
 		run += hailstone(3*n+1);
 	}
-	std::cout << "[Number::hailstone(int)]: returns:" << run << std::endl;
+	std::cout << "[hailstone(int)]: returns:" << run << std::endl;
 	return run;
 }
 
@@ -149,19 +149,19 @@ int amo::Number::sum(std::vector<int>& vector) {
 	int back = 0;
 	int sum = 0;
 	if (vector.size() < 0) {
-		std::cout << "[Number::sum(std::vector<int>&)]: !!! n < 0 returns:" << 0 << std::endl;
+		std::cout << "[sum(std::vector<int>&)]: !!! n < 0 returns:" << 0 << std::endl;
 		return 0;
 	}
 	if (vector.size() == 0) {
-		std::cout << "[Number::sum(std::vector<int>&)]: size == 0 returns:" << 0 << std::endl;
+		std::cout << "[sum(std::vector<int>&)]: size == 0 returns:" << 0 << std::endl;
 		return 0;
 	}
 	back = vector.back();
 	vector.pop_back();
 	int recursion = Number::sum(vector);
-	std::cout << "[Number::sum(std::vector<int>&)]: going to sum = back:" << back << " + sum() recurrently:" << recursion << std::endl;
+	std::cout << "[sum(std::vector<int>&)]: going to sum = back:" << back << " + sum() recurrently:" << recursion << std::endl;
 	sum = back + recursion;
-	std::cout << "[Number::sum(std::vector<int>&)]: returns:" << sum << std::endl;
+	std::cout << "[sum(std::vector<int>&)]: returns:" << sum << std::endl;
 	return sum;
 }
 #else
@@ -170,15 +170,15 @@ struct functor {
 } my_functor;	
 int amo::Number::sum(std::vector<int>& vector) {
 	if (vector.size() < 0) {
-		std::cout << "[Number::sum(std::vector<int>&)]: !!! n < 0 returns:" << 0 << std::endl;
+		std::cout << "[sum(std::vector<int>&)]: !!! n < 0 returns:" << 0 << std::endl;
 		return 0;
 	}
 	if (vector.size() == 0) {
-		std::cout << "[Number::sum(std::vector<int>&)]: size == 0 returns:" << 0 << std::endl;
+		std::cout << "[sum(std::vector<int>&)]: size == 0 returns:" << 0 << std::endl;
 		return 0;
 	}
 	if (vector.size() == 1) {
-		std::cout << "[Number::sum(std::vector<int>&)]: size == 0 returns:" << 0 << std::endl;
+		std::cout << "[sum(std::vector<int>&)]: size == 0 returns:" << 0 << std::endl;
 		return vector.back();
 	}
 	int back  = 0;
@@ -187,9 +187,9 @@ int amo::Number::sum(std::vector<int>& vector) {
 	std::vector<int> v1, v2;
 	v1.assign(vector.begin(), std::next(vector.begin(), mi));
 	v2.assign(std::next(vector.begin(), mi), vector.end());
-	std::cout << "[Number::sum(std::vector<int>&)]: v1:" << std::endl;
+	std::cout << "[sum(std::vector<int>&)]: v1:" << std::endl;
 	for_each(v1.begin(), v1.end(), my_functor);
-	std::cout << "[Number::sum(std::vector<int>&)]: v2:" << std::endl;
+	std::cout << "[sum(std::vector<int>&)]: v2:" << std::endl;
 	for_each(v2.begin(), v2.end(), my_functor);
 	sum = Number::sum(v1) + Number::sum(v2);
 
@@ -208,11 +208,11 @@ int amo::Number::factory(int n) {
  */
 int amo::Number::fibonacci(int n) {
 	if (n < 2) {
-		std::cout << "[Number::fibonacci(int)]: n < 2 returns:" << n << std::endl;
+		std::cout << "[fibonacci(int)]: n < 2 returns:" << n << std::endl;
 		return n;
 	} else {
 		int fib = fibonacci(n-1) + fibonacci(n-2);
-		std::cout << "[Number::fibonacci(int)]: n = " << n << " returns:" << fib << std::endl;
+		std::cout << "[fibonacci(int)]: n = " << n << " returns:" << fib << std::endl;
 		return fib;
 	}
 }
@@ -239,27 +239,19 @@ int amo::Number::fibonacci(int n) {
  * base case of recursion could be set any n with known return and prev
  * O(n)
  */
-int amo::Number::fibonacci(int n, int& prev) {
-	/*
-	if (n == 1) {
-		std::cout << "[Number::fibonacci(int)]: base case of recursion n == 1 returns:" << 1 << " and prev = 0" << std::endl;
-		prev = 0;
-		return 1;
-    } 
-	if (n == 2) {
-		std::cout << "[Number::fibonacci(int)]: base case of recursion n == 2 returns:" << 1 << " and prev = 1" << std::endl;
-		prev = 1;
-		return 1;
-    }
-	*/
+int amo::Number::fibonacci(int n, int& pp) {
 	if (n == 3) {
-		std::cout << "[Number::fibonacci(int)]: base case of recursion n == 3 returns:" << 2 << " and prev = 1" << std::endl;
-		prev = 1;
-		return 2;
+		int prevprev = 1;
+		int prev = 1;
+		pp = prev;
+		std::cout << "[fibonacci(int)]: Base case of recursion (n == 3) returns:" << (prev + prevprev) << " and pp:" << pp << std::endl;
+		return prev + prevprev;prev + prevprev;
     } else {
 		int prevprev;
+		int prev;
 		prev = fibonacci(n-1, prevprev);
-		std::cout << "[Number::fibonacci(int)]: n:" << n << " returns:" << prev + prevprev << std::endl;
+		pp = prev;
+		std::cout << "[fibonacci(int)]: n:" << n << " returns:" << (prev + prevprev) << " and pp:" << pp << std::endl;
 		return prev + prevprev;
 	}
 }
@@ -317,27 +309,27 @@ std::vector<char> amo::Number::rePolish(std::vector<char>& infix) {
 	amo::Stack<char> stack;
 	for (std::vector<char>::iterator it=infix.begin(); it!=infix.end(); it++) {
 		char c = *it;
-		std::cout << "[Number::rePolish()]: for-loop, c:" << c << std::endl;
+		std::cout << "[rePolish()]: for-loop, c:" << c << std::endl;
 		if (isdigit(c)) {
-			std::cout << "[Number::rePolish()]: met a digit and pushes postfix char:" << c << std::endl;
+			std::cout << "[rePolish()]: met a digit and pushes postfix char:" << c << std::endl;
 			postfix.push_back(c);
 		} else {
 			if (c == '(') {
-				std::cout << "[Number::rePolish()]: met a '(' and pushes stack char:" << c << std::endl;
+				std::cout << "[rePolish()]: met a '(' and pushes stack char:" << c << std::endl;
 				stack.push(c);
 			} 
 			else if (isCal(c)) {
 				if (stack.empty()) {
-					std::cout << "[Number::rePolish()]: met a cal, stack is empty and pushes stack char:" << c << std::endl;
+					std::cout << "[rePolish()]: met a cal, stack is empty and pushes stack char:" << c << std::endl;
 					stack.push(c);
 				} else if (stack.top() == '(') {
-					std::cout << "[Number::rePolish()]: met a cal, stack top is '(' and pushes stack char:" << c << std::endl;
+					std::cout << "[rePolish()]: met a cal, stack top is '(' and pushes stack char:" << c << std::endl;
 					stack.push(c);
 				} else if (stack.top() != '(' && isPrior(c, stack.top())) {
-					std::cout << "[Number::rePolish()]: met a cal, stack top is char:" << stack.top() << " which is lower prior and pushes stack char:" << c << std::endl;
+					std::cout << "[rePolish()]: met a cal, stack top is char:" << stack.top() << " which is lower prior and pushes stack char:" << c << std::endl;
 					stack.push(c);
 				} else if (!isPrior(c, stack.top())) {
-					std::cout << "[Number::rePolish()]: met a cal, pops stack top:" << stack.top() 
+					std::cout << "[rePolish()]: met a cal, pops stack top:" << stack.top() 
 							  << " which is higher prior and pushes postfix char:" << stack.top()
 							  << " then pushes stack char:" << c 
 							  << std::endl;
@@ -347,18 +339,18 @@ std::vector<char> amo::Number::rePolish(std::vector<char>& infix) {
 			}
 			else if (c == ')') {
 				while (stack.top()!='(') {
-					std::cout << "[Number::rePolish()]: met a ')', pops stack top:" << stack.top() 
+					std::cout << "[rePolish()]: met a ')', pops stack top:" << stack.top() 
 							  << " and pushes postfix char:" << stack.top()
 							  << std::endl;
 					postfix.push_back(stack.pop());
 				}
 				stack.pop(); //pops '(' out from stack 
 			}
-			else std::cout << "[Number::rePolish()]: not a calculator or digit:" << c << std::endl;
+			else std::cout << "[rePolish()]: not a calculator or digit:" << c << std::endl;
 		}	
 	}
 	while(!stack.empty()) {
-		std::cout << "[Number::rePolish()]: eventually pushes postfix and pops stack top:" << stack.top() << std::endl;
+		std::cout << "[rePolish()]: eventually pushes postfix and pops stack top:" << stack.top() << std::endl;
 		postfix.push_back(stack.pop());
 	}
 	return postfix;
@@ -366,7 +358,7 @@ std::vector<char> amo::Number::rePolish(std::vector<char>& infix) {
 
 int amo::Number::calculate(int arg, char op) {
 	//int arg = atoi(&d);
-	std::cout << "[Number::calculate()]: returns " << op << "" << arg << std::endl;
+	std::cout << "[calculate()]: returns " << op << "" << arg << std::endl;
 	if (op=='!') return factory(arg);
 	else return -1;
 }
@@ -374,7 +366,7 @@ int amo::Number::calculate(int arg, char op) {
 int amo::Number::calculate(int arg1, int arg2, char op) {
 	//int arg1 = atoi(&d1);
 	//int arg2 = atoi(&d2);
-	std::cout << "[Number::calculate()]: returns " << arg1 << " " << op << " " << arg2 << std::endl;
+	std::cout << "[calculate()]: returns " << arg1 << " " << op << " " << arg2 << std::endl;
 	if (op=='+')      return arg1 + arg2;
 	else if (op=='-') return arg1 - arg2;
 	else if (op=='*') return arg1 * arg2;
@@ -387,7 +379,7 @@ int amo::Number::evaluate(char* rpn) {
 	amo::Stack<int> stack;
 	char c;
 	while ((c=*rpn++) != '\0') {
-		std::cout << "[Number::evaluate()]: while-loop, c:" << c << std::endl;
+		std::cout << "[evaluate()]: while-loop, c:" << c << std::endl;
 		if (isdigit(c)) stack.push(atoi(&c));
 		else {
 			if (c == '!')
@@ -395,7 +387,7 @@ int amo::Number::evaluate(char* rpn) {
 			else
 				stack.push(calculate(stack.pop(), stack.pop(), c));		
 		}
-		std::cout << CYAN << "[Number::evaluate()]: operated " << c << ", and top:" << stack.top() << WHITE << std::endl;
+		std::cout << CYAN << "[evaluate()]: operated " << c << ", and top:" << stack.top() << WHITE << std::endl;
 	}
 	return stack.pop();
 }

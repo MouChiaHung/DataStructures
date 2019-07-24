@@ -2245,11 +2245,11 @@ int main(int argc, char *argv[])
 	std::cout << GREEN << "****************** fibonacci ******************\n" << WHITE << std::endl;
 	
 	cout << GREEN << "going to (amo::Number::getInstance()).fibonacci(5)" << WHITE << endl;
-	int n = 7;
+	int n = 11;
 	int dummy = 0;
-	int fib = (amo::Number::getInstance()).fibonacci(n);
-	//int fib = (amo::Number::getInstance()).fibonacci(n, dummy);
-	cout << YELLOW << "n = " << n <<" fibonacci:" << fib << WHITE << endl;
+	//int fib = (amo::Number::getInstance()).fibonacci(n);
+	int fib = (amo::Number::getInstance()).fibonacci(n, dummy);
+	cout << YELLOW << "n:" << n <<" and fibonacci:" << fib << WHITE << endl;
 	
 	std::cout << GREEN << "\n****************** main return ******************" << WHITE << std::endl;
 	return 0;
@@ -2974,7 +2974,7 @@ int main(int argc, char *argv[])
 #endif
 #endif
 
-#if 1
+#if 0
 	std::cout << GREEN << "****************** binary search tree ******************\n" << WHITE << std::endl;
 	amo::BST<int> bst;
 	bst.insert(36);
@@ -2997,9 +2997,38 @@ int main(int argc, char *argv[])
 	bst.remove(46);
 	//bst.remove(64);
 
-
 	cout << bst << endl;
 	bst.traverseIn();	
+#endif
+
+#if 1
+	std::cout << GREEN << "****************** AVL tree ******************\n" << WHITE << std::endl;
+	amo::AVL<int> avl;
+	avl.insert(36);
+	avl.insert(27);
+	//avl.insert(6);
+	//avl.insert(58);
+	//avl.insert(53);
+	//avl.insert(69);
+	//avl.insert(40);
+	//avl.insert(46);
+	//avl.insert(64);
+	/*
+	avl.remove(36);
+	avl.remove(27);
+	avl.remove(6);
+	avl.remove(58);
+	avl.remove(53);
+	avl.remove(69);
+	avl.remove(40);
+	avl.remove(46);
+	bst.remove(64);
+	*/
+	int e = 36;
+	int bal_fac = avl.balanceFactor(avl.search(e));
+	cout << MAGENTA << "balance factor of element:" << e << " is " << bal_fac <<  WHITE << endl;
+	cout << avl << endl;
+	avl.traverseIn();	
 #endif
 
 	std::cout << GREEN << "\n****************** main return ******************" << WHITE << std::endl;

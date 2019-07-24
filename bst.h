@@ -36,6 +36,9 @@ public:
 	bool remove(T const& e);
 	BinNode<T>* removeAt(BinNode<T>* node, BinNode<T>*& hot);
 	BinNode<T>* succ(BinNode<T>* node);
+	int stature(BinNode<T>* node) { //leaf:0, null:-1
+		return (node != NULL) ? node->height : -1;
+	}
 
 friend std::ostream& operator<<(std::ostream& os, const BST<T>& bst) {
 	os << YELLOW << "------ BST MEMBER ------" << endl;
@@ -48,6 +51,29 @@ friend std::ostream& operator<<(std::ostream& os, const BST<T>& bst) {
 	os << "------ BST MEMBER ------" << WHITE;
 	return os;
 }
+};
+
+template<typename T>
+class AVL : public BST<T> {
+public:
+	//BinNode<T>* insert(T const& e);
+	//bool remove(T const& e);
+	bool balance(BinNode<T>* node) {
+		if (node == NULL) return false;
+		return (this->stature(node->lchild) == this->stature(node->rchild)); 
+	};
+	bool balanceAVL(BinNode<T>* node) {
+		if (node == NULL) return false;
+		return  (this->stature(node->lchild) - this->stature(node->rchild)) < 2
+				&& (this->stature(node->lchild) - this->stature(node->rchild)) > -2; 
+	};
+	int balanceFactor(BinNode<T>* node) {
+		if (node == NULL) {
+			std::cout << RED << __func__ << ":Exception case balance factor of null" << WHITE << std::endl;
+			return -(std::numeric_limits<int>::max());
+		}
+		return (this->stature(node->lchild) - this->stature(node->rchild));
+	}
 };
 
 template<typename T>
@@ -67,7 +93,7 @@ BinNode<T>* BST<T>::searchIn(BinNode<T>* v, T const& e, BinNode<T>*& hot) {
 
 template<typename T>
 BinNode<T>* BST<T>::search(T const& e) {
-	return searchIn(this->root(), e, (this->_hot)=NULL);
+	return (this->empty()) ? NULL : searchIn(this->root(), e, (this->_hot)=NULL);
 }
 
 template<typename T>
