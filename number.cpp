@@ -240,12 +240,32 @@ int amo::Number::fibonacci(int n) {
  * O(n)
  */
 int amo::Number::fibonacci(int n, int& pp) {
-	if (n == 3) {
+	if (n < 0) {
+		int prevprev = 0;
+		int prev = 0;
+		pp = prev;
+		return 0;
+	}
+	else if (n == 1) {
+		int prevprev = 0;
+		int prev = 0;
+		pp = prev;
+		std::cout << "[fibonacci(int)]: Base case of recursion (n == 1) returns:" << (prev + prevprev) << " and pp:" << pp << std::endl;
+		return 1;
+    } 
+	else if (n == 2) {
+		int prevprev = 0;
+		int prev = 1;
+		pp = prev;
+		std::cout << "[fibonacci(int)]: Base case of recursion (n == 2) returns:" << (prev + prevprev) << " and pp:" << pp << std::endl;
+		return 1;
+    }
+	else if (n == 3) {
 		int prevprev = 1;
 		int prev = 1;
 		pp = prev;
 		std::cout << "[fibonacci(int)]: Base case of recursion (n == 3) returns:" << (prev + prevprev) << " and pp:" << pp << std::endl;
-		return prev + prevprev;prev + prevprev;
+		return prev + prevprev;
     } else {
 		int prevprev;
 		int prev;
