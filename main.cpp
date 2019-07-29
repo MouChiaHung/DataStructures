@@ -3005,14 +3005,24 @@ int main(int argc, char *argv[])
 	std::cout << GREEN << "****************** AVL tree ******************\n" << WHITE << std::endl;
 	amo::AVL<int> avl;
 	avl.insert(36);
+	std::cout << std::endl;
 	avl.insert(27);
-	//avl.insert(6);
-	//avl.insert(58);
-	//avl.insert(53);
-	//avl.insert(69);
-	//avl.insert(40);
+	std::cout << std::endl;
+	avl.insert(58);
+	std::cout << std::endl;
+	avl.insert(53);
+	std::cout << std::endl;
+	avl.insert(69);
+	std::cout << std::endl;
+	avl.insert(40); //RL
+	std::cout << std::endl;
 	//avl.insert(46);
-	//avl.insert(64);
+	//std::cout << std::endl;
+	avl.insert(64);
+	std::cout << std::endl;
+	//avl.insert(66); //err
+	//std::cout << std::endl;
+
 	/*
 	avl.remove(36);
 	avl.remove(27);
@@ -3022,13 +3032,24 @@ int main(int argc, char *argv[])
 	avl.remove(69);
 	avl.remove(40);
 	avl.remove(46);
-	bst.remove(64);
+	avl.remove(64);
 	*/
+	
+	/*
 	int e = 36;
-	int bal_fac = avl.balanceFactor(avl.search(e));
-	cout << MAGENTA << "balance factor of element:" << e << " is " << bal_fac <<  WHITE << endl;
-	cout << avl << endl;
-	avl.traverseIn();	
+	BinNode<int>* node = avl.search(e);
+	int bal_fac = avl.balanceFactor(node);
+	BinNode<int>* taller = BST<int>::tallerChild(node);
+	cout << YELLOW << "Stature of element:" << e << " is " << amo::BST<int>::stature(node) <<  WHITE << endl;
+	cout << YELLOW << "Balance factor of element:" << e << " is " << bal_fac <<  WHITE << endl;
+	cout << YELLOW << "Taller child of element:" << e << " is " << taller->data <<  WHITE << endl;
+	*/
+	
+	std::cout << avl << std::endl;
+	//avl.traversePre();	
+	//avl.traverseIn();	
+	//avl.traversePost();	
+	avl.traverseLevel();	
 #endif
 
 	std::cout << GREEN << "\n****************** main return ******************" << WHITE << std::endl;

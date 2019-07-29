@@ -157,7 +157,7 @@ void amo::BinNode<T>::traverse() {
 		functor(*this);
 		if (hasLeftChild()) lchild->traverse();
 		if (hasRightChild()) rchild->traverse();
-		if (isRoot()) std::cout << CYAN << "\n[pre-order traverse]--- TREE BOTTOM ------" << WHITE << std::endl;
+		if (isRoot()) std::cout << CYAN << "[pre-order traverse]--- TREE BOTTOM ------" << WHITE << std::endl;
 		return;
 	}
 }
@@ -174,7 +174,7 @@ void amo::BinNode<T>::traverse(FUNCTOR_TRAVERSER& functor) {
 		functor(*this);
 		if (hasLeftChild()) lchild->traverse();
 		if (hasRightChild()) rchild->traverse();
-		if (isRoot()) std::cout << GREEN << "\n[pre-order traverse]--- TREE BOTTOM ------" << WHITE << std::endl;
+		if (isRoot()) std::cout << GREEN << "[pre-order traverse]--- TREE BOTTOM ------" << WHITE << std::endl;
 		return;
 	}
 }
@@ -193,7 +193,7 @@ void amo::BinNode<T>::traversePre() {
 		functor(*this);
 		if (hasLeftChild()) lchild->traversePre();
 		if (hasRightChild()) rchild->traversePre();
-		if (isRoot()) std::cout << GREEN << "\n[pre-order traverse]--- TREE BOTTOM ------" << WHITE << std::endl;
+		if (isRoot()) std::cout << GREEN << "[pre-order traverse]--- TREE BOTTOM ------" << WHITE << std::endl;
 		return;
 	}
 }
@@ -214,7 +214,7 @@ void amo::BinNode<T>::traversePreLoop() {
 		if (node->hasRightChild()) stack.push(node->rchild);
 		if (node->hasLeftChild()) stack.push(node->lchild);
 	}
-	std::cout << GREEN << "\n[pre-order traverse loop version 1]--- TREE BOTTOM ------" << WHITE << std::endl;
+	std::cout << GREEN << "[pre-order traverse loop version 1]--- TREE BOTTOM ------" << WHITE << std::endl;
 }
 
 template<typename T>
@@ -241,7 +241,7 @@ void amo::BinNode<T>::traversePreLoop2() {
 		node = stack.top();
 		stack.pop();
 	}
-	std::cout << GREEN << "\n[pre-order traverse loop version 2]--- TREE BOTTOM ------" << WHITE << std::endl;
+	std::cout << GREEN << "[pre-order traverse loop version 2]--- TREE BOTTOM ------" << WHITE << std::endl;
 }
 
 template<typename T>
@@ -258,7 +258,7 @@ void amo::BinNode<T>::traverseIn() {
 		std::cout << GREEN << "vertex" << WHITE << std::endl;
 		functor(*this);
 		if (hasRightChild()) rchild->traverseIn();
-		if (isRoot()) std::cout << GREEN << "\n[in-order traverse]--- TREE BOTTOM ------" << WHITE << std::endl;
+		if (isRoot()) std::cout << GREEN << "[in-order traverse]--- TREE BOTTOM ------" << WHITE << std::endl;
 		return;
 	}
 }
@@ -292,7 +292,7 @@ void amo::BinNode<T>::traverseInLoop() {
 			node = node->rchild;
 		}
 	}
-	std::cout << GREEN << "\n[in-order traverse loop version 1]--- TREE BOTTOM ------" << WHITE << std::endl;
+	std::cout << GREEN << "[in-order traverse loop version 1]--- TREE BOTTOM ------" << WHITE << std::endl;
 }
 
 template<typename T>
@@ -316,7 +316,7 @@ void amo::BinNode<T>::traverseInLoop2() {
 			node = node->rchild;
 		}
 	}
-	std::cout << GREEN << "\n[in-order traverse loop version 2]--- TREE BOTTOM ------" << WHITE << std::endl;
+	std::cout << GREEN << "[in-order traverse loop version 2]--- TREE BOTTOM ------" << WHITE << std::endl;
 }
 
 template<typename T>
@@ -350,7 +350,7 @@ void amo::BinNode<T>::traverseInLoop3() {
 		node = node->succ();
 		if (node == NULL) break;
 	}
-	std::cout << CYAN << "\n[in-order traverse loop version 3]--- TREE BOTTOM ------" << WHITE << std::endl;
+	std::cout << CYAN << "[in-order traverse loop version 3]--- TREE BOTTOM ------" << WHITE << std::endl;
 } 
 
 template<typename T>
@@ -367,7 +367,7 @@ void amo::BinNode<T>::traversePost() {
 		if (hasRightChild()) rchild->traversePost();
 		std::cout << GREEN << "vertex" << WHITE << std::endl;
 		functor(*this);
-		if (isRoot()) std::cout << GREEN << "\n[post-order traverse]--- TREE BOTTOM ------" << WHITE << std::endl;
+		if (isRoot()) std::cout << GREEN << "[post-order traverse]--- TREE BOTTOM ------" << WHITE << std::endl;
 		return;
 	}
 }
@@ -407,7 +407,7 @@ void amo::BinNode<T>::traversePostLoop() {
 		else std::cout << CYAN << "vertex" << WHITE << std::endl;
 		functor(*popped);
 	}	
-	if (isRoot()) std::cout << CYAN << "\n[post-order traverse loop version]--- TREE BOTTOM ------" << WHITE << std::endl;	
+	if (isRoot()) std::cout << CYAN << "[post-order traverse loop version]--- TREE BOTTOM ------" << WHITE << std::endl;	
 }
 
 template<typename T>
@@ -416,16 +416,18 @@ void amo::BinNode<T>::traverseLevel() {
 	std::queue<BinNode<T>*> queue;
 	BinNode<T>* node = this;
 	queue.push(node);
-	if (isRoot()) std::cout << GREEN << "[level traverse]--- TREE TOP ------" << WHITE << std::endl;
+	if (isRoot()) std::cout << GREEN << "\n[level traverse]--- TREE TOP ------" << WHITE << std::endl;
 	while (true) {
 		if (queue.empty()) break;
 		node = queue.front();
 		queue.pop();
+		if (node->isLeaf()) std::cout << GREEN << "leaf (h:" << node->height << ")" << WHITE << std::endl;
+		else std::cout << GREEN << "vertex (h:" << node->height << ")" << WHITE << std::endl;
 		functor(*node);
 		if (node->hasLeftChild()) queue.push(node->lchild);
 		if (node->hasRightChild()) queue.push(node->rchild);
 	}
-	if (isRoot()) std::cout << GREEN << "\n[level traverse]--- TREE BOTTOM ------" << WHITE << std::endl;
+	if (isRoot()) std::cout << GREEN << "[level traverse]--- TREE BOTTOM ------" << WHITE << std::endl;
 }
 
 template<typename T>
