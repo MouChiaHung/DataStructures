@@ -248,23 +248,39 @@ BinNode<T>* amo::AVL<T>::connect34(BinNode<T>* a, BinNode<T>* b, BinNode<T>* c, 
 	//print
 	std::string str;
 	char abc[32];
-	char tmp[8];
+	char tmp[16];
 	sprintf(abc, "a:%d, b:%d, c:%d", a->data, b->data, c->data);
 	str.append(abc);
 	if (T0) {
 		sprintf(tmp, ", T0:%d", T0->data);
 		str.append(tmp);
 	}
+	else {
+		sprintf(tmp, ", T0:NULL");
+		str.append(tmp);
+	}
 	if (T1) {
 		sprintf(tmp, ", T1:%d", T1->data);
+		str.append(tmp);
+	}
+	else {
+		sprintf(tmp, ", T1:NULL");
 		str.append(tmp);
 	}
 	if (T2) {
 		sprintf(tmp, ", T2:%d", T2->data);
 		str.append(tmp);
 	}
+	else {
+		sprintf(tmp, ", T2:NULL");
+		str.append(tmp);
+	}
 	if (T3) {
 		sprintf(tmp, ", T3:%d", T3->data);
+		str.append(tmp);
+	}
+	else {
+		sprintf(tmp, ", T3:NULL");
 		str.append(tmp);
 	}
 	std::cout << YELLOW << str << std::endl;
@@ -282,7 +298,9 @@ BinNode<T>* amo::AVL<T>::connect34(BinNode<T>* a, BinNode<T>* b, BinNode<T>* c, 
 	c->parent = b;
 	b->lchild = a;
 	b->rchild = c;
-	this->updateHeight(b);
+	this->updateHeight(a);
+	this->updateHeight(c);
+	this->updateHeight(b); //should be last to update its height
 	return b;
 }
 
@@ -352,33 +370,35 @@ BinNode<T>* AVL<T>::insert(T const& e) {
 		return NULL;
 	}
 	//checks if need to AVL balance
-	std::cout << YELLOW << "going to checks if need to AVL balance" << WHITE << std::endl;
+	std::cout << CYAN << "Check if AVL balance at insert:" << x->data << " (parent:" << x->parent->data << ")" << WHITE << std::endl;
 	sentry = x;
 	while (sentry) {
-		std::cout << YELLOW << "sentry:" << sentry->data << std::endl;
-		if (sentry->parent) 
-			std::cout << YELLOW << "parent:" << sentry->parent->data << WHITE << endl;
-		
 		if (!(this->balanceAVL(sentry))) { //met the deepest unbalanced g
 			if (sentry->parent == NULL) { //g is root
-				std::cout << YELLOW << "met the g:" << sentry->data << ", parent of g: NULL" << WHITE << endl;
-				this->_root = this->rotateGPV(BST<T>::tallerChild(BST<T>::tallerChild(sentry)));
+				std::cout << CYAN << "AVL rotate at ROOT g:" << sentry->data << WHITE << endl;
+				BinNode<T>* b = this->rotateGPV(BST<T>::tallerChild(BST<T>::tallerChild(sentry)));		
+				b->parent = NULL;
+				this->_root = b;
 			}
 			else { //g is node
-				std::cout << YELLOW << "met the g:" << sentry->data << ", parent of g:" << sentry->parent->data << WHITE << endl;
-				sentry->parentLink() = this->rotateGPV(BST<T>::tallerChild(BST<T>::tallerChild(sentry)));
+				std::cout << CYAN << "AVL rotate at VERTEX g:" << sentry->data << WHITE << endl;
+				BinNode<T>*& hot_link = sentry->parentLink();
+				BinNode<T>* hot = sentry->parent;
+				BinNode<T>* b = this->rotateGPV(BST<T>::tallerChild(BST<T>::tallerChild(sentry)));
+				hot_link = b;
+				b->parent = hot;
 			}
-			std::cout << YELLOW << "------ AVL tree top ------" << WHITE << std::endl;
-			this->traverseLevel();
-			std::cout << YELLOW << "------ AVL tree bottom ------" << WHITE << std::endl;
 			break;
 		}
-		else { 
+		else {
 			this->updateHeight(sentry);
+			std::cout << YELLOW << "updated of sentry:" << sentry->data << " to be " << sentry->height << std::endl;
 		}
 		sentry = sentry->parent;
 	}
-	std::cout << CYAN << "AVL inserted:" << x->data << WHITE << std::endl;
+	std::cout << YELLOW << "------ AVL tree top ------";
+	this->traverseLevel();
+	std::cout << YELLOW << "------ AVL tree bottom ------" << WHITE << std::endl;
 	return x;
 }
 

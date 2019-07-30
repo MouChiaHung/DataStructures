@@ -421,8 +421,18 @@ void amo::BinNode<T>::traverseLevel() {
 		if (queue.empty()) break;
 		node = queue.front();
 		queue.pop();
-		if (node->isLeaf()) std::cout << GREEN << "leaf (h:" << node->height << ")" << WHITE << std::endl;
-		else std::cout << GREEN << "vertex (h:" << node->height << ")" << WHITE << std::endl;
+		if (node->isLeaf()) {
+			if (node->parent) 
+				std::cout << GREEN << "leaf (h:" << node->height << ") (parent:" << node->parent->data << ")" << WHITE << std::endl;
+			else
+				std::cout << GREEN << "leaf (h:" << node->height << ") (parent: NULL)" << WHITE << std::endl;
+		}
+		else {
+			if (node->parent) 
+				std::cout << GREEN << "vertex (h:" << node->height << ") (parent:" << node->parent->data << ")" << WHITE << std::endl;
+			else
+				std::cout << GREEN << "vertex (h:" << node->height << ") (parent: NULL)" << WHITE << std::endl;
+		}
 		functor(*node);
 		if (node->hasLeftChild()) queue.push(node->lchild);
 		if (node->hasRightChild()) queue.push(node->rchild);

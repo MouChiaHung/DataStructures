@@ -3004,25 +3004,56 @@ int main(int argc, char *argv[])
 #if 1
 	std::cout << GREEN << "****************** AVL tree ******************\n" << WHITE << std::endl;
 	amo::AVL<int> avl;
+	
+	/*
 	avl.insert(36);
 	std::cout << std::endl;
 	avl.insert(27);
 	std::cout << std::endl;
 	avl.insert(58);
 	std::cout << std::endl;
+	
 	avl.insert(53);
 	std::cout << std::endl;
+	
 	avl.insert(69);
 	std::cout << std::endl;
-	avl.insert(40); //RL
+	
+	avl.insert(40);
 	std::cout << std::endl;
-	//avl.insert(46);
-	//std::cout << std::endl;
+	
+	avl.insert(46);
+	std::cout << std::endl;
+	
 	avl.insert(64);
 	std::cout << std::endl;
-	//avl.insert(66); //err
-	//std::cout << std::endl;
-
+	
+	avl.insert(66); //err
+	std::cout << std::endl;
+	*/
+	int i = 100;
+	while (0<i--) avl.insert(i);
+	amo::BinNode<int>* r = avl.root();
+	amo::BinNode<int>* node = r;
+	std::stack<amo::BinNode<int>*> stack;
+	while (true) {
+		if (node) {
+			stack.push(node);
+			node = node->lchild;
+		}
+		else {
+			if (stack.empty()) break;
+			node = stack.top();
+			stack.pop();
+			if (!(avl.balanceAVL(node))) {
+				std::cout << RED << node->data << " is not balanced:" << avl.balanceFactor(node) << std::endl;
+			}
+			else {
+				std::cout << GREEN << node->data << " is balanced" << std::endl;
+			}
+			node = node->rchild;
+		}
+	}
 	/*
 	avl.remove(36);
 	avl.remove(27);
