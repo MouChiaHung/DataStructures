@@ -223,31 +223,31 @@ BinTree<T>* amo::BinTree<T>::secede(BinNode<T>* node) {
 template<typename T>
 void amo::BinTree<T>::traverse() {
 	if (!empty()) _root->traverse();
-	else std::cout << GREEN << "no element to traverse" << WHITE << std::endl;
+	else std::cout << GREEN << "\nno element to traverse" << WHITE << std::endl;
 }
 
 template<typename T>
 void amo::BinTree<T>::traversePre() {
 	if (!empty()) _root->traversePre();
-	else std::cout << GREEN << "no element to traverse" << WHITE << std::endl;
+	else std::cout << GREEN << "\nno element to traverse" << WHITE << std::endl;
 }
 
 template<typename T>
 void amo::BinTree<T>::traverseIn() {
 	if (!empty()) _root->traverseIn();
-	else std::cout << GREEN << "no element to traverse" << WHITE << std::endl;
+	else std::cout << GREEN << "\nno element to traverse" << WHITE << std::endl;
 }
 
 template<typename T>
 void amo::BinTree<T>::traversePost() {
 	if (!empty()) _root->traversePost();
-	else std::cout << GREEN << "no element to traverse" << WHITE << std::endl;
+	else std::cout << GREEN << "\nno element to traverse" << WHITE << std::endl;
 }
 
 template<typename T>
 void amo::BinTree<T>::traverseLevel() {
 	if (!empty()) _root->traverseLevel();
-	else std::cout << GREEN << "no element to traverse" << WHITE << std::endl;
+	else std::cout << GREEN << "\nno element to traverse" << WHITE << std::endl;
 }
 };
 #endif

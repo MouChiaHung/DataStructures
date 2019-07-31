@@ -3031,8 +3031,9 @@ int main(int argc, char *argv[])
 	avl.insert(66); //err
 	std::cout << std::endl;
 	*/
-	int i = 100;
+	int i = 5;
 	while (0<i--) avl.insert(i);
+	std::cout << avl << std::endl;
 	amo::BinNode<int>* r = avl.root();
 	amo::BinNode<int>* node = r;
 	std::stack<amo::BinNode<int>*> stack;
@@ -3049,23 +3050,40 @@ int main(int argc, char *argv[])
 				std::cout << RED << node->data << " is not balanced:" << avl.balanceFactor(node) << std::endl;
 			}
 			else {
-				std::cout << GREEN << node->data << " is balanced" << std::endl;
+				std::cout << WHITE << node->data << " is balanced" << std::endl;
 			}
 			node = node->rchild;
 		}
 	}
-	/*
-	avl.remove(36);
-	avl.remove(27);
-	avl.remove(6);
-	avl.remove(58);
-	avl.remove(53);
-	avl.remove(69);
-	avl.remove(40);
-	avl.remove(46);
-	avl.remove(64);
-	*/
 	
+#if 1
+	i = 5;
+	while (!stack.empty()) stack.pop();
+	while (0<i--) {
+		std::cout << WHITE <<"----------REMOVE " << i << " START ----------------------" << std::endl;
+		avl.remove(i);
+		if (avl.empty()) {
+			std::cout << WHITE <<"----------REMOVE " << i << " END   ----------------------" << std::endl;
+			break;
+		}
+		r = avl.root();
+		stack.push(r);
+		while (true) {
+			if (stack.empty()) break;
+			node = stack.top();
+			stack.pop();
+			if (!(avl.balanceAVL(node))) {
+				std::cout << RED << node->data << " is not balanced:" << avl.balanceFactor(node) << std::endl;
+			}
+			else {
+				std::cout << node->data << " is balanced" << std::endl;
+			}
+			if (node->hasRightChild()) stack.push(node->rchild);
+			if (node->hasLeftChild()) stack.push(node->lchild);
+		}
+		std::cout << WHITE <<"----------REMOVE " << i << " END   ----------------------" << std::endl;
+	}
+#endif	
 	/*
 	int e = 36;
 	BinNode<int>* node = avl.search(e);

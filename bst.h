@@ -90,6 +90,7 @@ public:
 	BinNode<T>* connect34(BinNode<T>* a, BinNode<T>* b, BinNode<T>* c, BinNode<T>* T0, BinNode<T>* T1, BinNode<T>* T2, BinNode<T>* T3);
 	BinNode<T>* rotateGPV(BinNode<T>* v);
 	BinNode<T>* insert(T const& e);
+	bool remove(T const& e);
 };
 
 template<typename T>
@@ -180,17 +181,17 @@ BinNode<T>* BST<T>::removeAt(BinNode<T>* node, BinNode<T>*& hot) {
 	}
 	BinNode<T>* replace = NULL;
 	
-	//replaces for single sub->tree or swaps and replaces for dual sub->tree
-	if (node->hasLeftChild() && !node->hasRightChild()) { //node has single left sub->tree
+	//replaces for single sub-tree or swaps and replaces for dual sub-tree
+	if (node->hasLeftChild() && !node->hasRightChild()) { //node has single left sub-tree
 		replace = node->lchild;
 	}
-	else if (!node->hasLeftChild() && node->hasRightChild()) { //node has single right sub->tree
+	else if (!node->hasLeftChild() && node->hasRightChild()) { //node has single right sub-tree
 		replace = node->rchild;
 		
 	}
-	else if (node->hasLeftChild() && node->hasRightChild()) { //node has dual sub->tree
-		//BinNode<T>* succ = node->succ(); //succ is the most left of the right sub->tree of node
-		BinNode<T>* succ = this->succ(node); //succ is the most left of the right sub->tree of node
+	else if (node->hasLeftChild() && node->hasRightChild()) { //node has dual sub-tree
+		//BinNode<T>* succ = node->succ(); //succ is the most left of the right sub-tree of node
+		BinNode<T>* succ = this->succ(node); //succ is the most left of the right sub-tree of node
 		if (succ == NULL) {
 			std::cout << RED << __func__ << ":Exception case null succ" << WHITE << std::endl;
 			hot = NULL;
@@ -369,6 +370,8 @@ BinNode<T>* AVL<T>::insert(T const& e) {
 		std::cout << RED << __func__ << ":Exception case unknown AVL inserting" << WHITE << std::endl;
 		return NULL;
 	}
+	this->_size++;
+	
 	//checks if need to AVL balance
 	std::cout << CYAN << "Check if AVL balance at insert:" << x->data << " (parent:" << x->parent->data << ")" << WHITE << std::endl;
 	sentry = x;
@@ -396,13 +399,67 @@ BinNode<T>* AVL<T>::insert(T const& e) {
 		}
 		sentry = sentry->parent;
 	}
+	
 	std::cout << YELLOW << "------ AVL tree top ------";
 	this->traverseLevel();
 	std::cout << YELLOW << "------ AVL tree bottom ------" << WHITE << std::endl;
 	return x;
 }
 
-
+template<typename T>
+bool AVL<T>::remove(T const& e) {
+	//removes a new node
+	BinNode<T>* sentry = NULL;
+	if ((sentry = this->search(e)) == NULL) {
+		std::cout << CYAN << "no equivalent:" << e << WHITE << std::endl;
+		return false;
+	}
+	BinNode<int>* replace = this->removeAt(sentry, this->_hot);
+	if (replace != NULL) 
+		cout << CYAN << "removed:" << e << " and replaced:" << *replace << WHITE;
+	else 
+		cout << CYAN << "removed:" << e << " and replaced:NULL" << WHITE << std::endl;
+	this->_size--;
+	this->updateHeightAbove(this->_hot);
+	
+	//checks if need to AVL balance
+	if (this->_hot) 
+		std::cout << CYAN << "Check if AVL balance at hot:" << this->_hot->data << WHITE << std::endl;
+	else {
+		std::cout << YELLOW << "------ AVL tree top ------";
+		this->traverseLevel();
+		std::cout << YELLOW << "------ AVL tree bottom ------" << WHITE << std::endl;
+		return true;
+	}
+	sentry = this->_hot;
+	while (sentry) {
+		if (!(this->balanceAVL(sentry))) {
+			if (sentry->parent == NULL) { //removed root
+				std::cout << CYAN << "AVL rotate at ROOT g:" << sentry->data << WHITE << endl;
+				BinNode<T>* b = this->rotateGPV(BST<T>::tallerChild(BST<T>::tallerChild(sentry)));
+				this->_root = b;
+				b->parent = NULL;
+			}
+			else { //removed node
+				std::cout << CYAN << "AVL rotate at NODE g:" << sentry->data << WHITE << endl;
+				BinNode<T>*& hot_link = sentry->parentLink();
+				BinNode<T>* hot = sentry->parent;
+				BinNode<T>* b = this->rotateGPV(BST<T>::tallerChild(BST<T>::tallerChild(sentry)));
+				hot_link = b;
+				b->parent = hot;
+			}
+		}
+		else {
+			this->updateHeight(sentry);
+		}
+		sentry = sentry->parent;
+	}
+	
+	std::cout << YELLOW << "------ AVL tree top ------";
+	this->traverseLevel();
+	std::cout << YELLOW << "------ AVL tree bottom ------" << WHITE << std::endl;
+	return true;
+}
 
 
 
