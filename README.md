@@ -21,4 +21,6 @@ Practices includes:
  - stack
  - tree
  - graph
+ - bst
+ - avl
  - algorithm
