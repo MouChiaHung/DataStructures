@@ -47,6 +47,7 @@
 #include <graph.h>
 #include <entry.h>
 
+#include <dict.h>
 
 using namespace std;
 using namespace amo;
@@ -3001,7 +3002,7 @@ int main(int argc, char *argv[])
 	bst.traverseIn();	
 #endif
 
-#if 1
+#if 0
 	std::cout << GREEN << "****************** AVL tree ******************\n" << WHITE << std::endl;
 	amo::AVL<int> avl;
 	
@@ -3101,6 +3102,10 @@ int main(int argc, char *argv[])
 	avl.traverseLevel();	
 #endif
 
+#if 1
+	std::cout << GREEN << "****************** Dictionary ******************\n" << WHITE << std::endl;
+
+#endif
 	std::cout << GREEN << "\n****************** main return ******************" << WHITE << std::endl;
 	return 0;
 }

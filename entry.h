@@ -31,7 +31,5 @@ public:
 	bool operator!=(Entry<K, V> const& e) {return key != e.key;}
 };
 
-
-
 };
 #endif
