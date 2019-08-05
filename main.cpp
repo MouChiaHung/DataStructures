@@ -48,6 +48,7 @@
 #include <entry.h>
 
 #include <dict.h>
+#include <entry.h>
 
 using namespace std;
 using namespace amo;
@@ -3104,6 +3105,9 @@ int main(int argc, char *argv[])
 
 #if 1
 	std::cout << GREEN << "****************** Dictionary ******************\n" << WHITE << std::endl;
+
+	//amo::QuadList<Entry<int, int>> dict;
+	amo::SkipList<int, int> dict;
 
 #endif
 	std::cout << GREEN << "\n****************** main return ******************" << WHITE << std::endl;
