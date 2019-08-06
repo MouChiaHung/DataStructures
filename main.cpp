@@ -3108,7 +3108,20 @@ int main(int argc, char *argv[])
 
 	//amo::QuadList<Entry<int, int>> dict;
 	amo::SkipList<int, int> dict;
-
+	//dict.get(0);
+	/*
+	amo::Entry<int, int> e1(0, 10);
+	amo::Entry<int, int> e2(1, 20);
+	amo::QuadListNode<Entry<int, int>> n1(e1);
+	n1.insertSuccAbove(e2, NULL);
+	std::cout << "n1:" << n1;
+	std::cout << "n2:" << *n1.succ;
+	std::cout << "n1:" << *((*n1.succ).pred);
+	*/
+	dict.put(0, 100);
+	dict.put(1, 200);
+	std::cout << dict << std::endl;
+	
 #endif
 	std::cout << GREEN << "\n****************** main return ******************" << WHITE << std::endl;
 	return 0;

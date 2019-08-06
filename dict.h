@@ -46,7 +46,12 @@ public:
 	QuadListNode<E>* above;
 	QuadListNode<E>* below;
 	QuadListNode(E e = E(), QuadListNode<E>* p = NULL, QuadListNode<E>* s = NULL, QuadListNode<E>* a = NULL, QuadListNode<E>* b = NULL) : entry(e), pred(p), succ(s), above(a), below(b) {}
-	QuadListNode<E>* insertSuccAbove(E const& e, QuadListNode<E>* b = NULL);
+	QuadListNode<E>* insertSuccAbove(E const& e, QuadListNode<E>* b);
+friend std::ostream& operator<<(std::ostream& os, const QuadListNode<E>& node) {
+	os << "[" << node.entry.key;
+	os << "/" << node.entry.val << "] ";
+	return os;
+}		
 };
 
 template<typename E>
@@ -76,7 +81,7 @@ public:
 		return _size <= 0;
 	}
 	QuadListNode<E>* first() {
-		if (head) return head->first;
+		if (head) return head->succ;
 		else return NULL;
 	}
 	QuadListNode<E>* last() {
@@ -87,10 +92,17 @@ public:
 		return (node && (node != head) && (node != tail));
 	}
 	E remove(QuadListNode<E>* node);
-	QuadListNode<E>* insertSuccAbove(E const& e, QuadListNode<E>* p, QuadListNode<E>* b);
+	QuadListNode<E>* insert(E const& e, QuadListNode<E>* p, QuadListNode<E>* b);
 	void traverse();
 	
-friend std::ostream& operator<<(std::ostream& os, const QuadList<E>& dict) {
+friend std::ostream& operator<<(std::ostream& os, QuadList<E>& dict) {
+	QuadListNode<E>* node = dict.first();
+	os << YELLOW << "------ QuadList ------" << std::endl;
+	while (node && dict.valid(node)) {
+		os << *node;
+		node = node->succ;
+	}
+	os << YELLOW << "\n------ QuadList ------" << std::endl;
 	return os;
 }	
 };
@@ -102,7 +114,7 @@ protected:
 public:	
 	int _size;
 	std::list<QuadList<Entry<K, V>>*> _list;
-	SkipList() : Dictionary<K, V>() {}
+	SkipList() : Dictionary<K, V>(), _size(0) {}
 	~SkipList() {}
 	int size();
 	bool put(K, V);
@@ -111,12 +123,26 @@ public:
 	bool empty() {
 		return _size <= 0;
 	}
-	V* skipSearch(K k);
+	bool skipSearch(typename std::list<QuadList<Entry<K, V>>*>::iterator& it, QuadListNode<Entry<K, V>>*& node, K k);
 
-friend std::ostream& operator<<(std::ostream& os, const SkipList<K, V>& dict) {
+friend std::ostream& operator<<(std::ostream& os, SkipList<K, V>& dict) {
+	for (typename std::list<QuadList<Entry<K, V>>*>::iterator it = dict._list.begin(); it != dict._list.end(); it++) {
+		os << **it;
+		os << std::endl;
+	}
+	
 	return os;
 }
 };
+
+template<typename E>
+QuadListNode<E>* amo::QuadListNode<E>::insertSuccAbove(E const& e, QuadListNode<E>* b) {
+	QuadListNode<E>* node = new QuadListNode<E>(e, this, this->succ, NULL, b);
+	if (this->succ) this->succ->pred = node;
+	this->succ = node;
+	if (b) b->above = node;
+	return node;
+}
 
 template<typename E>
 void amo::QuadList<E>::init() {
@@ -133,20 +159,33 @@ void amo::QuadList<E>::init() {
 	_size = 0;
 }
 
-template<typename K, typename V>
-V* amo::SkipList<K, V>::get(K k) {
-	return skipSearch(k);
+template<typename E>
+QuadListNode<E>* amo::QuadList<E>::insert(E const& e, QuadListNode<E>* p, QuadListNode<E>* b) {
+	_size++;
+	return p->insertSuccAbove(e, b);
 }
 
 template<typename K, typename V>
-V* amo::SkipList<K, V>::skipSearch(K k) {
+V* amo::SkipList<K, V>::get(K k) {
 	typename std::list<QuadList<Entry<K, V>>*>::iterator it = _list.begin();
-	QuadList<Entry<K, V>>* qlist = *it;
-	QuadListNode<Entry<K, V>>* node = qlist->first();
+	if (*it) {
+		QuadListNode<Entry<K, V>>* node = (*it)->first();
+		return skipSearch(it, node, k) ? &(node->entry.val) : NULL;		
+	}
+	else {
+		std::cout << "list is empty" << std::endl;
+		return NULL;
+	}
+}
+
+template<typename K, typename V>
+bool amo::SkipList<K, V>::skipSearch(typename std::list<QuadList<Entry<K, V>>*>::iterator& it, QuadListNode<Entry<K, V>>*& node, K k) {
+	QuadList<Entry<K, V>>* qlist = NULL;
+	std::cout << "[" << __func__ << "]" << std::endl;
 	while (true) {
 		if (node == NULL) {
 			std::cout << RED << __func__ << ":Exception case searching null" << WHITE << std::endl;
-			return NULL;
+			return false;
 		}
 		//searches in quad list
 		while (node->succ && node->entry.key <= k) {
@@ -156,17 +195,17 @@ V* amo::SkipList<K, V>::skipSearch(K k) {
 		node = node->pred;
 		if (node->entry.key == k) {
 			std::cout << GREEN << "searched " << node->entry.val << WHITE << std::endl;
-			return &(node->entry.val);
+			return true;
 		}
 		//probes to next level of quad list
 		it++;
-		qlist = *it;
 		//checks if beyond
-		if (it == std::next(_list.end(), -1)){
+		if (it == std::next(_list.end(), 0)){
 			std::cout << "not searched " << node->entry.val << std::endl;
-			return NULL;
+			return false;
 		}
 		//positions the node which is a sentry
+		qlist = *it;
 		if (node->pred) {
 			node = node->below;
 		}
@@ -174,10 +213,44 @@ V* amo::SkipList<K, V>::skipSearch(K k) {
 			node = qlist->first();	
 		}
 	}
-	return NULL;
+	return false;
 }
+
+template<typename K, typename V>
+bool amo::SkipList<K, V>::put(K k, V v) {
+	std::cout << "[" << __func__ << "]" << std::endl;
+	Entry<K, V> e = Entry<K, V>(k, v); //cloned and release
+	if (empty()) {
+		std::cout << "inserts first quad list into skip list" << std::endl;
+		_list.push_back(new QuadList<Entry<K, V>>());
+	}
+	typename std::list<QuadList<Entry<K, V>>*>::iterator it = _list.begin();
+	QuadList<Entry<K, V>>* qlist = *it;
+	QuadListNode<Entry<K, V>>* node = qlist->first();
+	//searches if exists and positions node to the matched or the predecessor
+	if (skipSearch(it, node, k)) { //key exists
+		while (node->below) {
+			node = node->below;
+		} 
+	}
+	//inserts after p
+	QuadListNode<Entry<K, V>>* p = node;
+	QuadListNode<Entry<K, V>>* x = NULL;
+	QuadListNode<Entry<K, V>>* b = NULL;
+	qlist = *std::next(_list.end(), -1);
+	x = qlist->insert(e, p, b);
+	b = x;
+	//builds tower
+	while (false) {
 	
 
+
+
+		
+	}
+	_size++;
+	return true;
+}
 
 
 
