@@ -3120,6 +3120,8 @@ int main(int argc, char *argv[])
 	*/
 	dict.put(0, 100);
 	dict.put(1, 200);
+	dict.put(1, 200);
+	dict.put(2, 300);
 	std::cout << dict << std::endl;
 	
 #endif

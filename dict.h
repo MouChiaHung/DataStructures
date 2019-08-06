@@ -102,7 +102,7 @@ friend std::ostream& operator<<(std::ostream& os, QuadList<E>& dict) {
 		os << *node;
 		node = node->succ;
 	}
-	os << YELLOW << "\n------ QuadList ------" << std::endl;
+	os << YELLOW << "\n----------------------" << std::endl;
 	return os;
 }	
 };
@@ -128,7 +128,6 @@ public:
 friend std::ostream& operator<<(std::ostream& os, SkipList<K, V>& dict) {
 	for (typename std::list<QuadList<Entry<K, V>>*>::iterator it = dict._list.begin(); it != dict._list.end(); it++) {
 		os << **it;
-		os << std::endl;
 	}
 	
 	return os;
@@ -180,8 +179,8 @@ V* amo::SkipList<K, V>::get(K k) {
 
 template<typename K, typename V>
 bool amo::SkipList<K, V>::skipSearch(typename std::list<QuadList<Entry<K, V>>*>::iterator& it, QuadListNode<Entry<K, V>>*& node, K k) {
-	QuadList<Entry<K, V>>* qlist = NULL;
-	std::cout << "[" << __func__ << "]" << std::endl;
+	QuadList<Entry<K, V>>* qlist = *it;
+	std::cout << YELLOW << "[" << __func__ << "]: key:" << k << WHITE << std::endl;
 	while (true) {
 		if (node == NULL) {
 			std::cout << RED << __func__ << ":Exception case searching null" << WHITE << std::endl;
@@ -194,14 +193,20 @@ bool amo::SkipList<K, V>::skipSearch(typename std::list<QuadList<Entry<K, V>>*>:
 		//checks if found
 		node = node->pred;
 		if (node->entry.key == k) {
-			std::cout << GREEN << "searched " << node->entry.val << WHITE << std::endl;
+			if (qlist->valid(node)) std::cout << GREEN << "searched " << node->entry.val << WHITE << std::endl;
+			else if (node == qlist->head) std::cout << GREEN << "searched head:" << node->entry.val << WHITE << std::endl;
+			else if (node == qlist->tail) std::cout << GREEN << "searched tail:" << node->entry.val << WHITE << std::endl;
+			else {
+				std::cout << RED << __func__ << ":Exception case unknown search" << WHITE << std::endl;
+				return false;
+			}
 			return true;
 		}
 		//probes to next level of quad list
 		it++;
 		//checks if beyond
 		if (it == std::next(_list.end(), 0)){
-			std::cout << "not searched " << node->entry.val << std::endl;
+			//std::cout << "not searched " << node->entry.val << std::endl;
 			return false;
 		}
 		//positions the node which is a sentry
@@ -218,7 +223,7 @@ bool amo::SkipList<K, V>::skipSearch(typename std::list<QuadList<Entry<K, V>>*>:
 
 template<typename K, typename V>
 bool amo::SkipList<K, V>::put(K k, V v) {
-	std::cout << "[" << __func__ << "]" << std::endl;
+	std::cout << YELLOW << "[" << __func__ << "]: key:" << k << " and value:" << v << WHITE << std::endl;
 	Entry<K, V> e = Entry<K, V>(k, v); //cloned and release
 	if (empty()) {
 		std::cout << "inserts first quad list into skip list" << std::endl;
@@ -226,27 +231,52 @@ bool amo::SkipList<K, V>::put(K k, V v) {
 	}
 	typename std::list<QuadList<Entry<K, V>>*>::iterator it = _list.begin();
 	QuadList<Entry<K, V>>* qlist = *it;
-	QuadListNode<Entry<K, V>>* node = qlist->first();
+	QuadListNode<Entry<K, V>>* node = qlist->first(); //searches from the top
+	
 	//searches if exists and positions node to the matched or the predecessor
 	if (skipSearch(it, node, k)) { //key exists
-		while (node->below) {
+		while (node->below) { //inserts after a node which is at the bottom
 			node = node->below;
-		} 
+		}
+		std::cout << "searched predecessor:" << *node << std::endl;		
 	}
-	//inserts after p
+	else std::cout << "predecessor:" << *node << std::endl;
+	
+	//inserts after p which is pointing the same one being pointed by node
 	QuadListNode<Entry<K, V>>* p = node;
 	QuadListNode<Entry<K, V>>* x = NULL;
 	QuadListNode<Entry<K, V>>* b = NULL;
-	qlist = *std::next(_list.end(), -1);
-	x = qlist->insert(e, p, b);
+	qlist = *std::next(_list.end(), -1); //inserts at the bottom
+	x = qlist->insert(e, p, NULL);
 	b = x;
-	//builds tower
-	while (false) {
 	
-
-
-
-		
+	//builds tower from the bottom
+	it = std::next(_list.end(), -1);
+	qlist = *it;
+	//while (std::rand() % 1) {
+	if (true) {
+		//builds upon one more high level above following the head
+		if (!qlist->valid(p)) { 
+			if (p->pred == NULL) std::cout << "builds tower following the head:" << *p << std::endl;
+			else if (p->succ == NULL) std::cout << "builds tower following the tail:" << *p << std::endl;
+			else {
+				std::cout << RED << __func__ << ":Exception case unknown predecessor" << WHITE << std::endl;
+				return false;
+			}
+			if (qlist == *(_list.begin()) && _list.size() == 1) {
+				_list.push_front(new QuadList<Entry<K, V>>());
+			}
+			p = (*std::next(_list.end(), -2))->first()->pred;
+			qlist = *std::next(it, -1); 
+		}
+		//builds upon one more high level above following the node which is closest to and has a such level clone
+		else { 
+			while (qlist->valid(p) && !(p->above)) p = p->pred;
+			p = p->above; //builds above the bottom
+			qlist = *std::next(it, -1); 
+			std::cout << "builds tower following the node:" << *p << std::endl;
+		}
+		qlist->insert(e, p, b);
 	}
 	_size++;
 	return true;
