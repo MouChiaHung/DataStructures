@@ -3105,10 +3105,7 @@ int main(int argc, char *argv[])
 
 #if 1
 	std::cout << GREEN << "****************** Dictionary ******************\n" << WHITE << std::endl;
-
-	//amo::QuadList<Entry<int, int>> dict;
 	amo::SkipList<int, int> dict;
-	//dict.get(0);
 	/*
 	amo::Entry<int, int> e1(0, 10);
 	amo::Entry<int, int> e2(1, 20);
@@ -3118,11 +3115,16 @@ int main(int argc, char *argv[])
 	std::cout << "n2:" << *n1.succ;
 	std::cout << "n1:" << *((*n1.succ).pred);
 	*/
-	dict.put(0, 100);
-	dict.put(1, 200);
-	dict.put(1, 200);
-	dict.put(2, 300);
+	dict._height = 25/2 -1;
+	for (int i=1; i<=25; i++) {
+		dict.put(10+i, 10+i);
+		std::cout << std::endl;
+	}
+	std::cout << std::endl;
+	std::cout << GREEN << "SKIP LIST:" << WHITE << std::endl;
 	std::cout << dict << std::endl;
+	
+	dict.traverseTower();
 	
 #endif
 	std::cout << GREEN << "\n****************** main return ******************" << WHITE << std::endl;
