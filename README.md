@@ -13,6 +13,9 @@ Demostration:
 - DFS for strong connected components coding
 ![image](https://github.com/MouChiaHung/DataStructures/blob/master/SCC.PNG)
 
+- Skip list for dictionary implement
+![image](https://github.com/MouChiaHung/DataStructures/blob/master/SkipList.PNG)
+
 Practices includes:
  - C++ skills 
  - STL
@@ -23,4 +26,5 @@ Practices includes:
  - graph
  - bst
  - avl
+ - dictionary
  - algorithm
