@@ -50,6 +50,8 @@
 #include <dict.h>
 #include <entry.h>
 
+#include <cmath>
+
 using namespace std;
 using namespace amo;
 using namespace mystd::myfstream;
@@ -3115,14 +3117,25 @@ int main(int argc, char *argv[])
 	std::cout << "n2:" << *n1.succ;
 	std::cout << "n1:" << *((*n1.succ).pred);
 	*/
-	dict._height = 25/2 -1;
-	for (int i=1; i<=25; i++) {
-		dict.put(10+i, 10+i);
+	int amount = 20;
+	dict._height = (int) sqrt(amount) - 2;
+	for (int i=1; i<=amount; i++) {
+		dict.put(10+i, 30+i);
 		std::cout << std::endl;
 	}
 	std::cout << std::endl;
 	std::cout << GREEN << "SKIP LIST:" << WHITE << std::endl;
 	std::cout << dict << std::endl;
+	
+	for (int i=1; i<=amount; i++) {
+		std::cout << GREEN << "GET " << 10+i << "..." << WHITE << std::endl;
+		dict.get(10+i);
+	}
+	
+	dict.traverseTower();
+	
+	QuadList<Entry<int, int>>* qlist = *(dict._list.begin());
+	qlist->clear();
 	
 	dict.traverseTower();
 	

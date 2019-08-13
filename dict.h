@@ -60,7 +60,6 @@ private:
 	
 protected:
 	void init();
-	int clear();
 	
 public:
 	int _size;
@@ -91,8 +90,9 @@ public:
 	bool valid(QuadListNode<E>* node) {
 		return (node && (node != head) && (node != tail));
 	}
-	E remove(QuadListNode<E>* node);
 	QuadListNode<E>* insert(E const& e, QuadListNode<E>* p, QuadListNode<E>* b);
+	E remove(QuadListNode<E>* node);
+	int clear();
 	void traverse();
 	
 friend std::ostream& operator<<(std::ostream& os, QuadList<E>& dict) {
@@ -183,11 +183,12 @@ public:
 			i++;
 		}
 		int t = (len+2) * 3;
+		std::cout << GREEN;
 		while (t-- > 0) std::cout << "-";
-		std::cout << " TOWER TOP   ";
+		std::cout << " TOWER TOP    ";
 		t = (len+2) * 3;
 		while (t-- > 0) std::cout << "-";
-		std::cout << std::endl;
+		std::cout << WHITE << std::endl;
 		for (int x=0; x<h; x++) {
 			for (int y=0; y<len; y++) {
 				std::cout << tower[x][y];
@@ -195,11 +196,12 @@ public:
 			}
 		}
 		t = (len+2) * 3;
+		std::cout << GREEN;
 		while (t-- > 0) std::cout << "-";
 		std::cout << " TOWER BOTTOM ";
 		t = (len+2) * 3;
 		while (t-- > 0) std::cout << "-";
-		std::cout << std::endl;
+		std::cout << WHITE << std::endl;
 	}
 
 friend std::ostream& operator<<(std::ostream& os, SkipList<K, V>& dict) {
@@ -240,6 +242,26 @@ template<typename E>
 QuadListNode<E>* amo::QuadList<E>::insert(E const& e, QuadListNode<E>* p, QuadListNode<E>* b) {
 	_size++;
 	return p->insertSuccAbove(e, b);
+}
+
+template<typename E>
+E amo::QuadList<E>::remove(QuadListNode<E>* node) {
+	node->pred->succ = node->succ;
+	node->succ->pred = node->pred;
+	E e = node->entry;
+	delete node;
+	_size--;
+	return e;
+}
+
+template<typename E>
+int amo::QuadList<E>::clear() {
+	int num = 0;
+	while (valid(first())) {
+		std::cout << "removed:" << remove(first()) << std::endl;
+		num++;
+	}
+	return num;
 }
 
 template<typename K, typename V>
@@ -290,6 +312,7 @@ template<typename K, typename V>
 bool amo::SkipList<K, V>::skipSearch(QuadListNode<Entry<K, V>>*& node, K k) {
 	QuadList<Entry<K, V>>* qlist = *_list.begin();
 	int level = 0;
+	int n = 0;
 	std::cout << CYAN << "[" << __func__ << "]: key:" << k << WHITE << std::endl;
 	while (true) {
 		if (node == NULL) {
@@ -300,15 +323,19 @@ bool amo::SkipList<K, V>::skipSearch(QuadListNode<Entry<K, V>>*& node, K k) {
 			//std::cout << "searches at level " << std::distance(_list.end(), (std::next(_list.begin(), level))) << WHITE << std::endl;
 		}
 		//searches in quad list
-		while (node->succ && node->entry.key <= k) {
+		while (true) {
+			n++;
+			if (node->succ == NULL || node->entry.key > k) {
+				break;
+			}
 			node = node->succ;
 		}
 		//checks if found
 		node = node->pred;
 		if (node->entry.key == k) {
-			if (qlist->valid(node)) std::cout << GREEN << "searched " << node->entry.val << WHITE << std::endl;
-			else if (node == qlist->head) std::cout << GREEN << "searched head:" << node->entry.val << WHITE << std::endl;
-			else if (node == qlist->tail) std::cout << GREEN << "searched tail:" << node->entry.val << WHITE << std::endl;
+			if (qlist->valid(node)) std::cout << GREEN << "searched " << *node << " after " << n << " times searching "<< WHITE << std::endl;
+			else if (node == qlist->head) std::cout << GREEN << "searched head:" << *node << " after " << n << " times searching "<< WHITE << std::endl;
+			else if (node == qlist->tail) std::cout << GREEN << "searched tail:" << *node << " after " << n << " times searching "<< WHITE << std::endl;
 			else {
 				std::cout << RED << __func__ << ":Exception case unknown search" << WHITE << std::endl;
 				return false;
@@ -319,7 +346,7 @@ bool amo::SkipList<K, V>::skipSearch(QuadListNode<Entry<K, V>>*& node, K k) {
 		level++;
 		//checks if beyond
 		if (std::next(_list.begin(), level) == _list.end()){
-			//std::cout << "not searched " << node->entry.val << std::endl;
+			std::cout << "not searched " << *node << " after " << n << " times searching "<< WHITE << std::endl;
 			return false;
 		}
 		//positions the node which is a sentry
@@ -373,7 +400,12 @@ bool amo::SkipList<K, V>::put(K k, V v) {
 	qlist = *std::next(_list.end(), -1);
 	int lv = 0; //1 if bottom
 	bool flag = true;
-	while ((k+1) % 2 && flag) {
+	//while ((k+1) % 2 && flag) {
+	int dice = (std::rand()+1)%2;
+	std::cout << GREEN << "dice:" << dice << WHITE << std::endl;
+	//while ((std::rand()%2||std::rand()%2||std::rand()%2)  && flag) {
+	//while ((std::rand()%2 ||std::rand()%2)&& flag) {
+	while (std::rand()%2 && flag) {
 		std::cout << GREEN << "WHILE-LOOP, level of qlist:" << (this->level(qlist))
 						   << ", LV" << level(p) << " p:" << *p
 						   << ", LV" << level(b) << " b:" << *b << WHITE << std::endl;

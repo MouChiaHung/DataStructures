@@ -29,6 +29,11 @@ public:
 	bool operator>(Entry<K, V> const& e) {return key > e.key;}
 	bool operator==(Entry<K, V> const& e) {return key == e.key;}
 	bool operator!=(Entry<K, V> const& e) {return key != e.key;}
+friend std::ostream& operator<<(std::ostream& os, const Entry<K, V>& entry) {
+	os << "[" << entry.key;
+	os << "/" << entry.val << "] ";
+	return os;
+}	
 };
 
 };
