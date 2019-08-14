@@ -3117,8 +3117,8 @@ int main(int argc, char *argv[])
 	std::cout << "n2:" << *n1.succ;
 	std::cout << "n1:" << *((*n1.succ).pred);
 	*/
-	int amount = 20;
-	dict._height = (int) sqrt(amount) - 2;
+	int amount = 10;
+	dict._height = (int) sqrt(amount) - 1;
 	for (int i=1; i<=amount; i++) {
 		dict.put(10+i, 30+i);
 		std::cout << std::endl;
@@ -3127,15 +3127,24 @@ int main(int argc, char *argv[])
 	std::cout << GREEN << "SKIP LIST:" << WHITE << std::endl;
 	std::cout << dict << std::endl;
 	
+	/*
 	for (int i=1; i<=amount; i++) {
 		std::cout << GREEN << "GET " << 10+i << "..." << WHITE << std::endl;
 		dict.get(10+i);
 	}
+	*/
 	
 	dict.traverseTower();
 	
-	QuadList<Entry<int, int>>* qlist = *(dict._list.begin());
-	qlist->clear();
+	dict.remove(12);
+	dict.remove(14);
+	
+	dict.traverseTower();
+	
+	for (int i=1; i<=amount; i++) {
+		dict.put(amount+10+i, 99-i);
+		std::cout << std::endl;
+	}
 	
 	dict.traverseTower();
 	

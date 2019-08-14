@@ -123,8 +123,8 @@ public:
 		return _size <= 0;
 	}
 	bool skipSearch(QuadListNode<Entry<K, V>>*& node, K k);
-	int level(QuadList<Entry<K, V>>* qlist);
-	int level(QuadListNode<Entry<K, V>>* node);
+	int level(QuadList<Entry<K, V>>* qlist); //1 for bottom
+	int level(QuadListNode<Entry<K, V>>* node); //1 for bottom
 	void traverse() {
 		for (typename std::list<QuadList<Entry<K, V>>*>::iterator it = _list.begin(); it != _list.end(); it++) {
 			QuadListNode<Entry<K, V>>* node;
@@ -311,7 +311,7 @@ V* amo::SkipList<K, V>::get(K k) {
 template<typename K, typename V>
 bool amo::SkipList<K, V>::skipSearch(QuadListNode<Entry<K, V>>*& node, K k) {
 	QuadList<Entry<K, V>>* qlist = *_list.begin();
-	int level = 0;
+	int level = 0; //0 for top
 	int n = 0;
 	std::cout << CYAN << "[" << __func__ << "]: key:" << k << WHITE << std::endl;
 	while (true) {
@@ -379,11 +379,15 @@ bool amo::SkipList<K, V>::put(K k, V v) {
 	QuadList<Entry<K, V>>* qlist = *_list.begin();
 	QuadListNode<Entry<K, V>>* node = qlist->first(); //searches from the top
 	//searches if exists and positions node to the matched or the predecessor
-	if (skipSearch(node, k)) { //key exists
+	if (!skipSearch(node, k)) { //key exists
 		while (node->below) { //inserts after a node which is at the bottom
 			node = node->below;
 		}
 		//std::cout << GREEN << "searched p:" << *node << WHITE << std::endl;		
+	}
+	else {
+		std::cout << RED << __func__ << ":Exception case put already existing key:" << k << " and value:" << v << WHITE << std::endl;
+		return false;
 	}
 	//else std::cout << "p:" << *node << std::endl;
 	
@@ -402,41 +406,49 @@ bool amo::SkipList<K, V>::put(K k, V v) {
 	bool flag = true;
 	//while ((k+1) % 2 && flag) {
 	int dice = (std::rand()+1)%2;
-	std::cout << GREEN << "dice:" << dice << WHITE << std::endl;
 	//while ((std::rand()%2||std::rand()%2||std::rand()%2)  && flag) {
 	//while ((std::rand()%2 ||std::rand()%2)&& flag) {
 	while (std::rand()%2 && flag) {
-		std::cout << GREEN << "WHILE-LOOP, level of qlist:" << (this->level(qlist))
+		std::cout << GREEN << "WHILE-LOOP, LV" << level(qlist) << " qlist"
 						   << ", LV" << level(p) << " p:" << *p
 						   << ", LV" << level(b) << " b:" << *b << WHITE << std::endl;
 		lv++;
 		//positions the p which is closest to this inserted node and has a clone at the one level higher
 		while (qlist->valid(p) && !(p->above)) {
 			p = p->pred;
-			std::cout << WHITE << "positioning... ";
+			std::cout << GREEN << "Positioning ";
 			if (p->pred == NULL) {
-				std::cout << "LV" << level(p) << " (head) p:" << *p << WHITE << std::endl;
+				std::cout << "LV" << level(p) << " (head) p:" << *p << "..." << WHITE << std::endl;
 			}
 			else if (p->succ == NULL) {
-				std::cout << "LV" << level(p) << " (tail) p:" << *p << WHITE << std::endl;
+				std::cout << "LV" << level(p) << " (tail) p:" << *p << "..." << WHITE << std::endl;
 			}
 			else {
-				std::cout << "LV" << level(p) << " p:" << *p << WHITE << std::endl;
+				std::cout << "LV" << level(p) << " p:" << *p << "..." << WHITE << std::endl;
 			}
 		}
-			
+		
+		if (level(p) != level(qlist)) {
+			std::cout << RED << __func__ << ":Exception case level error LV" << level(qlist) << " qlist"  << " and LV" << level(p) << " p" << WHITE << std::endl;
+			return false;
+		}
+		
 		//adds a clone after the p and above this inserted node
 		if (!qlist->valid(p)) { //first clone at such level
 			if (qlist == *(_list.begin())) {
-				std::cout << MAGENTA << "ONE MORE QUAD LIST ABOVE LV" << (this->level(qlist)) << WHITE <<std::endl;
+				std::cout << MAGENTA << "ONE MORE QUAD LIST ABOVE LV" << level(qlist) << WHITE <<std::endl;
 				qlist = *(_list.insert(std::next(_list.end(), -lv), new QuadList<Entry<K, V>>()));
+				p = qlist->first()->pred; //p points to the above
 			}
-			p = qlist->first()->pred; //p points to the above
+			else {
+				std::cout << RED << __func__ << ":Exception case bad qlist at LV" << level(qlist) << WHITE << std::endl;
+				return false;
+			}
 			if (p->pred == NULL) {
-				std::cout << GREEN << "Positioned LV" << level(p) << " (head) p:" << *p << WHITE << std::endl;
+				std::cout << GREEN << "Positioned  LV" << level(p) << " (head) p:" << *p << WHITE << std::endl;
 			}
 			else if (p->succ == NULL) {
-				std::cout << GREEN << "Positioned LV" << level(p) << " (tail) p:" << *p << WHITE << std::endl;
+				std::cout << GREEN << "Positioned  LV" << level(p) << " (tail) p:" << *p << WHITE << std::endl;
 			}
 			else {
 				std::cout << RED << __func__ << ":Exception case unknown predecessor" << WHITE << std::endl;
@@ -446,7 +458,7 @@ bool amo::SkipList<K, V>::put(K k, V v) {
 		}
 		else { //normal clone at such level
 			p = p->above; //p points to the above
-			std::cout << GREEN << "Positioned LV" << level(p) << " p:" << *p << WHITE << std::endl;
+			std::cout << GREEN << "Positioned  LV" << level(p) << " p:" << *p << WHITE << std::endl;
 			qlist = *std::next(_list.end(), -(lv+1)); 		
 		}
 		//inserts
@@ -470,7 +482,45 @@ bool amo::SkipList<K, V>::put(K k, V v) {
 	return true;
 }
 
-
+template<typename K, typename V>
+bool amo::SkipList<K, V>::remove(K k) {
+	if (empty()) {
+		std::cout << "nothing to remove" << std::endl;
+		return false;
+	}
+	QuadList<Entry<K, V>>* qlist;
+	QuadListNode<Entry<K, V>>* node = (*(_list.begin()))->first();
+	int lv = -1; //assigns value if something could be removed
+	if (!skipSearch(node, k)) {
+		std::cout << "no such thing to remove" << std::endl;
+		return false;
+	}
+	//remove
+	lv = _list.size() - level(node); //0 for top
+	qlist = *(std::next(_list.begin(), lv));
+	Entry<K, V> e;
+	while (node) {
+		std::cout << GREEN << "Remove node:" << *node << " at LV" << level(node) << " and qlist:" << *qlist << " at LV" << level(qlist) << " ..." << WHITE << std::endl;
+		e = qlist->remove(node);
+		std::cout << GREEN << "Removed entry:" << e << WHITE << std::endl;
+		node = node->below;
+		lv++;
+		qlist = *(std::next(_list.begin(), lv));
+	}
+	//trim if empty
+	while (!empty()) {
+		qlist = *(_list.begin());
+		//std::cout << GREEN << "Check if empty qlist:" << *qlist << " at LV" << level(qlist) << " ..." << WHITE << std::endl;
+		if (!qlist->empty()) {
+			break;
+		}
+		else {
+			std::cout << GREEN << "Erase qlist:" << **(_list.begin()) << " at LV" << level(*(_list.begin())) << " ..." << WHITE << std::endl;
+			_list.erase(_list.begin());
+		}
+	}
+	return true;
+}
 
 
 
