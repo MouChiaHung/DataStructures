@@ -3123,9 +3123,6 @@ int main(int argc, char *argv[])
 		dict.put(10+i, 30+i);
 		std::cout << std::endl;
 	}
-	std::cout << std::endl;
-	std::cout << GREEN << "SKIP LIST:" << WHITE << std::endl;
-	std::cout << dict << std::endl;
 	
 	/*
 	for (int i=1; i<=amount; i++) {
@@ -3134,15 +3131,13 @@ int main(int argc, char *argv[])
 	}
 	*/
 	
-	dict.traverseTower();
-	
-	dict.remove(12);
-	dict.remove(14);
-	
-	dict.traverseTower();
-	
 	for (int i=1; i<=amount; i++) {
-		dict.put(amount+10+i, 99-i);
+		if (!dict.put(10+i, 99-i)) {
+			dict.remove(10+i);
+			if (!dict.put(10+i, 99-i)) {
+				std::cout << RED << "FAILED PUT:" << 10+i << WHITE << std::endl;
+			}
+		}
 		std::cout << std::endl;
 	}
 	

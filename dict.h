@@ -313,7 +313,7 @@ bool amo::SkipList<K, V>::skipSearch(QuadListNode<Entry<K, V>>*& node, K k) {
 	QuadList<Entry<K, V>>* qlist = *_list.begin();
 	int level = 0; //0 for top
 	int n = 0;
-	std::cout << CYAN << "[" << __func__ << "]: key:" << k << WHITE << std::endl;
+	//std::cout << CYAN << "[" << __func__ << "]: key:" << k << WHITE << std::endl;
 	while (true) {
 		if (node == NULL) {
 			std::cout << RED << __func__ << ":Exception case searching null" << WHITE << std::endl;
@@ -386,7 +386,9 @@ bool amo::SkipList<K, V>::put(K k, V v) {
 		//std::cout << GREEN << "searched p:" << *node << WHITE << std::endl;		
 	}
 	else {
-		std::cout << RED << __func__ << ":Exception case put already existing key:" << k << " and value:" << v << WHITE << std::endl;
+		std::cout << RED << "key:" << k << "/value:" << v 
+			      << " collided existing node:" << *node	
+				  << WHITE << std::endl;
 		return false;
 	}
 	//else std::cout << "p:" << *node << std::endl;
@@ -396,7 +398,7 @@ bool amo::SkipList<K, V>::put(K k, V v) {
 	QuadListNode<Entry<K, V>>* x = NULL;
 	QuadListNode<Entry<K, V>>* b = NULL;
 	qlist = *std::next(_list.end(), -1); //inserts at the bottom
-	std::cout << "BASE INSERT e:" << e.val << ", p" << *p << ", b:NULL" << " at the LV"<< level(qlist) << " base:\n" << *qlist << std::endl;
+	std::cout << "BASE INSERT e:" << e << ", p" << *p << ", b:NULL" << " at the LV"<< level(qlist) << " base:" << *qlist << std::endl;
 	x = qlist->insert(e, p, NULL);
 	b = x;
 	
@@ -409,7 +411,7 @@ bool amo::SkipList<K, V>::put(K k, V v) {
 	//while ((std::rand()%2||std::rand()%2||std::rand()%2)  && flag) {
 	//while ((std::rand()%2 ||std::rand()%2)&& flag) {
 	while (std::rand()%2 && flag) {
-		std::cout << GREEN << "WHILE-LOOP, LV" << level(qlist) << " qlist"
+		std::cout << GREEN << "BUILDING TOWER from LV" << level(qlist) << " qlist"
 						   << ", LV" << level(p) << " p:" << *p
 						   << ", LV" << level(b) << " b:" << *b << WHITE << std::endl;
 		lv++;
@@ -463,22 +465,21 @@ bool amo::SkipList<K, V>::put(K k, V v) {
 		}
 		//inserts
 		if (qlist) {
-			std::cout << "TOWER INSERT e:" << e.val 
+			std::cout << "TOWER INSERT e:" << e 
 					  << ", at LV" << level(p) << " p" << *p 
 					  << ", at LV" << level(b) << " b:" << *b 
-					  << "at LV" << level(qlist) << " qlist:\n" << *qlist << WHITE << std::endl;
+					  << "at LV" << level(qlist) << " qlist:" << *qlist << WHITE << std::endl;
 			b = qlist->insert(e, p, b);
 		}
 		else {
 			std::cout << RED << __func__ << ":Exception case inserting null quad list" << WHITE << std::endl;
 			return false;
 		}
-		std::cout << YELLOW << "AFTER TOWER INSERT [" << k << "/" << v << "], SKIP LIST:\n" << *this << WHITE << std::endl;
 		if (lv > _height) flag = false;
 	}
 	_size++;
 	std::cout << CYAN << "AFTER INSERT [" << k << "/" << v << "], SKIP LIST:" << WHITE << std::endl;
-	traverse();
+	traverseTower();
 	return true;
 }
 
@@ -500,11 +501,13 @@ bool amo::SkipList<K, V>::remove(K k) {
 	qlist = *(std::next(_list.begin(), lv));
 	Entry<K, V> e;
 	while (node) {
-		std::cout << GREEN << "Remove node:" << *node << " at LV" << level(node) << " and qlist:" << *qlist << " at LV" << level(qlist) << " ..." << WHITE << std::endl;
+		std::cout << GREEN << "Removed node:" << *node << " at LV" << level(node) 
+						   << " of qlist:" << *qlist << " at LV" << level(qlist);
 		e = qlist->remove(node);
-		std::cout << GREEN << "Removed entry:" << e << WHITE << std::endl;
+		std::cout << " and entry:" << e << WHITE << std::endl;
 		node = node->below;
 		lv++;
+		//probe and remove
 		qlist = *(std::next(_list.begin(), lv));
 	}
 	//trim if empty
