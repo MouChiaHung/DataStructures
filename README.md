@@ -14,7 +14,7 @@ Demostration:
 ![image](https://github.com/MouChiaHung/DataStructures/blob/master/SCC.PNG)
 
 - Skip list for dictionary implement
-![image](https://github.com/MouChiaHung/DataStructures/blob/master/SkipDict.PNG)
+![image](https://github.com/MouChiaHung/DataStructures/blob/master/SkipList.PNG)
 
 Practices includes:
  - C++ skills 
