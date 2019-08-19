@@ -49,8 +49,9 @@
 
 #include <dict.h>
 #include <entry.h>
-
 #include <cmath>
+
+#include <bmp.h>
 
 using namespace std;
 using namespace amo;
@@ -3105,7 +3106,7 @@ int main(int argc, char *argv[])
 	avl.traverseLevel();	
 #endif
 
-#if 1
+#if 0
 	std::cout << GREEN << "****************** Dictionary ******************\n" << WHITE << std::endl;
 	amo::SkipList<int, int> dict;
 	/*
@@ -3142,6 +3143,17 @@ int main(int argc, char *argv[])
 	}
 	
 	dict.traverseTower();
+	
+#endif
+
+
+#if 1
+	std::cout << GREEN << "****************** Bitmap ******************\n" << WHITE << std::endl;
+	amo::BMP bmp;
+	bmp.load("finger.bmp");
+	cout << bmp << endl;
+	
+	
 	
 #endif
 	std::cout << GREEN << "\n****************** main return ******************" << WHITE << std::endl;
