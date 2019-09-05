@@ -4,6 +4,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <assert.h>
+#include <time.h>
 
 namespace amo {
 
@@ -47,9 +48,9 @@ friend std::ostream& operator<<(std::ostream& os, const PX& px) {
 	while (t-- > 0) os << "-";
 	os << WHITE << std::endl;
 	
-	os << "[R]:" << px.R << std::endl; // 0x4d42 = BM
-	os << "[G]:" << px.G << std::endl; // 0x4d42 = BM
-	os << "[B]:" << px.B << std::endl; // 0x4d42 = BM
+	os << "[R]:" << px.R << std::endl;
+	os << "[G]:" << px.G << std::endl;
+	os << "[B]:" << px.B << std::endl;
 	
 	t = 10;
 	os << GREEN;
@@ -98,9 +99,13 @@ public:
 	BMP() : HEADER_SIZE(14), INFO_SIZE(40) {}
 	~BMP() {}
 	size_t size_data() {
-		return width*height*3;
+		//return width*height*3;
+		return imageSize;
 	}
 	bool load(const char* inputFilePath);
+	void setPixel(int x, int y, BYTE R, BYTE G, BYTE B);
+	void setBox(int start_x, int start_y, int w, int h, BYTE R, BYTE G, BYTE B);
+	bool save(const char* outputFilePath);
 
 friend std::ostream& operator<<(std::ostream& os, const BMP& bmp) {
 	int t = 10;
@@ -115,16 +120,19 @@ friend std::ostream& operator<<(std::ostream& os, const BMP& bmp) {
 	os << "[file size]      :" << bmp.fileSize << std::endl;
 	os << "[data offset]    :" << bmp.dataOffset << std::endl;
 	os << "[size]           :" << bmp.size << std::endl;
-	os << "[width]          :" << bmp.width << std::endl;;
-	os << "[height]         :" << bmp.height << std::endl;;
-	os << "[planes]         :" << bmp.planes << std::endl;;
-	os << "[bits per pixel] :" << bmp.bitsPerPixel << std::endl;;
-	os << "[compression]    :" << bmp.compression << std::endl;;
-	os << "[image size]     :" << bmp.imageSize << std::endl;;
-	os << "[X pixel/meter]  :" << bmp.xPixelsPerM << std::endl;;
-	os << "[Y pixel/meter]  :" << bmp.yPixelsPerM << std::endl;;
-	os << "[color used]     :" << bmp.colorsUsed << std::endl;;
-	os << "[color important]:" << bmp.colorsImportant << std::endl;;
+	os << "[width]          :" << bmp.width << std::endl;
+	os << "[height]         :" << bmp.height << std::endl;
+	os << "[planes]         :" << bmp.planes << std::endl;
+	os << "[bits per pixel] :" << bmp.bitsPerPixel << std::endl;
+	os << "[compression]    :" << bmp.compression << std::endl;
+	os << "[image size]     :" << bmp.imageSize << std::endl;
+	os << "[X pixel/meter]  :" << bmp.xPixelsPerM << std::endl;
+	os << "[Y pixel/meter]  :" << bmp.yPixelsPerM << std::endl;
+	os << "[color used]     :" << bmp.colorsUsed << std::endl;
+	os << "[blue]:" << bmp.blue << std::endl;
+	os << "[green]:" << bmp.green << std::endl;
+	os << "[red]:" << bmp.red << std::endl;
+	os << "[creserved]:" << bmp.creserved << std::endl;
 	
 	t = 10;
 	os << GREEN;
@@ -137,7 +145,7 @@ friend std::ostream& operator<<(std::ostream& os, const BMP& bmp) {
 }
 };
 
-bool amo::BMP::load(const char* inputFilePath){
+bool amo::BMP::load(const char* inputFilePath) {
 	std::ifstream fis(inputFilePath, std::ios::binary|std::ios::in);
 	char c;
 	int len = 0;
@@ -188,11 +196,25 @@ bool amo::BMP::load(const char* inputFilePath){
 		}
 		l++;
 	}
+	size = B2U32(info, 0);
+	assert(size == 40);
+	width = B2U32(info, 4);
+	height = B2U32(info, 8);
+	planes = B2U16(info, 12);
+	assert(planes == 1);
+	bitsPerPixel = B2U16(info, 14);
+	//assert(bitsPerPixel == 24);
+	compression = B2U32(info, 16);
+	imageSize = B2U32(info, 20);
+	xPixelsPerM = B2U32(info, 24);
+	yPixelsPerM = B2U32(info, 28);
+	colorsUsed = B2U32(info, 32);
+	colorsImportant = B2U32(info, 36);
 	
 	//data
-	fis.seekg(HEADER_SIZE+INFO_SIZE, fis.beg);
+	fis.seekg(dataOffset, fis.beg);
 	data = (BYTE*) malloc(size_data());
-	fis.read((char*) data, 10);
+	fis.read((char*) data, size_data());
 	
 	if (fis) {
 		std::cout << GREEN << "loaded data for " << fis.gcount() << " bytes" << WHITE << std::endl;
@@ -200,10 +222,80 @@ bool amo::BMP::load(const char* inputFilePath){
 	else {
 		std::cout << RED << __func__ << ":Exception case loading data only " << fis.gcount() << " could be read" << WHITE << std::endl;
 		return false;
-	}	
+	}
+	fis.close();
+	return true;
+}
+
+bool amo::BMP::save(const char* outputFilePath) {
+	time_t t;
+	struct tm *tm_s;
+	int diff;
+	char stamp[64] {'S', 'T', 'A', 'M', 'P'};
+	
+	time(&t);
+	tm_s =  localtime(&t);
+	tm_s->tm_hour = 0;
+	tm_s->tm_min = 0;
+	tm_s->tm_sec = 0;
+	tm_s->tm_mon = 0;
+	tm_s->tm_mday = 0;
+	tm_s->tm_year = 119;
+	diff = (int)difftime(t, mktime(tm_s))/1000;	
+	sprintf(stamp, "%d", diff);	
+	std::cout << "stamp:" << stamp << std::endl;
+	
+	char copy[128];
+	char out[128];
+	char format[64];
+	
+	char* pch;
+	strcpy(copy, outputFilePath);
+	pch = strtok(copy, ".");
+	strcpy(out, pch);
+	while(pch != NULL) {
+		strcpy(format, pch);
+		pch = strtok(NULL, ".");
+	}
+	strcat(out, "_");
+	strcat(out, stamp);
+	strcat(out, ".");
+	strcat(out, format);
+	std::cout << "save as file:" << out << std::endl;
+	
+	std::ofstream fos(out, std::ofstream::binary);
+	fos.seekp(0, fos.beg);
+	fos.write((char*) header, HEADER_SIZE);
+	std::cout << "tellp:" << fos.tellp() << std::endl;
+	fos.seekp(HEADER_SIZE, fos.beg);
+	fos.write((char*) info, INFO_SIZE);
+	std::cout << "tellp:" << fos.tellp() << std::endl;
+	fos.seekp(dataOffset, fos.beg);
+	fos.write((char*) data, size_data());
+	std::cout << "tellp:" << fos.tellp() << std::endl;
+	fos.close();
+	return true;
 }
 
 
+
+
+void amo::BMP::setPixel(int x, int y, BYTE R, BYTE G, BYTE B) {
+	int i = 0+(y*width)+x;
+	PX *pix = (PX*) &data[i*bitsPerPixel/8]; 
+	pix->R = R;
+	pix->G = G;
+	pix->B = B;
+	std::cout << *pix << std::endl;
+}
+
+void amo::BMP::setBox(int start_x, int start_y, int w, int h, BYTE R, BYTE G, BYTE B) {
+	int i = 0;
+	int j = 0;
+	for (i=0; i<start_y+h; i++)
+		for (j=0; j<start_x+w; j++)
+			setPixel(start_x+j, start_y+i, R, G, B);
+}
 
 
 

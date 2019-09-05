@@ -3150,9 +3150,10 @@ int main(int argc, char *argv[])
 #if 1
 	std::cout << GREEN << "****************** Bitmap ******************\n" << WHITE << std::endl;
 	amo::BMP bmp;
-	bmp.load("finger.bmp");
+	bmp.load("land.bmp");
 	cout << bmp << endl;
 	
+	bmp.save("land.bmp");
 	
 	
 #endif
