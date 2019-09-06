@@ -22,12 +22,21 @@ typedef unsigned char BYTE;
 typedef unsigned short int UINT16;
 typedef unsigned long UINT32;
 
+/*
+typedef int WORD;
+typedef long DWORD;
+typedef unsigned int UWORD;
+typedef unsigned long UDWORD;
+*/
+
 //#define HEADER_SIZE 14
 //#define INFO_SIZE 40
-#define U16(x) ((UINT16) x)
-#define U32(x) ((UINT32) x)
-#define B2U16(bytes, offset) (bytes[offset] | bytes[offset+1] << 8)
-#define B2U32(bytes, offset) (bytes[offset] | bytes[offset+1] << 8 | bytes[offset+2] << 16 | bytes[offset+3] << 24)
+
+//Little-Endian
+#define U16(x) ((unsigned short) (x))
+#define U32(x) ((int) (x))
+#define B2U16(bytes, offset) (U16(bytes[offset]) | U16(bytes[offset+1]) << 8)
+#define B2U32(bytes, offset) (U32(bytes[offset]) | U32(bytes[offset+1]) << 8 | U32(bytes[offset+2]) << 16 | U32(bytes[offset+3]) << 24)
 
 class PX {
 protected:	
@@ -69,10 +78,9 @@ protected:
 public:
 	int HEADER_SIZE;
 	int INFO_SIZE;
-	BYTE header[14];    
-    BYTE info[40];
+	int PALETTE_SIZE;
     //Header
-    UINT16 signature;  //Magic Number = "BM" = 0x4D42
+    UINT16 signature;  //Magic Number 0x4D42 stored in memory (Little-Endian) and saved in file 0x42 0x4D as "BM"
     UINT32 fileSize;   //File size in bytes
     UINT32 hreserved;  //unused (=0)
     UINT32 dataOffset; //File offset to Raster Data
@@ -95,17 +103,27 @@ public:
     BYTE creserved; //unused (=0)
     //Raster Data
     BYTE* data;
+	//Palette for gray scale
+	BYTE* palette;
+	//Arrays allocated by specific space which have to be declared last
+	BYTE header[14];    
+    BYTE info[40];
 	
-	BMP() : HEADER_SIZE(14), INFO_SIZE(40) {}
+	BMP() : HEADER_SIZE(14), INFO_SIZE(40), PALETTE_SIZE(1024) {
+		//header = (BYTE*) malloc(HEADER_SIZE);
+		//info = (BYTE*) malloc(INFO_SIZE);
+	}
 	~BMP() {}
 	size_t size_data() {
 		//return width*height*3;
-		return imageSize;
+		return imageSize != 0 ? imageSize : width*height*3;
 	}
 	bool load(const char* inputFilePath);
+	amo::PX getPixel(int x, int y);
 	void setPixel(int x, int y, BYTE R, BYTE G, BYTE B);
 	void setBox(int start_x, int start_y, int w, int h, BYTE R, BYTE G, BYTE B);
-	bool save(const char* outputFilePath);
+	void setZone(int start_x, int start_y, int w, int h, BYTE R, BYTE G, BYTE B);
+	string save(const char* outputFilePath);
 
 friend std::ostream& operator<<(std::ostream& os, const BMP& bmp) {
 	int t = 10;
@@ -116,7 +134,7 @@ friend std::ostream& operator<<(std::ostream& os, const BMP& bmp) {
 	while (t-- > 0) os << "-";
 	os << WHITE << std::endl;
 	
-	os << "[signature]      :" << bmp.signature << std::endl; // 0x4d42 = BM
+	os << "[signature]      :" << std::hex << bmp.signature << std::dec << std::endl; // 0x4d42 = BM
 	os << "[file size]      :" << bmp.fileSize << std::endl;
 	os << "[data offset]    :" << bmp.dataOffset << std::endl;
 	os << "[size]           :" << bmp.size << std::endl;
@@ -129,10 +147,11 @@ friend std::ostream& operator<<(std::ostream& os, const BMP& bmp) {
 	os << "[X pixel/meter]  :" << bmp.xPixelsPerM << std::endl;
 	os << "[Y pixel/meter]  :" << bmp.yPixelsPerM << std::endl;
 	os << "[color used]     :" << bmp.colorsUsed << std::endl;
-	os << "[blue]:" << bmp.blue << std::endl;
-	os << "[green]:" << bmp.green << std::endl;
-	os << "[red]:" << bmp.red << std::endl;
-	os << "[creserved]:" << bmp.creserved << std::endl;
+	os << "[color important]:" << bmp.colorsImportant << std::endl;
+	os << "[blue]           :" << bmp.blue << std::endl;
+	os << "[green]          :" << bmp.green << std::endl;
+	os << "[red]            :" << bmp.red << std::endl;
+	os << "[reserved]       :" << bmp.creserved << std::endl;
 	
 	t = 10;
 	os << GREEN;
@@ -146,12 +165,11 @@ friend std::ostream& operator<<(std::ostream& os, const BMP& bmp) {
 };
 
 bool amo::BMP::load(const char* inputFilePath) {
+	std::cout << YELLOW << "Loading... " << inputFilePath << WHITE << std::endl;
 	std::ifstream fis(inputFilePath, std::ios::binary|std::ios::in);
 	char c;
 	int len = 0;
 	int l = 0;
-	BYTE header[HEADER_SIZE];
-	BYTE info[INFO_SIZE];
 	
 	//header
 	memset(header, 0, HEADER_SIZE);
@@ -175,9 +193,13 @@ bool amo::BMP::load(const char* inputFilePath) {
 	signature = B2U16(header, 0);
 	assert(signature == 0x4D42);
 	fileSize = B2U32(header, 2);
-	hreserved = B2U32(header, 6);
+	//hreserved = B2U32(header, 6);
 	dataOffset = B2U32(header, 10);
-	
+	if (dataOffset == 1078) {
+		std::cout << YELLOW << "allocates a palette for gray scale" << WHITE << std::endl;
+		palette = (BYTE*) malloc(PALETTE_SIZE);
+	} 
+	else palette = NULL;
 	//info
 	memset(info, 0, INFO_SIZE);
 	l = 0;
@@ -211,9 +233,15 @@ bool amo::BMP::load(const char* inputFilePath) {
 	colorsUsed = B2U32(info, 32);
 	colorsImportant = B2U32(info, 36);
 	
+	//palette
+	if (palette != NULL) {
+		fis.seekg(HEADER_SIZE+INFO_SIZE, fis.beg);
+		fis.read((char*) palette, PALETTE_SIZE);
+	}
+	
 	//data
 	fis.seekg(dataOffset, fis.beg);
-	data = (BYTE*) malloc(size_data());
+	this->data = (BYTE*) malloc(size_data());
 	fis.read((char*) data, size_data());
 	
 	if (fis) {
@@ -227,7 +255,7 @@ bool amo::BMP::load(const char* inputFilePath) {
 	return true;
 }
 
-bool amo::BMP::save(const char* outputFilePath) {
+string amo::BMP::save(const char* outputFilePath) {
 	time_t t;
 	struct tm *tm_s;
 	int diff;
@@ -261,23 +289,52 @@ bool amo::BMP::save(const char* outputFilePath) {
 	strcat(out, stamp);
 	strcat(out, ".");
 	strcat(out, format);
-	std::cout << "save as file:" << out << std::endl;
+	//std::cout << "saved as file:" << out << std::endl;
 	
-	std::ofstream fos(out, std::ofstream::binary);
-	fos.seekp(0, fos.beg);
+	std::ofstream fos(out, std::ios::binary|std::ios::out);
 	fos.write((char*) header, HEADER_SIZE);
-	std::cout << "tellp:" << fos.tellp() << std::endl;
+	//std::cout << "tellp:" << fos.tellp() << std::endl;
+	
 	fos.seekp(HEADER_SIZE, fos.beg);
 	fos.write((char*) info, INFO_SIZE);
-	std::cout << "tellp:" << fos.tellp() << std::endl;
+	//std::cout << "tellp:" << fos.tellp() << std::endl;
+	
+	//palette
+	if (palette) {
+		fos.seekp(HEADER_SIZE+INFO_SIZE, fos.beg);
+		fos.write((char*) palette, PALETTE_SIZE);
+	}
+	
 	fos.seekp(dataOffset, fos.beg);
 	fos.write((char*) data, size_data());
-	std::cout << "tellp:" << fos.tellp() << std::endl;
+	//std::cout << "tellp:" << fos.tellp() << std::endl;
 	fos.close();
-	return true;
+	
+	string str;
+	str.assign(out);
+	return str;
 }
 
-
+amo::PX amo::BMP::getPixel(int x, int y) {
+	int i = 0+(y*width)+x;
+	int idxB = (i*bitsPerPixel/8)+0;
+	int idxG = (i*bitsPerPixel/8)+1;
+	int idxR = (i*bitsPerPixel/8)+2;
+	
+	for (int k=0; k<size_data(); k++) 
+		std::cout << "data[" << k << "]:" << std::hex << data[k] << std::dec << std::endl;
+	PX pix;
+	std::cout << "idxB:" << idxB << std::endl;
+	std::cout << "idxG:" << idxG << std::endl;
+	std::cout << "idxR:" << idxR << std::endl;
+	std::cout << "data[" << idxB << "]:" << std::hex << data[idxB] << std::dec << std::endl;
+	std::cout << "data[" << idxG << "]:" << std::hex << data[idxG] << std::dec << std::endl;
+	std::cout << "data[" << idxR << "]:" << std::hex << data[idxR] << std::dec << std::endl;
+	pix.B = data[(i*bitsPerPixel/8)+0];
+	pix.G = data[(i*bitsPerPixel/8)+1];
+	pix.R = data[(i*bitsPerPixel/8)+2];
+	return pix;
+}
 
 
 void amo::BMP::setPixel(int x, int y, BYTE R, BYTE G, BYTE B) {
@@ -286,7 +343,7 @@ void amo::BMP::setPixel(int x, int y, BYTE R, BYTE G, BYTE B) {
 	pix->R = R;
 	pix->G = G;
 	pix->B = B;
-	std::cout << *pix << std::endl;
+	//std::cout << *pix << std::endl;
 }
 
 void amo::BMP::setBox(int start_x, int start_y, int w, int h, BYTE R, BYTE G, BYTE B) {
@@ -297,7 +354,36 @@ void amo::BMP::setBox(int start_x, int start_y, int w, int h, BYTE R, BYTE G, BY
 			setPixel(start_x+j, start_y+i, R, G, B);
 }
 
-
+void amo::BMP::setZone(int start_x, int start_y, int w, int h, BYTE R, BYTE G, BYTE B) {
+	int i = 0;
+	int j = 0;
+	for (i=0; i<h; i++)
+		for (j=0; j<w; j++) {
+			if (R <= 255) {
+				if (R > 0) R--;
+				else R++;
+			} 
+			else {
+				R = 255;
+			}
+			if (G <= 255) {
+				if (G > 0) G = G-2;
+				else G = G+2;
+			} 
+			else {
+				G = 255;
+			}
+			if (B <= 255) {
+				if (B > 0) B = B-3;
+				else B = B+3;
+			} 
+			else {
+				B = 255;
+			}
+			setPixel(start_x+j, start_y+i, R, G, B);
+		}
+			
+}
 
 
 

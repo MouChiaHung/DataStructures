@@ -3150,11 +3150,24 @@ int main(int argc, char *argv[])
 #if 1
 	std::cout << GREEN << "****************** Bitmap ******************\n" << WHITE << std::endl;
 	amo::BMP bmp;
-	bmp.load("land.bmp");
+	bmp.load("red.bmp");
 	cout << bmp << endl;
 	
-	bmp.save("land.bmp");
+	amo::PX px = bmp.getPixel(5, 5);
+	std::cout << px << std::endl;
 	
+	//bmp.setBox(0, 0, 20, 20, 0x00, 0x00, 0x00);
+	bmp.setZone(0, 0, 10, 1, 0xff, 0xff, 0xff);
+	string str = bmp.save("red.bmp");
+	//char out[128];
+	//int l = str.copy(out, str.size(), 0);
+	//str[l] = '\0';
+	const char* out = str.c_str();
+	std::cout << GREEN << "saved as file" << out << WHITE << std::endl;
+	
+	amo::BMP bmp2;
+	bmp2.load(out);
+	cout << bmp2 << endl;
 	
 #endif
 	std::cout << GREEN << "\n****************** main return ******************" << WHITE << std::endl;
