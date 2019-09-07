@@ -3150,15 +3150,18 @@ int main(int argc, char *argv[])
 #if 1
 	std::cout << GREEN << "****************** Bitmap ******************\n" << WHITE << std::endl;
 	amo::BMP bmp;
-	bmp.load("red.bmp");
+	bmp.load("finger.bmp");
 	cout << bmp << endl;
 	
-	amo::PX px = bmp.getPixel(5, 5);
+	amo::PX px = bmp.getPixel(0, 0);
 	std::cout << px << std::endl;
 	
 	//bmp.setBox(0, 0, 20, 20, 0x00, 0x00, 0x00);
-	bmp.setZone(0, 0, 10, 1, 0xff, 0xff, 0xff);
-	string str = bmp.save("red.bmp");
+	bmp.setZone(0, 0, 10, 10, 0xcc, 0xcc, 0xcc);
+	amo::PX px2 = bmp.getPixel(0, 0);
+	std::cout << px2 << std::endl;
+	
+	string str = bmp.save("finger.bmp");
 	//char out[128];
 	//int l = str.copy(out, str.size(), 0);
 	//str[l] = '\0';

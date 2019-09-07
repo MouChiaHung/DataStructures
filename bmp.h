@@ -57,9 +57,9 @@ friend std::ostream& operator<<(std::ostream& os, const PX& px) {
 	while (t-- > 0) os << "-";
 	os << WHITE << std::endl;
 	
-	os << "[R]:" << px.R << std::endl;
-	os << "[G]:" << px.G << std::endl;
-	os << "[B]:" << px.B << std::endl;
+	os << "[R]:" << std::hex << (int)px.R << std::endl;
+	os << "[G]:" << std::hex << (int)px.G << std::endl;
+	os << "[B]:" << std::hex << (int)px.B << std::endl;
 	
 	t = 10;
 	os << GREEN;
@@ -80,7 +80,7 @@ public:
 	int INFO_SIZE;
 	int PALETTE_SIZE;
     //Header
-    UINT16 signature;  //Magic Number 0x4D42 stored in memory (Little-Endian) and saved in file 0x42 0x4D as "BM"
+    UINT16 signature;  //Magic Number 0x4D42 stored in memory (Little-Endian), 0x42 0x4D saved in file as "BM"
     UINT32 fileSize;   //File size in bytes
     UINT32 hreserved;  //unused (=0)
     UINT32 dataOffset; //File offset to Raster Data
@@ -124,6 +124,7 @@ public:
 	void setBox(int start_x, int start_y, int w, int h, BYTE R, BYTE G, BYTE B);
 	void setZone(int start_x, int start_y, int w, int h, BYTE R, BYTE G, BYTE B);
 	string save(const char* outputFilePath);
+	void traverseData();
 
 friend std::ostream& operator<<(std::ostream& os, const BMP& bmp) {
 	int t = 10;
@@ -315,21 +316,21 @@ string amo::BMP::save(const char* outputFilePath) {
 	return str;
 }
 
+void amo::BMP::traverseData() {
+	for (int k=0; k<size_data()/100; k++) 
+		printf("data[%d]:%x\n", k, data[k]);
+}
+
 amo::PX amo::BMP::getPixel(int x, int y) {
 	int i = 0+(y*width)+x;
 	int idxB = (i*bitsPerPixel/8)+0;
 	int idxG = (i*bitsPerPixel/8)+1;
 	int idxR = (i*bitsPerPixel/8)+2;
 	
-	for (int k=0; k<size_data(); k++) 
-		std::cout << "data[" << k << "]:" << std::hex << data[k] << std::dec << std::endl;
 	PX pix;
-	std::cout << "idxB:" << idxB << std::endl;
-	std::cout << "idxG:" << idxG << std::endl;
-	std::cout << "idxR:" << idxR << std::endl;
-	std::cout << "data[" << idxB << "]:" << std::hex << data[idxB] << std::dec << std::endl;
-	std::cout << "data[" << idxG << "]:" << std::hex << data[idxG] << std::dec << std::endl;
-	std::cout << "data[" << idxR << "]:" << std::hex << data[idxR] << std::dec << std::endl;
+	printf("data[%d]:%x\n", idxB, data[idxB]);
+	printf("data[%d]:%x\n", idxG, data[idxG]);
+	printf("data[%d]:%x\n", idxR, data[idxR]);
 	pix.B = data[(i*bitsPerPixel/8)+0];
 	pix.G = data[(i*bitsPerPixel/8)+1];
 	pix.R = data[(i*bitsPerPixel/8)+2];
