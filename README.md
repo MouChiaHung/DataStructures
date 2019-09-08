@@ -16,6 +16,10 @@ Demostration:
 - Skip list for dictionary implement
 ![image](https://github.com/MouChiaHung/DataStructures/blob/master/SkipList.PNG)
 
+- Bitmap implement
+![image](https://github.com/MouChiaHung/DataStructures/blob/master/bitmap.png)
+
+
 Practices includes:
  - C++ skills 
  - STL
@@ -28,3 +32,4 @@ Practices includes:
  - avl
  - dictionary
  - algorithm
+ - bitmap
