@@ -3150,18 +3150,46 @@ int main(int argc, char *argv[])
 #if 1
 	std::cout << GREEN << "****************** Bitmap ******************\n" << WHITE << std::endl;
 	amo::BMP bmp;
-	bmp.load("finger.bmp");
+	bmp.load("red.bmp");
 	cout << bmp << endl;
 	
 	amo::PX px = bmp.getPixel(0, 0);
 	std::cout << px << std::endl;
 	
 	//bmp.setBox(0, 0, 20, 20, 0x00, 0x00, 0x00);
-	bmp.setZone(0, 0, 10, 10, 0xcc, 0xcc, 0xcc);
+	//bmp.setZone(0, 0, 10, 10, 0xcc, 0xcc, 0xcc);
+	int i, j;
+	i = 0;
+	j = 0;
+	while (true) {
+		if (i >= bmp.width) break;
+		if (j >= bmp.height) break;
+		bmp.setZone(i, j, 10, 10, 0xcc, 0xcc, 0xcc);
+		i += 10;
+		j += 10;
+	}
+	
+	std::cout << "test 1" << std::endl;
+	amo::PX t1 = bmp.getPixel(bmp.width - 1, bmp.height - 1);
+	std::cout << t1 << std::endl;
+	bmp.setPixel(bmp.width - 1, bmp.height - 1, 0xff, 0xfe, 0xfc);
+	amo::PX t2 = bmp.getPixel(bmp.width - 1, bmp.height - 1);
+	std::cout << t2 << std::endl;
+	std::cout << "test 2" << std::endl;
+	
+	
+	i = 0;
+	j = bmp.height - 1;
+	while (false) {
+		if (i+20 >= bmp.width || j < 0) break;
+		bmp.setZone(i, j, 20, 20, 0x00, 0x00, 0x00);
+		i += 20;
+		j -= 1;
+	}
 	amo::PX px2 = bmp.getPixel(0, 0);
 	std::cout << px2 << std::endl;
 	
-	string str = bmp.save("finger.bmp");
+	string str = bmp.save("red.bmp");
 	//char out[128];
 	//int l = str.copy(out, str.size(), 0);
 	//str[l] = '\0';

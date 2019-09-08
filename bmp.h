@@ -42,9 +42,17 @@ class PX {
 protected:	
 
 public:
+	/** 
+	 * BGR saved in file
+	 */
+	/* 
 	BYTE R;
 	BYTE G;
 	BYTE B;
+	*/
+	BYTE B;
+	BYTE G;
+	BYTE R;
 	PX() {}
 	~PX() {}
 
@@ -341,9 +349,9 @@ amo::PX amo::BMP::getPixel(int x, int y) {
 void amo::BMP::setPixel(int x, int y, BYTE R, BYTE G, BYTE B) {
 	int i = 0+(y*width)+x;
 	PX *pix = (PX*) &data[i*bitsPerPixel/8]; 
-	pix->R = R;
-	pix->G = G;
-	pix->B = B;
+	pix->B = B; //&data[(i*bitsPerPixel/8)] + 0;
+	pix->G = G; //&data[(i*bitsPerPixel/8)] + sizeof(BYTE);
+	pix->R = R; //&data[(i*bitsPerPixel/8)] + sizeof(BYTE) + sizeof(BYTE);
 	//std::cout << *pix << std::endl;
 }
 
