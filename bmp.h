@@ -43,7 +43,7 @@ protected:
 
 public:
 	/** 
-	 * BGR saved in file
+	 * pixel is saved by BGR  
 	 */
 	/* 
 	BYTE R;
@@ -65,9 +65,9 @@ friend std::ostream& operator<<(std::ostream& os, const PX& px) {
 	while (t-- > 0) os << "-";
 	os << WHITE << std::endl;
 	
-	os << "[R]:" << std::hex << (int)px.R << std::endl;
-	os << "[G]:" << std::hex << (int)px.G << std::endl;
-	os << "[B]:" << std::hex << (int)px.B << std::endl;
+	os << "[R]:" << std::hex << (int)px.R << std::dec << std::endl;
+	os << "[G]:" << std::hex << (int)px.G << std::dec << std::endl;
+	os << "[B]:" << std::hex << (int)px.B << std::dec << std::endl;
 	
 	t = 10;
 	os << GREEN;
@@ -347,11 +347,26 @@ amo::PX amo::BMP::getPixel(int x, int y) {
 
 
 void amo::BMP::setPixel(int x, int y, BYTE R, BYTE G, BYTE B) {
+	if (x >= width || x < 0) {
+		std::cout << RED << "out range x:" << x << WHITE << std::endl;
+		//return;
+	}
+	if (y >= height || y < 0) {
+		std::cout << RED << "out range y:" << y << WHITE << std::endl;
+		//return;
+	}
+	
 	int i = 0+(y*width)+x;
-	PX *pix = (PX*) &data[i*bitsPerPixel/8]; 
+#if 1	
+	data[i*bitsPerPixel/8] = B;
+	data[i*bitsPerPixel/8+1] = G;
+	data[i*bitsPerPixel/8+2] = R;
+#else
+	PX *pix = (PX*) &data[i*bitsPerPixel/8]; 	
 	pix->B = B; //&data[(i*bitsPerPixel/8)] + 0;
 	pix->G = G; //&data[(i*bitsPerPixel/8)] + sizeof(BYTE);
 	pix->R = R; //&data[(i*bitsPerPixel/8)] + sizeof(BYTE) + sizeof(BYTE);
+#endif	
 	//std::cout << *pix << std::endl;
 }
 
@@ -366,32 +381,38 @@ void amo::BMP::setBox(int start_x, int start_y, int w, int h, BYTE R, BYTE G, BY
 void amo::BMP::setZone(int start_x, int start_y, int w, int h, BYTE R, BYTE G, BYTE B) {
 	int i = 0;
 	int j = 0;
-	for (i=0; i<h; i++)
+	int r = R;
+	int g = G;
+	int b = B;
+	for (i=0; i<h; i++) {
 		for (j=0; j<w; j++) {
-			if (R <= 255) {
-				if (R > 0) R--;
+			if (R <= 128) {
+				if (R-1 > 0) R = R-1;
 				else R++;
 			} 
 			else {
-				R = 255;
+				R = 128;
 			}
-			if (G <= 255) {
-				if (G > 0) G = G-2;
+			if (G <= 128) {
+				if (G-2 > 0) G = G-2;
 				else G = G+2;
 			} 
 			else {
-				G = 255;
+				G = 128;
 			}
-			if (B <= 255) {
-				if (B > 0) B = B-3;
+			if (B <= 128) {
+				if (B-3 > 0) B = B-3;
 				else B = B+3;
 			} 
 			else {
-				B = 255;
+				B = 128;
 			}
 			setPixel(start_x+j, start_y+i, R, G, B);
 		}
-			
+		R = r;
+		G = g;
+		B = b;
+	}	
 }
 
 

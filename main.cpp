@@ -3150,46 +3150,49 @@ int main(int argc, char *argv[])
 #if 1
 	std::cout << GREEN << "****************** Bitmap ******************\n" << WHITE << std::endl;
 	amo::BMP bmp;
-	bmp.load("red.bmp");
+	bmp.load("finger.bmp");
 	cout << bmp << endl;
-	
-	amo::PX px = bmp.getPixel(0, 0);
-	std::cout << px << std::endl;
 	
 	//bmp.setBox(0, 0, 20, 20, 0x00, 0x00, 0x00);
 	//bmp.setZone(0, 0, 10, 10, 0xcc, 0xcc, 0xcc);
-	int i, j;
+	int i, j, w, h;
 	i = 0;
 	j = 0;
+	w = 5;
+	h = 5;
 	while (true) {
 		if (i >= bmp.width) break;
 		if (j >= bmp.height) break;
-		bmp.setZone(i, j, 10, 10, 0xcc, 0xcc, 0xcc);
-		i += 10;
-		j += 10;
+		bmp.setZone(i, j, w, h, 0xcc, 0xcc, 0xcc);
+		i += w;
+		j += h;
 	}
 	
-	std::cout << "test 1" << std::endl;
-	amo::PX t1 = bmp.getPixel(bmp.width - 1, bmp.height - 1);
-	std::cout << t1 << std::endl;
-	bmp.setPixel(bmp.width - 1, bmp.height - 1, 0xff, 0xfe, 0xfc);
-	amo::PX t2 = bmp.getPixel(bmp.width - 1, bmp.height - 1);
-	std::cout << t2 << std::endl;
-	std::cout << "test 2" << std::endl;
-	
+	amo::PX p1 = bmp.getPixel(bmp.width-1, bmp.height-2);
+	std::cout << "Before p1:\n" << p1 << std::endl;
+	bmp.setPixel(bmp.width-1, bmp.height-2, 0xff, 0xfe, 0xfd);
+	p1 = bmp.getPixel(bmp.width-1, bmp.height-2);
+	std::cout << "After p1:\n" << p1 << std::endl;
 	
 	i = 0;
-	j = bmp.height - 1;
-	while (false) {
-		if (i+20 >= bmp.width || j < 0) break;
-		bmp.setZone(i, j, 20, 20, 0x00, 0x00, 0x00);
-		i += 20;
-		j -= 1;
+	j = 0;
+	w = 5;
+	h = 5;
+	int shift = 0;
+	while (true) {
+		i = (bmp.width-1)-shift-(w-1);
+		if (i >= bmp.width) break;
+		if (i < 0) break;
+		if (j >= bmp.height) break;
+		if (j < 0) break;
+		bmp.setZone(i, j, w, h, 0x00, 0x00, 0x00);
+		shift += w;
+		j += h;
 	}
-	amo::PX px2 = bmp.getPixel(0, 0);
-	std::cout << px2 << std::endl;
 	
-	string str = bmp.save("red.bmp");
+	bmp.setZone(0, bmp.height/2, bmp.width, 15, 0xcc, 0xcc, 0xcc);
+	
+	string str = bmp.save("finger.bmp");
 	//char out[128];
 	//int l = str.copy(out, str.size(), 0);
 	//str[l] = '\0';
